@@ -1,0 +1,247 @@
+{% extends 'restaurant/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="animate-fade-in">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
+        <div>
+            <h2 class="text-4xl font-bold text-white mb-2">Dashboard</h2>
+            <p class="text-gray-400">Welcome back, chef!</p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+            <a href="{% url 'add_table' %}" class="group relative px-5 py-3 bg-gradient-to-r from-accent-500 to-neon-orange rounded-xl font-semibold text-dark-900 hover:shadow-[0_0_30px_rgba(251,191,36,0.4)] transition-all duration-300">
+                <span class="relative flex items-center gap-2">
+                    <svg class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                    Add Table
+                </span>
+            </a>
+            <a href="{% url 'add_menu_item' %}" class="group relative px-5 py-3 glass rounded-xl font-semibold text-white hover:bg-white/10 transition-all duration-300 border border-white/10">
+                <span class="relative flex items-center gap-2">
+                    <svg class="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                    </svg>
+                    Menu Item
+                </span>
+            </a>
+            <a href="{% url 'add_order' %}" class="group relative px-5 py-3 glass rounded-xl font-semibold text-white hover:bg-white/10 transition-all duration-300 border border-white/10">
+                <span class="relative flex items-center gap-2">
+                    <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                    New Order
+                </span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+    <div class="glass-card rounded-2xl p-6 hover-lift border-glow relative overflow-hidden group">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/20 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500"></div>
+        <div class="relative flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-400 uppercase tracking-wider mb-1">Total Tables</p>
+                <p class="text-5xl font-bold text-white">{{ tables|length }}</p>
+                <p class="text-sm text-green-400 mt-2 flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Active
+                </p>
+            </div>
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center shadow-[0_0_30px_rgba(59,130,246,0.3)]">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+    
+    <div class="glass-card rounded-2xl p-6 hover-lift border-glow relative overflow-hidden group">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-500/20 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500"></div>
+        <div class="relative flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-400 uppercase tracking-wider mb-1">Menu Items</p>
+                <p class="text-5xl font-bold text-white">{{ menu_items|length }}</p>
+                <p class="text-sm text-green-400 mt-2 flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Available
+                </p>
+            </div>
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-400 to-neon-green flex items-center justify-center shadow-[0_0_30px_rgba(0,255,136,0.3)]">
+                <svg class="w-8 h-8 text-dark-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+    
+    <div class="glass-card rounded-2xl p-6 hover-lift border-glow relative overflow-hidden group">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-500/20 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500"></div>
+        <div class="relative flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-400 uppercase tracking-wider mb-1">Total Orders</p>
+                <p class="text-5xl font-bold text-white">{{ orders|length }}</p>
+                <p class="text-sm text-accent-400 mt-2 flex items-center gap-1">
+                    <svg class="w-4 h-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    Live
+                </p>
+            </div>
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center shadow-[0_0_30px_rgba(168,85,247,0.3)]">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+    <div class="glass-card rounded-2xl overflow-hidden hover-lift">
+        <div class="px-6 py-5 border-b border-white/5 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-white">Tables</h3>
+            </div>
+            <a href="{% url 'table_list' %}" class="text-sm text-accent-400 hover:text-accent-300 transition-colors">View All →</a>
+        </div>
+        <div class="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {% for table in tables|slice:":6" %}
+            <div class="group relative p-4 rounded-xl bg-dark-600/50 hover:bg-dark-600 transition-all duration-300 border border-white/5 hover:border-{{ table.status|default:'white' }}/20">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-2xl font-bold text-white">#{{ table.number }}</span>
+                    <span class="w-2 h-2 rounded-full {% if table.status == 'available' %}bg-green-400 shadow-[0_0_10px_rgba(0,255,136,0.5)]{% elif table.status == 'occupied' %}bg-red-400 shadow-[0_0_10px_rgba(255,68,68,0.5)]{% else %}bg-gray-400{% endif %}"></span>
+                </div>
+                <p class="text-sm text-gray-400">{{ table.seats }} seats</p>
+                <p class="text-xs text-gray-500 capitalize mt-1">{{ table.status }}</p>
+                <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                    <a href="{% url 'update_table' table.id %}" class="p-1.5 rounded-lg bg-white/10 hover:bg-accent-500/20 transition-colors">
+                        <svg class="w-3.5 h-3.5 text-gray-400 hover:text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                        </svg>
+                    </a>
+                    <a href="{% url 'delete_table' table.id %}" class="p-1.5 rounded-lg bg-white/10 hover:bg-red-500/20 transition-colors">
+                        <svg class="w-3.5 h-3.5 text-gray-400 hover:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-8 text-gray-500">No tables yet</div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="glass-card rounded-2xl overflow-hidden hover-lift">
+        <div class="px-6 py-5 border-b border-white/5 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-white">Menu Items</h3>
+            </div>
+            <a href="{% url 'menu_list' %}" class="text-sm text-accent-400 hover:text-accent-300 transition-colors">View All →</a>
+        </div>
+        <div class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {% for item in menu_items|slice:":4" %}
+            <div class="group relative p-4 rounded-xl bg-dark-600/50 hover:bg-dark-600 transition-all duration-300 border border-white/5">
+                <div class="flex items-start justify-between mb-2">
+                    <div>
+                        <h4 class="font-semibold text-white">{{ item.name }}</h4>
+                        <p class="text-xs text-gray-500 capitalize">{{ item.category }}</p>
+                    </div>
+                    <span class="px-2 py-1 rounded-lg text-sm font-bold text-accent-400 bg-accent-500/10">${{ item.price }}</span>
+                </div>
+                <div class="flex items-center justify-between mt-3">
+                    <span class="text-xs px-2 py-1 rounded-full {% if item.available %}bg-green-500/20 text-green-400{% else %}bg-red-500/20 text-red-400{% endif %}">
+                        {% if item.available %}Available{% else %}Unavailable{% endif %}
+                    </span>
+                    <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <a href="{% url 'update_menu_item' item.id %}" class="p-1.5 rounded-lg bg-white/10 hover:bg-accent-500/20 transition-colors">
+                            <svg class="w-3.5 h-3.5 text-gray-400 hover:text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                            </svg>
+                        </a>
+                        <a href="{% url 'delete_menu_item' item.id %}" class="p-1.5 rounded-lg bg-white/10 hover:bg-red-500/20 transition-colors">
+                            <svg class="w-3.5 h-3.5 text-gray-400 hover:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-8 text-gray-500">No menu items yet</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="glass-card rounded-2xl overflow-hidden hover-lift mt-6">
+    <div class="px-6 py-5 border-b border-white/5 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
+                <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-white">Recent Orders</h3>
+        </div>
+        <a href="{% url 'order_list' %}" class="text-sm text-accent-400 hover:text-accent-300 transition-colors">View All →</a>
+    </div>
+    <div class="overflow-x-auto">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
+            {% for order in orders|slice:":8" %}
+            <div class="group relative p-5 rounded-xl bg-dark-600/50 hover:bg-dark-600 transition-all duration-300 border border-white/5">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-lg font-bold text-white">#{{ order.id }}</span>
+                    <span class="px-2 py-1 rounded-full text-xs font-medium {% if order.status == 'completed' %}bg-green-500/20 text-green-400{% elif order.status == 'pending' %}bg-yellow-500/20 text-yellow-400{% elif order.status == 'cancelled' %}bg-red-500/20 text-red-400{% else %}bg-blue-500/20 text-blue-400{% endif %}">
+                        {{ order.status }}
+                    </span>
+                </div>
+                <div class="space-y-2 mb-4">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-400">Table</span>
+                        <span class="text-white">#{{ order.table.number }}</span>
+                    </div>
+                    {% if order.items.all %}
+                    <div class="flex flex-wrap gap-1">
+                        {% for item in order.items.all|slice:":2" %}
+                        <span class="px-2 py-0.5 rounded-lg text-xs bg-white/10 text-gray-300">{{ item.name }}</span>
+                        {% endfor %}
+                        {% if order.items.all|length > 2 %}
+                        <span class="px-2 py-0.5 rounded-lg text-xs bg-white/10 text-gray-400">+{{ order.items.all|length|add:"-2" }}</span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    <div class="flex justify-between text-sm pt-2 border-t border-white/5">
+                        <span class="text-gray-400">Total</span>
+                        <span class="text-accent-400 font-bold">${{ order.total_price }}</span>
+                    </div>
+                </div>
+                <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <a href="{% url 'update_order' order.id %}" class="flex-1 py-2 text-center text-sm rounded-lg bg-white/10 hover:bg-accent-500/20 transition-colors">Edit</a>
+                    <a href="{% url 'delete_order' order.id %}" class="flex-1 py-2 text-center text-sm rounded-lg bg-white/10 hover:bg-red-500/20 transition-colors text-red-400">Delete</a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-12 text-gray-500">No orders yet</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

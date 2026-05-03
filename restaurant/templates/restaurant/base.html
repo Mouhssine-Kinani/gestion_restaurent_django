@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Restaurant Manager{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            900: '#0a0a0f',
+                            800: '#12121a',
+                            700: '#1a1a25',
+                            600: '#252532',
+                            500: '#32324a',
+                        },
+                        accent: {
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        },
+                        neon: {
+                            cyan: '#00f5ff',
+                            magenta: '#ff00ff',
+                            green: '#00ff88',
+                            orange: '#ff6b35',
+                        }
+                    },
+                    animation: {
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'float': 'float 3s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'fade-in': 'fadeIn 0.3s ease-out',
+                    },
+                    keyframes: {
+                        glow: {
+                            '0%': { boxShadow: '0 0 20px rgba(251, 191, 36, 0.3)' },
+                            '100%': { boxShadow: '0 0 40px rgba(251, 191, 36, 0.6)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        }
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+        
+        * {
+            font-family: 'Outfit', sans-serif;
+        }
+        
+        .font-mono {
+            font-family: 'Space Mono', monospace;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
+            min-height: 100vh;
+        }
+        
+        .glass {
+            background: rgba(26, 26, 37, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .glass-card {
+            background: linear-gradient(145deg, rgba(37, 37, 50, 0.8) 0%, rgba(26, 26, 37, 0.6) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        
+        .glow-accent {
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.2), 0 0 60px rgba(251, 191, 36, 0.1);
+        }
+        
+        .glow-neon-cyan {
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+        }
+        
+        .glow-neon-green {
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+        
+        .text-gradient {
+            background: linear-gradient(90deg, #fbbf24, #ff6b35, #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: shimmer 3s linear infinite;
+        }
+        
+        @keyframes shimmer {
+            to { background-position: 200% center; }
+        }
+        
+        .border-glow {
+            position: relative;
+        }
+        
+        .border-glow::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.5), transparent, rgba(0, 245, 255, 0.3));
+            -webkit-mask: linear-gradient(#fff 0 0) content-, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+        
+        .mesh-bg {
+            background: 
+                radial-gradient(at 40% 20%, rgba(251, 191, 36, 0.15) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, rgba(0, 245, 255, 0.1) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, rgba(255, 0, 255, 0.08) 0px, transparent 50%),
+                radial-gradient(at 80% 50%, rgba(0, 255, 136, 0.08) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(255, 107, 53, 0.1) 0px, transparent 50%);
+        }
+        
+        .hover-lift {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        input[type="text"], input[type="password"], input[type="email"], input[type="number"], select, textarea {
+            background: rgba(26, 26, 37, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: rgba(251, 191, 36, 0.5);
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.2);
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: rgba(26, 26, 37, 0.5);
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: rgba(251, 191, 36, 0.3);
+            border-radius: 3px;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+            background: rgba(251, 191, 36, 0.5);
+        }
+        
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="text-white min-h-screen mesh-bg">
+    <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="{% url 'dashboard' %}" class="flex items-center space-x-3 group">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-400 to-neon-orange flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
+                            <svg class="w-6 h-6 text-dark-900" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H12a1 1 0 100-2H6.414a1 1 0 00-1.017.089l-.893.892a1 1 0 01-.894 0l-.894-.892A1 1 0 013 14H2V1z"/>
+                            </svg>
+                        </div>
+                        <span class="text-xl font-bold text-gradient hidden sm:block">RESTO</span>
+                    </a>
+                </div>
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="{% url 'dashboard' %}" class="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 {% if request.resolver_match.url_name == 'dashboard' %}text-accent-500 bg-accent-500/10{% else %}text-gray-400 hover:text-white hover:bg-white/5{% endif %}">Dashboard</a>
+                    <a href="{% url 'table_list' %}" class="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 {% if request.resolver_match.url_name == 'table_list' %}text-accent-500 bg-accent-500/10{% else %}text-gray-400 hover:text-white hover:bg-white/5{% endif %}">Tables</a>
+                    <a href="{% url 'menu_list' %}" class="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 {% if request.resolver_match.url_name == 'menu_list' %}text-accent-500 bg-accent-500/10{% else %}text-gray-400 hover:text-white hover:bg-white/5{% endif %}">Menu</a>
+                    <a href="{% url 'order_list' %}" class="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 {% if request.resolver_match.url_name == 'order_list' %}text-accent-500 bg-accent-500/10{% else %}text-gray-400 hover:text-white hover:bg-white/5{% endif %}">Orders</a>
+                    <a href="{% url 'logout' %}" class="ml-2 px-4 py-2 rounded-xl text-sm font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all duration-300">Logout</a>
+                </div>
+                <div class="flex md:hidden items-center">
+                    <button id="mobile-menu-btn" class="p-2 rounded-xl hover:bg-white/10 transition-colors">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden glass border-t border-white/5">
+            <div class="px-4 py-4 space-y-2">
+                <a href="{% url 'dashboard' %}" class="block px-4 py-3 rounded-xl text-base font-medium hover:bg-white/10">Dashboard</a>
+                <a href="{% url 'table_list' %}" class="block px-4 py-3 rounded-xl text-base font-medium hover:bg-white/10">Tables</a>
+                <a href="{% url 'menu_list' %}" class="block px-4 py-3 rounded-xl text-base font-medium hover:bg-white/10">Menu</a>
+                <a href="{% url 'order_list' %}" class="block px-4 py-3 rounded-xl text-base font-medium hover:bg-white/10">Orders</a>
+                <a href="{% url 'logout' %}" class="block px-4 py-3 rounded-xl text-base font-medium text-red-400 hover:bg-red-500/20">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="border-t border-white/5 py-8 mt-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-sm text-gray-500">&copy; 2024 RESTO. Crafted with fire.</p>
+        </div>
+    </footer>
+
+    <script>
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>
