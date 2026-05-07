@@ -22,6 +22,9 @@
       }
     </script>
 <style>
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
         body { font-family: 'Outfit', sans-serif; background-color: theme('colors.background'); color: theme('colors.on-background'); }
     </style>
 </head>
@@ -40,7 +43,7 @@
 <a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-colors" href="{% url 'order_list' %}"><span class="material-symbols-outlined">receipt_long</span>Orders</a>
 </div>
 <div class="border-t border-outline-variant/30 py-md font-body-main text-body-main">
-<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-colors" href="#"><span class="material-symbols-outlined">settings</span>Settings</a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-colors" href="{% url 'settings' %}"><span class="material-symbols-outlined">settings</span>Settings</a>
 <a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-colors" href="{% url 'logout' %}"><span class="material-symbols-outlined">logout</span>Logout</a>
 </div>
 </nav>
@@ -56,7 +59,7 @@
 </div>
 </header>
 <main class="flex-1 ml-64 mt-[88px] p-margin bg-background">
-<form method="post">
+<form method="post" enctype="multipart/form-data">
 {% csrf_token %}
 <div class="mb-lg flex justify-between items-end border-b border-outline-variant/30 pb-lg">
 <div>
@@ -78,6 +81,10 @@
 <div class="border border-outline-variant/30 rounded-xl p-xl bg-surface-container">
 <h3 class="font-h2-subhead text-h2-subhead text-on-surface mb-lg pb-sm border-b border-outline-variant/30">Core Details</h3>
 <div class="space-y-8">
+<div>
+<label class="block font-label-caps text-label-caps text-on-surface-variant uppercase mb-3" for="id_image">Item Image</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-md p-4 font-body-main text-body-main text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors file:bg-primary file:text-on-primary file:border-0 file:px-md file:py-sm file:mr-md file:font-data-mono file:text-data-mono file:cursor-pointer" type="file" id="id_image" name="image" accept="image/*"/>
+</div>
 <div>
 <label class="block font-label-caps text-label-caps text-on-surface-variant uppercase mb-3" for="id_name">Item Name</label>
 <input class="w-full bg-surface-container-lowest border border-outline-variant rounded-md p-4 font-body-main text-body-main text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" type="text" id="id_name" name="name" value="{{ form.name.value|default:'' }}"/>
@@ -105,7 +112,7 @@
 <h3 class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-lg tracking-widest flex items-center gap-2"><span class="material-symbols-outlined text-sm">visibility</span>Live Menu Preview</h3>
 <div class="border rounded-2xl overflow-hidden shadow-2xl relative group bg-surface-container border-outline-variant/30 flex flex-col">
 <div class="h-64 w-full relative">
-<img alt="Menu Item Preview" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWuXpDVkeY7U0Ck37me2dXPQEOglY1grFAVUas4ZP6RJXDke4S8ZQV0qu5MffsgVRMtYHNE3b5wZZCtuSqj4RPJJ8z5e3Xqooio5GGT4jzXWnPbeQbgVwQkob0-3TfvO3fDWTXcTMtv-X6i6108dQFxtqb_F_4lu8VClHMaqXG2fEB3dQYXaduU2MoxBOH3YGg7TWEAXBOWe70NGtvkX5k8rok4HrWXBAUz_h2Q-u0X3GYMSHN9vH36ZyEkD0z08I8jbDqp-Vmvb4"/>
+<img id="preview-image" alt="Menu Item Preview" class="w-full h-full object-cover" src="{% if form.instance.image %}{{ form.instance.image.url }}{% else %}https://lh3.googleusercontent.com/aida-public/AB6AXuCWuXpDVkeY7U0Ck37me2dXPQEOglY1grFAVUas4ZP6RJXDke4S8ZQV0qu5MffsgVRMtYHNE3b5wZZCtuSqj4RPJJ8z5e3Xqooio5GGT4jzXWnPbeQbgVwQkob0-3TfvO3fDWTXcTMtv-X6i6108dQFxtqb_F_4lu8VClHMaqXG2fEB3dQYXaduU2MoxBOH3YGg7TWEAXBOWe70NGtvkX5k8rok4HrWXBAUz_h2Q-u0X3GYMSHN9vH36ZyEkD0z08I8jbDqp-Vmvb4{% endif %}"/>
 <div class="absolute top-4 right-4 bg-surface-container-lowest/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-outline-variant/50 flex items-center gap-2 shadow-lg">
 <div class="w-2 h-2 rounded-full bg-secondary"></div>
 <span class="font-label-caps text-label-caps text-secondary uppercase tracking-wider" id="preview-status">{% if form.available.value == 'Yes' %}Available{% else %}Unavailable{% endif %}</span>
@@ -122,5 +129,22 @@
 </div>
 </div>
 </form>
+<script>
+(function() {
+  const imageInput = document.getElementById('id_image');
+  const previewImage = document.getElementById('preview-image');
+  if (imageInput && previewImage) {
+    imageInput.addEventListener('change', function() {
+      if (this.files && this.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          previewImage.src = e.target.result;
+        };
+        reader.readAsDataURL(this.files[0]);
+      }
+    });
+  }
+})();
+</script>
 </main>
 </body></html>

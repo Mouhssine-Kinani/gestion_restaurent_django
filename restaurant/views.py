@@ -61,7 +61,7 @@ def menu_list(request):
 @login_required
 def add_menu_item(request):
     if request.method == 'POST':
-        form = MenuItemForm(request.POST)
+        form = MenuItemForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             return redirect('menu_list')
@@ -73,7 +73,7 @@ def add_menu_item(request):
 def update_menu_item(request, id):
     item = get_object_or_404(MenuItem, id=id)
     if request.method == 'POST':
-        form = MenuItemForm(request.POST, instance=item)
+        form = MenuItemForm(request.POST, request.FILES, instance=item)
         if form.is_valid():
             form.save()
             return redirect('menu_list')
@@ -163,6 +163,10 @@ def logout_user(request):
     return redirect('login')
 
 
+
+@login_required
+def settings_view(request):
+    return render(request, 'restaurant/settings.html')
 
 @login_required
 def dashboard(request):

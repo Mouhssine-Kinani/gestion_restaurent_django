@@ -24,6 +24,11 @@
           }
         }
     </script>
+<style>
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number] { -moz-appearance: textfield; }
+</style>
 </head>
 <body class="bg-background text-on-background font-body-main antialiased selection:bg-primary/30 selection:text-primary min-h-screen flex">
 <nav class="bg-surface-container font-body-main text-body-main docked full-height left-0 w-64 border-r border-outline-variant/30 backdrop-blur-xl fixed left-0 top-0 h-full flex flex-col z-50 transition-all">
@@ -38,7 +43,7 @@
 <a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-colors" href="{% url 'order_list' %}"><span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span><span>Orders</span></a>
 </div>
 <div class="border-t border-outline-variant/30 py-md">
-<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-colors" href="#"><span class="material-symbols-outlined" data-icon="settings">settings</span><span>Settings</span></a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-colors" href="{% url 'settings' %}"><span class="material-symbols-outlined" data-icon="settings">settings</span><span>Settings</span></a>
 <a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-colors" href="{% url 'logout' %}"><span class="material-symbols-outlined" data-icon="logout">logout</span><span>Logout</span></a>
 </div>
 </nav>

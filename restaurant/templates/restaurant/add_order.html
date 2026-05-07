@@ -109,6 +109,7 @@
         ::-webkit-scrollbar-track { background: rgba(30, 32, 35, 0.5); }
         ::-webkit-scrollbar-thumb { background: rgba(77, 70, 53, 0.8); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #99907c; }
+        .menu-item-card.selected { border-color: rgba(242, 202, 80, 0.4); background: rgba(242, 202, 80, 0.05); }
     </style>
 </head>
 <body class="bg-background text-on-surface font-body-main antialiased selection:bg-primary/20 selection:text-primary">
@@ -125,7 +126,7 @@
 <a class="flex items-center gap-md bg-primary/10 text-primary border-r-2 border-primary py-3 px-lg opacity-90 scale-[0.99] transition-all" href="#"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">receipt_long</span><span class="font-body-main text-body-main font-medium">Orders</span></a>
 </div>
 <div class="mt-auto border-t border-outline-variant/30 py-md flex flex-col gap-sm">
-<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors" href="#"><span class="material-symbols-outlined">settings</span><span class="font-body-main text-body-main">Settings</span></a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors" href="{% url 'settings' %}"><span class="material-symbols-outlined">settings</span><span class="font-body-main text-body-main">Settings</span></a>
 <a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors" href="{% url 'logout' %}"><span class="material-symbols-outlined">logout</span><span class="font-body-main text-body-main">Logout</span></a>
 </div>
 </nav>
@@ -175,13 +176,13 @@
 </div>
 <div class="relative flex-grow max-w-xs">
 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
-<input class="w-full bg-surface-container-highest border border-outline-variant/40 rounded-lg py-2 pl-9 pr-4 text-on-surface focus:outline-none focus:border-primary/50 focus:bg-surface transition-all font-data-mono text-data-mono" placeholder="Filter items..." type="text"/>
+<input class="w-full bg-surface-container-highest border border-outline-variant/40 rounded-lg py-2 pl-9 pr-4 text-on-surface focus:outline-none focus:border-primary/50 focus:bg-surface transition-all font-data-mono text-data-mono" id="item-search" placeholder="Filter items..." type="text"/>
 </div>
 </div>
 <div class="flex-1 overflow-y-auto pr-sm pb-xl">
-<div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-sm">
+<div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-sm" id="menu-items-grid">
 {% for item in menu_items %}
-<div class="glass-panel border border-outline-variant/20 rounded-xl p-md flex flex-col justify-between hover:border-primary/30 transition-colors group cursor-pointer relative overflow-hidden">
+<div class="glass-panel border border-outline-variant/20 rounded-xl p-md flex flex-col justify-between hover:border-primary/30 transition-colors group cursor-pointer relative overflow-hidden menu-item-card" data-id="{{ item.id }}" data-name="{{ item.name }}" data-price="{{ item.price }}">
 <div class="absolute inset-0 bg-gradient-to-br from-transparent to-surface-container-highest opacity-50 pointer-events-none"></div>
 <div class="flex justify-between items-start mb-sm relative z-10">
 <div>
@@ -195,7 +196,7 @@
 <span class="font-label-caps text-label-caps text-outline">{% if item.available == 'Yes' %}Available{% else %}Sold Out{% endif %}</span>
 </div>
 <label class="flex items-center gap-xs cursor-pointer">
-<input type="checkbox" name="items" value="{{ item.id }}" class="w-4 h-4 rounded border-outline-variant bg-surface-container-highest text-primary focus:ring-primary"/>
+<input type="checkbox" name="items" value="{{ item.id }}" class="item-checkbox w-4 h-4 rounded border-outline-variant bg-surface-container-highest text-primary focus:ring-primary"/>
 </label>
 </div>
 </div>
@@ -217,11 +218,26 @@
 <option value="served" class="bg-surface text-on-surface">Served</option>
 </select>
 </div>
+<div>
+<span class="font-label-caps text-label-caps text-outline block mb-1">Items</span>
+<span class="font-data-mono text-data-mono text-primary" id="item-count">0</span>
 </div>
-<div class="flex-1 overflow-y-auto p-md flex flex-col gap-sm">
-<p class="font-body-sm text-body-sm text-on-surface-variant text-center py-lg">Select items from the menu to build the order.</p>
+</div>
+<div class="flex-1 overflow-y-auto p-md flex flex-col gap-sm" id="selected-items-list">
+<p class="font-body-sm text-body-sm text-on-surface-variant text-center py-lg" id="empty-message">Select items from the menu to build the order.</p>
 </div>
 <div class="p-md border-t border-outline-variant/30 bg-surface-container-highest/80">
+<div class="space-y-2 mb-4">
+<div class="flex justify-between font-data-mono text-data-mono text-on-surface-variant">
+<span>Subtotal</span>
+<span id="order-subtotal">$0</span>
+</div>
+<div class="h-px w-full bg-outline-variant/30 my-2"></div>
+<div class="flex justify-between items-center">
+<span class="font-body-main text-body-main font-medium text-on-surface">Total</span>
+<span class="font-data-mono text-h2-subhead text-primary font-bold" id="order-total">$0</span>
+</div>
+</div>
 <div class="flex gap-sm">
 <a href="{% url 'order_list' %}" class="flex-1 py-3 border border-outline-variant text-on-surface rounded-lg hover:bg-surface-bright transition-colors font-body-main text-body-main font-medium text-center">Cancel</a>
 <button type="submit" class="flex-[2] py-3 bg-primary text-on-primary rounded-lg hover:bg-primary-fixed transition-all font-body-main text-body-main font-medium shadow-[0_4px_14px_rgba(242,202,80,0.25)] flex justify-center items-center gap-2">
@@ -234,4 +250,84 @@
 </div>
 </form>
 </main>
+<script>
+(function() {
+  const checkboxes = document.querySelectorAll('.item-checkbox');
+  const selectedList = document.getElementById('selected-items-list');
+  const emptyMessage = document.getElementById('empty-message');
+  const itemCount = document.getElementById('item-count');
+  const orderSubtotal = document.getElementById('order-subtotal');
+  const orderTotal = document.getElementById('order-total');
+  const itemData = {};
+
+  document.querySelectorAll('.menu-item-card').forEach(function(card) {
+    itemData[card.dataset.id] = {
+      name: card.dataset.name,
+      price: parseFloat(card.dataset.price)
+    };
+  });
+
+  function updateOrderSummary() {
+    let selected = [];
+    checkboxes.forEach(function(cb) {
+      if (cb.checked) {
+        selected.push({
+          id: cb.value,
+          name: itemData[cb.value].name,
+          price: itemData[cb.value].price
+        });
+      }
+    });
+
+    if (selected.length === 0) {
+      selectedList.innerHTML = '<p class="font-body-sm text-body-sm text-on-surface-variant text-center py-lg" id="empty-message">Select items from the menu to build the order.</p>';
+      itemCount.textContent = '0';
+      orderSubtotal.textContent = '$0';
+      orderTotal.textContent = '$0';
+      return;
+    }
+
+    let html = '';
+    let subtotal = 0;
+
+    selected.forEach(function(item) {
+      subtotal += item.price;
+      html += '<div class="flex justify-between items-start pb-sm border-b border-outline-variant/20">';
+      html += '<div class="flex-1 pr-sm">';
+      html += '<h4 class="font-body-main text-body-sm font-medium text-on-surface mb-1">' + item.name + '</h4>';
+      html += '</div>';
+      html += '<div class="flex items-center gap-2">';
+      html += '<span class="font-data-mono text-data-mono text-on-surface">$' + item.price.toFixed(2) + '</span>';
+      html += '</div>';
+      html += '</div>';
+    });
+
+    selectedList.innerHTML = html;
+    itemCount.textContent = selected.length;
+    orderSubtotal.textContent = '$' + subtotal.toFixed(2);
+    orderTotal.textContent = '$' + subtotal.toFixed(2);
+  }
+
+  checkboxes.forEach(function(cb) {
+    cb.addEventListener('change', function() {
+      var card = this.closest('.menu-item-card');
+      if (card) {
+        card.classList.toggle('selected', this.checked);
+      }
+      updateOrderSummary();
+    });
+  });
+
+  var searchInput = document.getElementById('item-search');
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      var query = this.value.toLowerCase();
+      document.querySelectorAll('.menu-item-card').forEach(function(card) {
+        var name = (card.dataset.name || '').toLowerCase();
+        card.style.display = name.includes(query) ? '' : 'none';
+      });
+    });
+  }
+})();
+</script>
 </body></html>

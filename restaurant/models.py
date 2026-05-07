@@ -15,6 +15,7 @@ class MenuItem(models.Model):
     name = models.CharField(max_length=100)
     price = models.IntegerField()
     available = models.CharField(max_length=100,choices=[('Yes','Yes'), ('No','No')])
+    image = models.ImageField(upload_to='menu_items/', blank=True, null=True)
 
 
     def __str__(self):

@@ -21,6 +21,9 @@ urlpatterns = [
     path('orders/update/<int:id>/', views.update_order, name='update_order'),
     path('orders/delete/<int:id>/', views.delete_order, name='delete_order'),
 
+    # Settings
+    path('settings/', views.settings_view, name='settings'),
+
     # Auth
     path('register/', views.register_user, name='register'),
     path('login/', views.login_user, name='login'),

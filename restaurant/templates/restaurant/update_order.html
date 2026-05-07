@@ -46,7 +46,7 @@
 <a class="flex items-center gap-md bg-primary/10 text-primary border-r-2 border-primary py-3 px-lg hover:bg-surface-bright transition-colors opacity-90 scale-[0.99]" href="#"><span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">receipt_long</span><span>Orders</span></a>
 </div>
 <div class="py-lg border-t border-outline-variant/30 flex flex-col gap-sm">
-<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">settings</span><span>Settings</span></a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-colors" href="{% url 'settings' %}"><span class="material-symbols-outlined text-[20px]">settings</span><span>Settings</span></a>
 <a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-colors" href="{% url 'logout' %}"><span class="material-symbols-outlined text-[20px]">logout</span><span>Logout</span></a>
 </div>
 </nav>
@@ -67,18 +67,22 @@
 <main class="ml-64 pt-[88px] p-margin min-h-screen">
 <form method="post">
 {% csrf_token %}
+<input type="hidden" name="table" value="{{ form.instance.table.id }}">
+{% for item in form.instance.items.all %}
+<input type="hidden" name="items" value="{{ item.id }}">
+{% endfor %}
 <div class="mb-lg flex justify-between items-end">
 <div>
 <div class="flex items-center gap-sm text-on-surface-variant font-label-caps text-label-caps uppercase tracking-widest mb-sm">
 <a class="inline-flex items-center gap-xs hover:text-primary transition-colors" href="{% url 'order_list' %}"><span class="material-symbols-outlined text-[14px]">arrow_left_alt</span>Back to List</a>
 <span class="text-outline-variant">/</span>
-<span class="text-primary">Order #ORD-{{ order.id|stringformat:"04d" }}</span>
+<span class="text-primary">Order #ORD-{{ form.instance.id|stringformat:"04d" }}</span>
 </div>
 <h1 class="font-h1-header text-h1-header text-on-surface flex items-center gap-md">
                     Update Status
                     <span class="bg-surface border border-outline-variant px-sm py-xs rounded-DEFAULT font-data-mono text-data-mono text-on-surface-variant flex items-center gap-xs">
 <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                        Table {{ order.table.number }}
+                        Table {{ form.instance.table.number }}
                     </span>
 </h1>
 </div>
@@ -86,6 +90,11 @@
 {% if form.errors %}
 <div class="mb-lg p-md bg-error-container/20 border border-error/30 rounded-lg">
 <p class="font-body-sm text-body-sm text-error">Please correct the errors below.</p>
+{% for field in form %}
+{% for error in field.errors %}
+<p class="font-body-sm text-body-sm text-error ml-sm mt-xs">- {{ error }}</p>
+{% endfor %}
+{% endfor %}
 </div>
 {% endif %}
 <div class="grid grid-cols-12 gap-gutter">
@@ -95,7 +104,7 @@
 <h2 class="font-h2-subhead text-h2-subhead text-on-surface border-b border-outline-variant/30 pb-sm mb-lg">Order Progression</h2>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-md flex-1">
 <label class="relative group cursor-pointer h-full">
-<input class="peer sr-only" name="status" type="radio" value="Pending" {% if order.status == 'Pending' %}checked{% endif %}/>
+<input class="peer sr-only" name="status" type="radio" value="Pending" {% if form.instance.status == 'Pending' %}checked{% endif %}/>
 <div class="h-full flex flex-col items-center justify-center p-xl rounded-xl border border-outline-variant/50 bg-surface/50 text-on-surface-variant transition-all duration-300 group-hover:bg-surface-bright peer-checked:border-primary peer-checked:bg-primary/5 peer-checked:text-primary peer-checked:shadow-[0_0_20px_rgba(242,202,80,0.15)]">
 <span class="material-symbols-outlined text-[48px] mb-md opacity-70 peer-checked:opacity-100 peer-checked:animate-pulse">schedule</span>
 <span class="font-h2-subhead text-h2-subhead mb-xs">Pending</span>
@@ -104,7 +113,7 @@
 </div>
 </label>
 <label class="relative group cursor-pointer h-full">
-<input class="peer sr-only" name="status" type="radio" value="served" {% if order.status == 'served' %}checked{% endif %}/>
+<input class="peer sr-only" name="status" type="radio" value="served" {% if form.instance.status == 'served' %}checked{% endif %}/>
 <div class="h-full flex flex-col items-center justify-center p-xl rounded-xl border border-outline-variant/50 bg-surface/50 text-on-surface-variant transition-all duration-300 group-hover:bg-surface-bright peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:text-primary peer-checked:shadow-[0_0_20px_rgba(242,202,80,0.15)]">
 <span class="material-symbols-outlined text-[48px] mb-md opacity-70 peer-checked:opacity-100" style="font-variation-settings: 'FILL' 1;">room_service</span>
 <span class="font-h2-subhead text-h2-subhead mb-xs text-on-surface">Served</span>
@@ -113,7 +122,7 @@
 </div>
 </label>
 <label class="relative group cursor-pointer h-full">
-<input class="peer sr-only" name="status" type="radio" value="cancelled" {% if order.status == 'cancelled' %}checked{% endif %}/>
+<input class="peer sr-only" name="status" type="radio" value="cancelled" {% if form.instance.status == 'cancelled' %}checked{% endif %}/>
 <div class="h-full flex flex-col items-center justify-center p-xl rounded-xl border border-outline-variant/50 bg-surface/50 text-on-surface-variant transition-all duration-300 group-hover:bg-surface-bright peer-checked:border-error peer-checked:bg-error/5 peer-checked:text-error peer-checked:shadow-[0_0_20px_rgba(255,180,171,0.15)]">
 <span class="material-symbols-outlined text-[48px] mb-md opacity-70 peer-checked:opacity-100">cancel</span>
 <span class="font-h2-subhead text-h2-subhead mb-xs">Cancelled</span>
@@ -136,10 +145,10 @@
 <aside class="bg-surface/40 backdrop-blur-md border border-outline-variant/30 rounded-xl p-lg h-full flex flex-col">
 <h2 class="font-h2-subhead text-h2-subhead text-on-surface border-b border-outline-variant/30 pb-sm mb-md flex justify-between items-center">
                         Manifest
-                        <span class="font-data-mono text-data-mono text-on-surface-variant text-sm">{{ order.items.count }} Items</span>
+                        <span class="font-data-mono text-data-mono text-on-surface-variant text-sm">{{ form.instance.items.count }} Items</span>
 </h2>
 <div class="flex-1 overflow-y-auto pr-sm -mr-sm">
-{% for item in order.items.all %}
+{% for item in form.instance.items.all %}
 <div class="py-sm border-b border-outline-variant/20 flex justify-between items-start hover:bg-surface-bright/30 transition-colors rounded-sm px-xs">
 <div class="flex gap-sm">
 <div>
@@ -153,7 +162,7 @@
 <div class="mt-md pt-md border-t border-outline-variant/40">
 <div class="flex justify-between items-center pt-sm border-t border-outline-variant/20">
 <span class="font-h2-subhead text-h2-subhead text-on-surface">Total</span>
-<span class="font-data-mono text-data-mono text-primary text-lg font-bold">${{ order.total }}</span>
+<span class="font-data-mono text-data-mono text-primary text-lg font-bold">${{ form.instance.total }}</span>
 </div>
 </div>
 </aside>

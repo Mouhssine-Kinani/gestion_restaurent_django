@@ -133,7 +133,7 @@
 </div>
 <div class="mt-auto p-md border-t border-outline-variant/30">
 <ul class="flex flex-col gap-xs">
-<li><a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-3 hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors rounded-lg" href="#"><span class="material-symbols-outlined text-[20px]" data-icon="settings">settings</span><span class="sidebar-text font-medium">Settings</span></a></li>
+<li><a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-3 hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors rounded-lg" href="{% url 'settings' %}"><span class="material-symbols-outlined text-[20px]" data-icon="settings">settings</span><span class="sidebar-text font-medium">Settings</span></a></li>
 <li><a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-3 hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors rounded-lg" href="{% url 'logout' %}"><span class="material-symbols-outlined text-[20px]" data-icon="logout">logout</span><span class="sidebar-text font-medium">Logout</span></a></li>
 </ul>
 </div>
@@ -170,9 +170,13 @@
 <div class="glass-panel rounded-2xl p-5 flex gap-5 transition-all hover:bg-surface-container/80 hover:border-outline-variant/50 group hover:shadow-xl relative overflow-hidden {% if item.available == 'No' %}opacity-70{% endif %}">
 <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
 <div class="w-32 h-32 rounded-xl bg-surface-container overflow-hidden shrink-0 shadow-inner relative">
+{% if item.image %}
+<img src="{{ item.image.url }}" alt="{{ item.name }}" class="w-full h-full object-cover"/>
+{% else %}
 <div class="w-full h-full bg-surface-container-highest flex items-center justify-center">
 <span class="material-symbols-outlined text-4xl text-on-surface-variant/30">restaurant_menu</span>
 </div>
+{% endif %}
 {% if item.available == 'No' %}<div class="absolute inset-0 bg-surface/40 flex items-center justify-center backdrop-blur-[1px]"><span class="font-label-caps text-xs text-on-surface-variant uppercase tracking-widest bg-surface/80 px-2 py-1 rounded backdrop-blur-md">Sold Out</span></div>{% endif %}
 </div>
 <div class="flex-1 flex flex-col justify-between relative z-10">

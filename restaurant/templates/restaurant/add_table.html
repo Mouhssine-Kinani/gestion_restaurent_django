@@ -23,6 +23,9 @@
         }
     </script>
 <style>
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
         .glass-panel { background-color: rgba(30, 32, 35, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(212, 175, 55, 0.1); }
         .glow-active { box-shadow: 0 0 15px rgba(212, 175, 55, 0.2); border-color: rgba(212, 175, 55, 0.5); }
         .sidebar { transition: width 0.3s ease; }
@@ -70,7 +73,7 @@
 </div>
 <div class="p-lg border-t border-outline-variant/30 mt-auto">
 <ul class="space-y-base">
-<li><a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors" href="#"><span class="material-symbols-outlined min-w-[24px]" data-icon="settings">settings</span><span class="font-body-main text-body-main sidebar-text whitespace-nowrap">Settings</span></a></li>
+<li><a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors" href="{% url 'settings' %}"><span class="material-symbols-outlined min-w-[24px]" data-icon="settings">settings</span><span class="font-body-main text-body-main sidebar-text whitespace-nowrap">Settings</span></a></li>
 <li><a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors" href="{% url 'logout' %}"><span class="material-symbols-outlined min-w-[24px]" data-icon="logout">logout</span><span class="font-body-main text-body-main sidebar-text whitespace-nowrap">Logout</span></a></li>
 </ul>
 </div>
