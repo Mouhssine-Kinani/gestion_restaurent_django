@@ -1,172 +1,210 @@
-{% extends 'restaurant/base.html' %}
-
-{% block title %}Menu{% endblock %}
-{% block title_text %}Our Menu{% endblock %}
-{% block breadcrumb %}Home &rsaquo; Menu{% endblock %}
-
-{% block page_actions %}
-<div style="display:flex;gap:10px;align-items:center;">
-  <form method="get" style="position:relative;">
-    <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--ghost);display:flex;">
-      <i data-lucide="search" style="width:13px;height:13px;"></i>
-    </span>
-    <input type="text" name="q" placeholder="Search dishes…" value="{{ request.GET.q|default:'' }}"
-      style="height:38px;padding:0 12px 0 32px;background:var(--surface-hi);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--cream);font-size:13px;font-weight:300;outline:none;width:200px;transition:all var(--transition);"
-      onfocus="this.style.borderColor='var(--ember)'" onblur="this.style.borderColor='var(--border)'">
-  </form>
-  <a href="{% url 'add_menu_item' %}" class="btn btn-primary" style="height:38px;padding:0 16px;font-size:13px;">
-    <i data-lucide="plus" style="width:14px;height:14px;"></i>
-    Add Item
-  </a>
-</div>
-{% endblock %}
-
-{% block content %}
-<div>
-  <!-- Category Tabs -->
-  <div
-    style="display:flex;gap:6px;margin-bottom:28px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:16px;">
-    <button onclick="filterCat('all',this)" id="cat-all"
-      style="padding:7px 18px;border-radius:var(--radius-sm);border:none;font-family:var(--font-sans);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--transition);background:var(--ember);color:#fff;letter-spacing:0.04em;">
-      All Items
-    </button>
-    {% for cat in categories %}
-    <button onclick="filterCat('{{ cat }}',this)"
-      style="padding:7px 18px;border-radius:var(--radius-sm);border:1px solid var(--border);background:transparent;font-family:var(--font-sans);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--transition);color:var(--muted);">
-      {{ cat }}
-    </button>
-    {% endfor %}
-  </div>
-
-  <!-- Menu Grid -->
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;" id="menu-grid">
-    {% for item in menu_items %}
-    <div class="menu-card card" data-category="{{ item.category|default:'Dish' }}"
-      style="overflow:hidden;position:relative;transition:all 250ms ease;">
-
-      <!-- Image / Placeholder -->
-      <div style="height:180px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;
-                {% if item.image %}
-                    background: url('{{ item.image.url }}') center/cover no-repeat;
-                {% else %}
-                    background: linear-gradient(135deg, rgba(196,96,26,0.08) 0%, rgba(184,145,42,0.06) 100%);
-                {% endif %}">
-
-        <!-- Category pill -->
-        <span class="badge badge-muted"
-          style="position:absolute;top:12px;left:12px;backdrop-filter:blur(8px);background:rgba(17,16,9,0.7);border-color:rgba(255,255,255,0.1);font-size:10px;">
-          {{ item.category|default:"Dish" }}
-        </span>
-
-        <!-- Availability toggle -->
-        <div style="position:absolute;top:12px;right:12px;">
-          <div style="padding:4px 10px;border-radius:100px;font-size:10px;font-family:var(--font-sans);font-weight:500;
-                        {% if item.available == 'Yes' %}
-                            background:rgba(76,175,125,0.15);color:var(--status-green);border:1px solid rgba(76,175,125,0.3);
-                        {% else %}
-                            background:rgba(232,90,58,0.15);color:var(--status-red);border:1px solid rgba(232,90,58,0.3);
-                        {% endif %}">
-            {% if item.available == 'Yes' %}Available{% else %}Unavailable{% endif %}
-          </div>
-        </div>
-
-        {% if not item.image %}
-        <!-- Decorative dish icon -->
-        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0.25;">
-          <i data-lucide="chef-hat" style="width:52px;height:52px;color:var(--ember);"></i>
-        </div>
-        {% endif %}
-
-        <!-- Hover overlay with quick actions -->
-        <div class="menu-overlay"
-          style="position:absolute;inset:0;background:rgba(17,16,9,0.85);backdrop-filter:blur(4px);opacity:0;transition:opacity 200ms ease;display:flex;align-items:center;justify-content:center;gap:10px;">
-          <a href="{% url 'update_menu_item' item.id %}" class="btn btn-ghost"
-            style="height:36px;padding:0 16px;border-color:rgba(255,255,255,0.15);">
-            <i data-lucide="pencil" style="width:13px;height:13px;"></i> Edit
-          </a>
-          <a href="{% url 'delete_menu_item' item.id %}"
-            style="height:36px;padding:0 16px;display:inline-flex;align-items:center;gap:6px;border-radius:var(--radius-sm);border:1px solid rgba(232,90,58,0.3);background:rgba(232,90,58,0.1);color:var(--status-red);font-size:13px;font-family:var(--font-sans);font-weight:500;transition:all var(--transition);">
-            <i data-lucide="trash-2" style="width:13px;height:13px;"></i> Delete
-          </a>
-        </div>
-      </div>
-
-      <!-- Card body -->
-      <div style="padding:18px 20px;">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px;">
-          <h3
-            style="font-family:var(--font-serif);font-style:italic;font-size:20px;color:var(--cream);line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;">
-            {{ item.name }}
-          </h3>
-          <div
-            style="font-family:var(--font-mono);font-size:16px;font-weight:500;color:var(--gold-pale);flex-shrink:0;padding-top:3px;">
-            {{ item.price }}
-          </div>
-        </div>
-        <p
-          style="font-size:12px;color:var(--muted);font-weight:300;line-height:1.5;height:36px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">
-          {{ item.description|default:"A delicious addition to our menu." }}
-        </p>
-
-        <!-- Bottom strip -->
-        <div
-          style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
-          <div style="display:flex;gap:6px;">
-            <a href="{% url 'update_menu_item' item.id %}" class="btn-icon" style="width:28px;height:28px;"
-              aria-label="Edit {{ item.name }}">
-              <i data-lucide="pencil" style="width:11px;height:11px;"></i>
-            </a>
-            <a href="{% url 'delete_menu_item' item.id %}" class="btn-icon danger" style="width:28px;height:28px;"
-              aria-label="Delete {{ item.name }}">
-              <i data-lucide="trash-2" style="width:11px;height:11px;"></i>
-            </a>
-          </div>
-          <span style="font-family:var(--font-mono);font-size:10px;color:var(--ghost);letter-spacing:0.08em;">ID #{{
-            item.id }}</span>
-        </div>
-      </div>
-    </div>
-    {% empty %}
-    <div style="grid-column:1/-1;">
-      <div class="empty-state">
-        <div class="empty-icon"><i data-lucide="book-open" style="width:24px;height:24px;"></i></div>
-        <div class="empty-title">No menu items yet</div>
-        <div class="empty-text">Start building your menu by adding your first item</div>
-        <a href="{% url 'add_menu_item' %}" class="btn btn-primary">
-          <i data-lucide="plus" style="width:14px;height:14px;"></i>
-          Add First Item
-        </a>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-</div>
-
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RestaurantOS - Menu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Outfit:wght@300;400;500;600;700&amp;family=Playfair+Display:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                "surface": "#111316",
+                "secondary-fixed": "#6ffbbe",
+                "surface-variant": "#333538",
+                "secondary": "#4edea3",
+                "on-error-container": "#ffdad6",
+                "primary-container": "#d4af37",
+                "tertiary": "#ffbec4",
+                "background": "#111316",
+                "on-tertiary-container": "#8e002f",
+                "on-tertiary-fixed": "#400010",
+                "on-surface-variant": "#d0c5af",
+                "inverse-primary": "#735c00",
+                "secondary-fixed-dim": "#4edea3",
+                "on-secondary": "#003824",
+                "on-secondary-fixed": "#002113",
+                "on-primary": "#3c2f00",
+                "on-tertiary-fixed-variant": "#910130",
+                "surface-dim": "#111316",
+                "surface-container-lowest": "#0c0e11",
+                "tertiary-fixed": "#ffd9dc",
+                "tertiary-container": "#ff94a1",
+                "outline": "#99907c",
+                "primary-fixed": "#ffe088",
+                "primary-fixed-dim": "#e9c349",
+                "surface-bright": "#37393d",
+                "surface-container": "#1e2023",
+                "on-primary-container": "#554300",
+                "secondary-container": "#00a572",
+                "surface-tint": "#e9c349",
+                "on-surface": "#e2e2e6",
+                "on-error": "#690005",
+                "on-background": "#e2e2e6",
+                "on-secondary-container": "#00311f",
+                "inverse-surface": "#e2e2e6",
+                "surface-container-low": "#1a1c1f",
+                "surface-container-high": "#282a2d",
+                "on-primary-fixed": "#241a00",
+                "on-secondary-fixed-variant": "#005236",
+                "error": "#ffb4ab",
+                "surface-container-highest": "#333538",
+                "tertiary-fixed-dim": "#ffb2ba",
+                "primary": "#d4af37",
+                "on-primary-fixed-variant": "#574500",
+                "error-container": "#93000a",
+                "on-tertiary": "#670020",
+                "outline-variant": "#4d4635",
+                "inverse-on-surface": "#2f3034"
+              },
+              "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+              },
+              "spacing": {
+                "base": "4px",
+                "md": "16px",
+                "xl": "40px",
+                "xs": "4px",
+                "margin": "32px",
+                "sm": "8px",
+                "lg": "24px",
+                "grid-columns": "12",
+                "gutter": "16px"
+              },
+              "fontFamily": {
+                "body-sm": ["Outfit"],
+                "body-main": ["Outfit"],
+                "label-caps": ["Outfit"],
+                "data-mono": ["JetBrains Mono"],
+                "h1-header": ["Playfair Display"],
+                "h2-subhead": ["Playfair Display"],
+                "display-hero": ["Playfair Display"]
+              },
+              "fontSize": {
+                "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                "body-main": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                "label-caps": ["11px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                "data-mono": ["13px", { "lineHeight": "1.4", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+                "h1-header": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                "h2-subhead": ["24px", { "lineHeight": "1.4", "fontWeight": "500" }],
+                "display-hero": ["48px", { "lineHeight": "1.2", "fontWeight": "700" }]
+              }
+            }
+          }
+        }
+      </script>
 <style>
-  .menu-card:hover .menu-overlay {
-    opacity: 1 !important;
-  }
-
-  .menu-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-    border-color: var(--border-hover);
-  }
-</style>
-
-<script>
-  function filterCat(cat, btn) {
-    document.querySelectorAll('#menu-grid .menu-card').forEach(card => {
-      card.style.display = (cat === 'all' || card.dataset.category === cat) ? '' : 'none';
-    });
-    document.querySelectorAll('[onclick^="filterCat"]').forEach(b => {
-      b.style.background = 'transparent';
-      b.style.color = 'var(--muted)';
-      b.style.border = '1px solid var(--border)';
-    });
-    btn.style.background = 'var(--ember)';
-    btn.style.color = '#fff';
-    btn.style.border = 'none';
-  }
-</script>
-{% endblock %}
+        body { background-color: #111316; color: #e2e2e6; }
+        .glass-panel { background-color: rgba(30, 32, 35, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .glass-panel-active { border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 0 15px rgba(212, 175, 55, 0.1); }
+        .sidebar { transition: width 0.3s ease; }
+        .sidebar.collapsed { width: 80px; }
+        .sidebar.collapsed .sidebar-text { display: none; }
+        .sidebar.collapsed .sidebar-header-text { display: none; }
+        .main-content { transition: margin-left 0.3s ease, width 0.3s ease; }
+        .main-content.expanded { margin-left: 80px; }
+        .top-header { transition: width 0.3s ease; }
+        .top-header.expanded { width: calc(100% - 80px); }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="font-body-main text-body-main bg-background text-on-background flex h-screen overflow-hidden selection:bg-primary/30 selection:text-primary">
+<nav class="sidebar bg-surface-container dark:bg-surface-container font-body-main text-body-main docked full-height left-0 w-64 border-r border-outline-variant/30 backdrop-blur-xl fixed left-0 top-0 h-full flex flex-col z-50 group" id="sidebar">
+<div class="p-lg flex items-center justify-between h-[88px] border-b border-outline-variant/30">
+<div class="flex flex-col gap-sm overflow-hidden whitespace-nowrap">
+<h1 class="sidebar-header-text font-h2-subhead text-h2-subhead text-primary dark:text-primary tracking-wide">RestaurantOS</h1>
+<p class="sidebar-header-text font-body-sm text-body-sm text-on-surface-variant uppercase tracking-widest text-[10px]">Kitchen HQ</p>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto py-md">
+<ul class="flex flex-col gap-xs px-md">
+<li><a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-3 hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors rounded-lg" href="{% url 'dashboard' %}"><span class="material-symbols-outlined text-[20px]" data-icon="dashboard">dashboard</span><span class="sidebar-text font-medium">Dashboard</span></a></li>
+<li><a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-3 hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors rounded-lg" href="{% url 'table_list' %}"><span class="material-symbols-outlined text-[20px]" data-icon="table_restaurant">table_restaurant</span><span class="sidebar-text font-medium">Tables</span></a></li>
+<li><a class="flex items-center gap-md bg-primary/10 text-primary border-r-2 border-primary py-3 px-3 rounded-l-lg opacity-90 transition-all" href="#"><span class="material-symbols-outlined text-[20px]" data-icon="restaurant_menu" style="font-variation-settings: 'FILL' 1;">restaurant_menu</span><span class="sidebar-text font-medium">Menu</span></a></li>
+<li><a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-3 hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors rounded-lg" href="{% url 'order_list' %}"><span class="material-symbols-outlined text-[20px]" data-icon="receipt_long">receipt_long</span><span class="sidebar-text font-medium">Orders</span></a></li>
+</ul>
+</div>
+<div class="mt-auto p-md border-t border-outline-variant/30">
+<ul class="flex flex-col gap-xs">
+<li><a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-3 hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors rounded-lg" href="#"><span class="material-symbols-outlined text-[20px]" data-icon="settings">settings</span><span class="sidebar-text font-medium">Settings</span></a></li>
+<li><a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-3 hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors rounded-lg" href="{% url 'logout' %}"><span class="material-symbols-outlined text-[20px]" data-icon="logout">logout</span><span class="sidebar-text font-medium">Logout</span></a></li>
+</ul>
+</div>
+</nav>
+<div class="main-content ml-64 flex-1 flex flex-col h-full relative bg-background" id="main-content">
+<header class="top-header bg-background/80 dark:bg-background/80 font-h2-subhead text-h2-subhead docked full-width top-0 border-b border-outline-variant/30 backdrop-blur-xl fixed top-0 right-0 w-[calc(100%-16rem)] flex justify-between items-center px-margin py-0 h-[88px] z-40 transition-all" id="top-header">
+<div class="flex items-center gap-lg h-full">
+<nav class="h-full">
+<ul class="flex gap-lg h-full items-center">
+<li class="h-full flex items-center border-b-2 border-transparent hover:border-primary transition-colors"><a class="text-on-surface-variant font-medium hover:text-primary transition-colors text-body-main" href="{% url 'dashboard' %}">Overview</a></li>
+</ul>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex gap-sm items-center border-l border-outline-variant/30 pl-sm ml-sm">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-bright" data-icon="notifications">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-bright" data-icon="help">help</button>
+</div>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto pt-[88px] w-full max-w-7xl mx-auto p-margin">
+<div class="flex justify-between items-end mb-xl mt-md">
+<div>
+<h2 class="font-h1-header text-[36px] font-medium text-on-surface mb-2 tracking-tight">Menu Management</h2>
+<p class="font-body-main text-[15px] text-on-surface-variant max-w-2xl">Curate your culinary offerings, adjust pricing dynamically, and manage real-time availability across all sections.</p>
+</div>
+<a href="{% url 'add_menu_item' %}" class="bg-primary text-surface px-6 py-2.5 rounded-full font-body-main font-semibold hover:bg-primary/90 transition-all flex items-center gap-2 shadow-[0_4px_14px_0_rgba(212,175,55,0.2)] hover:shadow-[0_6px_20px_rgba(212,175,55,0.25)] hover:-translate-y-0.5"><span class="material-symbols-outlined text-[20px]" data-icon="add">add</span>Add Menu Item</a>
+</div>
+<form method="get" class="flex gap-3 mb-lg overflow-x-auto pb-4 scrollbar-hide">
+<input type="text" name="q" placeholder="Search menu items..." value="{{ request.GET.q|default:'' }}" class="bg-surface-container text-on-surface-variant border border-outline-variant/30 hover:border-primary/50 hover:text-on-surface px-6 py-2 rounded-full font-label-caps text-[12px] transition-all whitespace-nowrap outline-none focus:border-primary"/>
+</form>
+<div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-6 pb-xl">
+{% for item in menu_items %}
+<div class="glass-panel rounded-2xl p-5 flex gap-5 transition-all hover:bg-surface-container/80 hover:border-outline-variant/50 group hover:shadow-xl relative overflow-hidden {% if item.available == 'No' %}opacity-70{% endif %}">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+<div class="w-32 h-32 rounded-xl bg-surface-container overflow-hidden shrink-0 shadow-inner relative">
+<div class="w-full h-full bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant/30">restaurant_menu</span>
+</div>
+{% if item.available == 'No' %}<div class="absolute inset-0 bg-surface/40 flex items-center justify-center backdrop-blur-[1px]"><span class="font-label-caps text-xs text-on-surface-variant uppercase tracking-widest bg-surface/80 px-2 py-1 rounded backdrop-blur-md">Sold Out</span></div>{% endif %}
+</div>
+<div class="flex-1 flex flex-col justify-between relative z-10">
+<div>
+<div class="flex justify-between items-start mb-1 gap-4">
+<h3 class="font-h2-subhead text-[22px] text-on-surface group-hover:text-primary transition-colors leading-tight">{{ item.name }}</h3>
+<span class="font-data-mono text-[15px] font-bold text-primary bg-primary/10 px-2 py-1 rounded-md">${{ item.price }}</span>
+</div>
+</div>
+<div class="flex justify-between items-center mt-4 pt-4 border-t border-outline-variant/20">
+<span class="font-label-caps text-[10px] text-on-surface-variant uppercase tracking-widest bg-surface-container px-2 py-1 rounded-full">Menu Item</span>
+<div class="flex items-center gap-3">
+<span class="flex items-center gap-1.5 font-body-sm text-[12px] font-medium {% if item.available == 'Yes' %}text-secondary{% else %}text-error{% endif %}">
+<span class="w-1.5 h-1.5 rounded-full {% if item.available == 'Yes' %}bg-secondary{% else %}bg-error{% endif %}"></span>
+{% if item.available == 'Yes' %}Available{% else %}86'd{% endif %}
+</span>
+<div class="flex gap-1">
+<a href="{% url 'update_menu_item' item.id %}" class="p-1.5 rounded bg-surface-container-higher border border-outline-variant/30 hover:border-primary/50 transition-colors"><span class="material-symbols-outlined text-[16px] text-on-surface-variant hover:text-primary">edit</span></a>
+<a href="{% url 'delete_menu_item' item.id %}" class="p-1.5 rounded bg-surface-container-higher border border-outline-variant/30 hover:border-error/50 transition-colors"><span class="material-symbols-outlined text-[16px] text-on-surface-variant hover:text-error">delete</span></a>
+</div>
+</div>
+</div>
+</div>
+</div>
+{% empty %}
+<div class="col-span-full flex flex-col items-center justify-center py-xl">
+<span class="material-symbols-outlined text-5xl text-on-surface-variant/30 mb-md">restaurant_menu</span>
+<p class="font-body-main text-body-main text-on-surface-variant">No menu items yet.</p>
+<a href="{% url 'add_menu_item' %}" class="mt-md text-primary hover:text-primary-fixed">Add your first item</a>
+</div>
+{% endfor %}
+</div>
+</main>
+</div>
+</body></html>

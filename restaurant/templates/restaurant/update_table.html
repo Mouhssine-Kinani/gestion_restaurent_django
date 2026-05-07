@@ -1,70 +1,127 @@
-{% extends 'restaurant/base.html' %}
-
-{% block title %}Edit Table{% endblock %}
-
-{% block page_title %}
-<div style="display: flex; align-items: center; gap: 12px;">
-    <a href="{% url 'table_list' %}" style="color: var(--muted); padding: 4px; border-radius: var(--radius-sm); transition: all var(--transition-fast); text-decoration: none; display: inline-flex;" onmouseover="this.style.color='var(--cream)'; this.style.background='var(--bg-elevated)'" onmouseout="this.style.color='var(--muted)'; this.style.background='transparent'">
-        <i data-lucide="arrow-left" style="width:20px;height:20px;"></i>
-    </a>
-    <div>
-        <h1 class="topbar-title">Edit Table</h1>
-        <div class="topbar-breadcrumb">Editing: <span style="color:var(--gold); font-style:italic;">Table {{ table.number }}</span> &mdash; <span class="{% if table.status == 'free' %}badge-green{% elif table.status == 'occupied' %}badge-gold{% else %}badge-blue{% endif %}" style="margin-left:4px;">{{ table.status|capfirst }}</span></div>
-    </div>
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RestaurantOS - Edit Table</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Outfit:wght@400;500;600;700&amp;family=Playfair+Display:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary-fixed": "#ffd9dc", "surface-tint": "#e9c349", "primary-container": "#d4af37", "tertiary-container": "#ff94a1", "on-error": "#690005", "background": "#111316", "primary-fixed-dim": "#e9c349", "inverse-primary": "#735c00", "outline-variant": "#4d4635", "surface": "#111316", "on-primary-fixed-variant": "#574500", "surface-variant": "#333538", "primary-fixed": "#ffe088", "inverse-surface": "#e2e2e6", "surface-bright": "#37393d", "error-container": "#93000a", "on-secondary": "#003824", "on-primary": "#3c2f00", "surface-container-highest": "#333538", "on-background": "#e2e2e6", "secondary-fixed-dim": "#4edea3", "on-primary-container": "#554300", "on-tertiary-container": "#8e002f", "on-surface-variant": "#d0c5af", "on-error-container": "#ffdad6", "on-secondary-fixed-variant": "#005236", "surface-container": "#1e2023", "surface-container-low": "#1a1c1f", "surface-container-lowest": "#0c0e11", "on-tertiary": "#670020", "secondary-container": "#00a572", "inverse-on-surface": "#2f3034", "on-tertiary-fixed": "#400010", "error": "#ffb4ab", "on-secondary-container": "#00311f", "surface-dim": "#111316", "on-surface": "#e2e2e6", "outline": "#99907c", "tertiary": "#ffbec4", "secondary": "#4edea3", "surface-container-high": "#282a2d", "on-secondary-fixed": "#002113", "tertiary-fixed-dim": "#ffb2ba", "on-tertiary-fixed-variant": "#910130", "secondary-fixed": "#6ffbbe", "primary": "#f2ca50", "on-primary-fixed": "#241a00"
+              },
+              "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+              "spacing": { "base": "4px", "md": "16px", "xl": "40px", "xs": "4px", "margin": "32px", "sm": "8px", "lg": "24px", "grid-columns": "12", "gutter": "16px" },
+              "fontFamily": { "body-sm": ["Outfit"], "body-main": ["Outfit"], "label-caps": ["Outfit"], "data-mono": ["JetBrains Mono"], "h1-header": ["Playfair Display"], "h2-subhead": ["Playfair Display"], "display-hero": ["Playfair Display"] },
+              "fontSize": { "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}], "body-main": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}], "label-caps": ["11px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700"}], "data-mono": ["13px", {"lineHeight": "1.4", "letterSpacing": "-0.02em", "fontWeight": "500"}], "h1-header": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}], "h2-subhead": ["24px", {"lineHeight": "1.4", "fontWeight": "500"}], "display-hero": ["48px", {"lineHeight": "1.2", "fontWeight": "700"}] }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-main antialiased selection:bg-primary/30 selection:text-primary min-h-screen flex">
+<nav class="bg-surface-container font-body-main text-body-main docked full-height left-0 w-64 border-r border-outline-variant/30 backdrop-blur-xl fixed left-0 top-0 h-full flex flex-col z-50 transition-all">
+<div class="p-lg border-b border-outline-variant/30">
+<h1 class="font-h2-subhead text-h2-subhead text-primary-container dark:text-primary-container">RestaurantOS</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant mt-xs">Kitchen HQ</p>
 </div>
-{% endblock %}
-
-{% block breadcrumb %}Home &rsaquo; Tables &rsaquo; Edit{% endblock %}
-
-{% block content %}
-<!-- Edit Banner -->
-<div style="background: var(--bg-elevated); border-bottom: 1px solid var(--ghost); padding: 12px 24px; margin: -32px -32px 32px -32px; display: flex; align-items: center; gap: 12px;">
-    <i data-lucide="pencil" style="width:16px;height:16px;color:var(--gold);"></i>
-    <div style="flex:1;">
-        <span style="font-size:13px; color:var(--cream); font-weight:500;">Editing: </span>
-        <span style="font-size:13px; color:var(--gold); font-style:italic;">Table {{ table.number }}</span>
-    </div>
-    <span style="font-family:var(--font-mono); font-size:12px; color:var(--muted);">Last modified: {{ table.updated_at|timesince|default:"2 hours" }} ago</span>
+<div class="flex-1 py-md overflow-y-auto">
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-colors" href="{% url 'dashboard' %}"><span class="material-symbols-outlined" data-icon="dashboard">dashboard</span><span>Dashboard</span></a>
+<a class="flex items-center gap-md bg-primary-container/10 text-primary-container border-r-2 border-primary-container py-3 px-lg active:opacity-90 active:scale-[0.99] transition-all" href="#"><span class="material-symbols-outlined" data-icon="table_restaurant" style="font-variation-settings: 'FILL' 1; color: #D4AF37;">table_restaurant</span><span>Tables</span></a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-colors" href="{% url 'menu_list' %}"><span class="material-symbols-outlined" data-icon="restaurant_menu">restaurant_menu</span><span>Menu</span></a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-colors" href="{% url 'order_list' %}"><span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span><span>Orders</span></a>
 </div>
-
-<div style="max-width: 640px;">
-    <div class="card" style="padding: 32px 40px;">
-        <form method="post" class="space-y-6" novalidate>
-            {% csrf_token %}
-
-            {% if form.non_field_errors %}
-            <div class="error-box">
-                <i data-lucide="alert-circle" style="width:20px;height:20px;flex-shrink:0;"></i>
-                <span>{{ form.non_field_errors }}</span>
-            </div>
-            {% endif %}
-
-            <div>
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
-                    <span style="font-family: var(--font-display); font-style: italic; font-size: 20px; color: var(--gold);">Table Details</span>
-                    <div style="flex: 1; height: 1px; background: linear-gradient(90deg, var(--gold-dim), transparent);"></div>
-                </div>
-
-                {% for field in form %}
-                <div class="form-group">
-                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.help_text %}<div style="font-size: 12px; color: var(--muted); margin-top: 4px;">{{ field.help_text|striptags }}</div>{% endif %}
-                    {% if field.errors %}<div class="error-text">{{ field.errors|striptags }}</div>{% endif %}
-                </div>
-                {% endfor %}
-            </div>
-
-            <div style="display: flex; gap: 12px; padding-top: 8px;">
-                <button type="submit" class="btn-primary" style="flex: 1; height: 48px;">
-                    <i data-lucide="save" style="width:16px;height:16px;"></i>
-                    Save Changes
-                </button>
-                <a href="{% url 'table_list' %}" class="btn-ghost" style="padding: 0 24px; height: 48px; display: flex; align-items: center;">
-                    Cancel
-                </a>
-            </div>
-        </form>
-    </div>
+<div class="border-t border-outline-variant/30 py-md">
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-colors" href="#"><span class="material-symbols-outlined" data-icon="settings">settings</span><span>Settings</span></a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-colors" href="{% url 'logout' %}"><span class="material-symbols-outlined" data-icon="logout">logout</span><span>Logout</span></a>
 </div>
-{% endblock %}
+</nav>
+<header class="bg-surface-container/80 font-h2-subhead text-h2-subhead docked full-width top-0 border-b border-outline-variant/30 backdrop-blur-xl fixed top-0 right-0 w-[calc(100%-16rem)] flex justify-between items-center px-margin py-md z-40 transition-all">
+<div class="flex items-center gap-lg">
+<nav class="hidden md:flex gap-md">
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors text-body-main" href="{% url 'dashboard' %}">Overview</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined" data-icon="notifications">notifications</span></button>
+<button class="text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined" data-icon="help">help</span></button>
+<a href="{% url 'add_table' %}" class="bg-surface-variant text-on-surface px-md py-sm rounded border border-outline-variant hover:text-primary transition-colors text-body-sm font-body-sm">Add Table</a>
+<a href="{% url 'add_order' %}" class="bg-primary-container text-on-primary-container px-md py-sm rounded font-medium hover:bg-primary-fixed transition-colors text-body-sm font-body-sm">Create Order</a>
+</div>
+</header>
+<main class="ml-64 pt-24 w-full min-h-screen p-margin flex flex-col gap-lg bg-background">
+<div class="flex items-center gap-sm">
+<a class="text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center w-8 h-8 rounded hover:bg-surface-bright" href="{% url 'table_list' %}"><span class="material-symbols-outlined text-body-main" data-icon="arrow_back">arrow_back</span></a>
+<h2 class="font-h1-header text-h1-header text-on-surface">Edit Table Management</h2>
+</div>
+<form method="post">
+{% csrf_token %}
+<div class="grid grid-cols-1 md:grid-cols-12 gap-lg flex-1 items-start">
+<div class="md:col-span-8 bg-surface-container border border-outline-variant/30 rounded-xl p-lg shadow-sm">
+<h3 class="font-h2-subhead text-h2-subhead text-primary-container mb-md pb-sm border-b border-outline-variant/30">Table Configuration</h3>
+{% if form.errors %}
+<div class="mb-lg p-md bg-error-container/20 border border-error/30 rounded-lg">
+<p class="font-body-sm text-body-sm text-error">Please correct the errors below.</p>
+</div>
+{% endif %}
+<div class="flex flex-col gap-md">
+<div class="flex gap-md w-full">
+<div class="flex flex-col gap-xs flex-1">
+<label class="font-label-caps text-label-caps text-on-surface-variant" for="id_number">Table Identifier</label>
+<input class="bg-surface/50 border-b border-t-0 border-x-0 border-primary-container/40 text-on-surface font-body-main rounded-t px-sm py-sm focus:border-primary focus:ring-0 focus:outline-none transition-colors font-data-mono" type="number" id="id_number" name="number" value="{{ form.number.value|default:'' }}"/>
+</div>
+<div class="flex flex-col gap-xs flex-1">
+<label class="font-label-caps text-label-caps text-on-surface-variant" for="id_seats">Seat Capacity</label>
+<input class="bg-surface/50 border-b border-t-0 border-x-0 border-primary-container/40 text-on-surface font-body-main rounded-t px-sm py-sm focus:border-primary focus:ring-0 focus:outline-none transition-colors font-data-mono" type="number" id="id_seats" name="seats" value="{{ form.seats.value|default:'' }}"/>
+</div>
+<div class="flex flex-col gap-xs flex-1">
+<label class="font-label-caps text-label-caps text-on-surface-variant" for="id_status">Current Status</label>
+<select id="id_status" name="status" class="bg-surface/50 border-b border-t-0 border-x-0 border-primary-container/40 text-on-surface font-body-main rounded-t px-sm py-sm focus:border-primary focus:ring-0 focus:outline-none transition-colors">
+<option value="free" {% if form.status.value == 'free' %}selected{% endif %}>Free</option>
+<option value="occupied" {% if form.status.value == 'occupied' %}selected{% endif %}>Occupied</option>
+</select>
+</div>
+</div>
+<div class="flex justify-end gap-md mt-sm pt-md">
+<a href="{% url 'table_list' %}" class="px-lg py-sm rounded border border-outline-variant text-on-surface-variant font-body-main text-body-main hover:bg-surface-bright hover:text-on-surface transition-colors" type="button">Cancel</a>
+<button type="submit" class="bg-primary-container text-on-primary-container px-lg py-sm rounded font-medium hover:bg-primary-fixed transition-colors shadow-lg shadow-primary-container/20 text-body-main">Update Table</button>
+</div>
+</div>
+</div>
+<div class="md:col-span-4 flex flex-col gap-lg">
+<div class="bg-surface-container border border-outline-variant/30 rounded-xl p-lg shadow-sm flex flex-col items-center justify-center min-h-[280px] relative overflow-hidden">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant absolute top-lg left-lg">Live Floor Plan Preview</h3>
+<div class="relative w-40 h-40 flex items-center justify-center mt-lg">
+<div class="absolute -top-4 left-1/2 -translate-x-1/2 w-12 h-4 rounded-t bg-surface-variant border border-outline-variant/50"></div>
+<div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-12 h-4 rounded-b bg-surface-variant border border-outline-variant/50"></div>
+<div class="absolute top-1/2 -left-4 -translate-y-1/2 w-4 h-12 rounded-l bg-surface-variant border border-outline-variant/50"></div>
+<div class="absolute top-1/2 -right-4 -translate-y-1/2 w-4 h-12 rounded-r bg-surface-variant border border-outline-variant/50"></div>
+<div class="w-full h-full {% if form.status.value == 'occupied' %}bg-error-container/20 border-error/30{% else %}bg-secondary/10 border-secondary/30{% endif %} border rounded-lg flex items-center justify-center shadow-lg backdrop-blur-sm">
+<span class="font-data-mono text-display-hero {% if form.status.value == 'occupied' %}text-error{% else %}text-secondary{% endif %}">{{ form.number.value|default:'?' }}</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-container border border-outline-variant/30 rounded-xl p-lg flex flex-col gap-sm shadow-sm">
+<div class="flex justify-between items-center">
+<span class="font-body-main text-body-main text-on-surface-variant">Live Status</span>
+<div class="flex items-center gap-xs px-sm py-xs rounded {% if form.status.value == 'occupied' %}bg-error-container/20 border-error/20{% else %}bg-secondary/10 border-secondary/20{% endif %} border">
+<div class="w-2 h-2 rounded-full {% if form.status.value == 'occupied' %}bg-error{% else %}bg-secondary{% endif %} shadow-lg"></div>
+<span class="font-data-mono text-data-mono {% if form.status.value == 'occupied' %}text-error{% else %}text-secondary{% endif %}">{% if form.status.value == 'occupied' %}Occupied{% else %}Free{% endif %}</span>
+</div>
+</div>
+<div class="flex justify-between items-center border-t border-outline-variant/30 pt-sm mt-xs">
+<span class="font-body-main text-body-main text-on-surface-variant">Seating</span>
+<span class="font-data-mono text-data-mono text-on-surface">{{ form.seats.value|default:'?' }} Seats</span>
+</div>
+</div>
+</div>
+</div>
+</form>
+</main>
+</body></html>

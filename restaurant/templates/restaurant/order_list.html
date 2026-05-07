@@ -1,211 +1,212 @@
-{% extends 'restaurant/base.html' %}
-
-{% block title %}Orders{% endblock %}
-{% block title_text %}Orders{% endblock %}
-{% block breadcrumb %}Home &rsaquo; Orders &mdash; <span style="color:var(--ember);">{{ orders|length }} total</span>{% endblock %}
-
-{% block page_actions %}
-<a href="{% url 'add_order' %}" class="btn btn-primary" style="height:38px;padding:0 16px;font-size:13px;">
-    <i data-lucide="clipboard-plus" style="width:14px;height:14px;"></i>
-    New Order
-</a>
-{% endblock %}
-
-{% block content %}
-<div>
-    <!-- KPI Strip -->
-    <div class="grid grid-4" style="margin-bottom:28px;">
-        <div class="stat-card">
-            <div class="stat-card-accent" style="background:var(--ember);"></div>
-            <div class="stat-card-icon" style="background:var(--ember-dim);">
-                <i data-lucide="receipt" style="width:18px;height:18px;color:var(--ember);"></i>
-            </div>
-            <div class="stat-value">{{ orders|length }}</div>
-            <div class="stat-label">Total Orders</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-card-accent" style="background:var(--status-amber);"></div>
-            <div class="stat-card-icon" style="background:rgba(212,129,58,0.12);">
-                <i data-lucide="clock" style="width:18px;height:18px;color:var(--status-amber);"></i>
-            </div>
-            <div class="stat-value">
-                {% with pending=orders|length %}{{ pending }}{% endwith %}
-            </div>
-            <div class="stat-label">Pending</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-card-accent" style="background:var(--status-green);"></div>
-            <div class="stat-card-icon" style="background:rgba(76,175,125,0.12);">
-                <i data-lucide="check-circle" style="width:18px;height:18px;color:var(--status-green);"></i>
-            </div>
-            <div class="stat-value">0</div>
-            <div class="stat-label">Served</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-card-accent" style="background:var(--gold);"></div>
-            <div class="stat-card-icon" style="background:rgba(184,145,42,0.12);">
-                <i data-lucide="banknote" style="width:18px;height:18px;color:var(--gold-pale);"></i>
-            </div>
-            <div class="stat-value" style="font-size:24px;">
-                <span style="font-size:13px;color:var(--muted);font-family:var(--font-sans);font-weight:300;vertical-align:middle;">MAD </span>
-                0
-            </div>
-            <div class="stat-label">Today's Revenue</div>
-        </div>
-    </div>
-
-    <!-- Filter Bar -->
-    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:20px;">
-        <form method="get" style="position:relative;flex:1;min-width:220px;max-width:300px;">
-            <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--ghost);display:flex;">
-                <i data-lucide="search" style="width:13px;height:13px;"></i>
-            </span>
-            <input type="text" name="q" placeholder="Order # or table…" value="{{ request.GET.q|default:'' }}"
-                style="width:100%;height:38px;padding:0 12px 0 32px;background:var(--surface-hi);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--cream);font-size:13px;font-weight:300;outline:none;transition:all var(--transition);"
-                onfocus="this.style.borderColor='var(--ember)'" onblur="this.style.borderColor='var(--border)'">
-        </form>
-
-        <!-- Status pills -->
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <button onclick="filterStatus('all',this)" id="pill-all"
-                style="height:34px;padding:0 14px;border-radius:100px;border:1px solid var(--ember);background:var(--ember);color:#fff;font-family:var(--font-sans);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--transition);">
-                All
-            </button>
-            <button onclick="filterStatus('Pending',this)"
-                style="height:34px;padding:0 14px;border-radius:100px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--font-sans);font-size:12px;cursor:pointer;transition:all var(--transition);">
-                Pending
-            </button>
-            <button onclick="filterStatus('served',this)"
-                style="height:34px;padding:0 14px;border-radius:100px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--font-sans);font-size:12px;cursor:pointer;transition:all var(--transition);">
-                Served
-            </button>
-            <button onclick="filterStatus('Cancelled',this)"
-                style="height:34px;padding:0 14px;border-radius:100px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--font-sans);font-size:12px;cursor:pointer;transition:all var(--transition);">
-                Cancelled
-            </button>
-        </div>
-
-        <span style="margin-left:auto;font-family:var(--font-mono);font-size:11px;color:var(--muted);">
-            {{ orders|length }} result{{ orders|pluralize }}
-        </span>
-    </div>
-
-    <!-- Orders Table -->
-    <div class="table-wrapper">
-        <table role="table" aria-label="Orders list">
-            <thead>
-                <tr>
-                    <th style="width:100px;">Order ID</th>
-                    <th>Table</th>
-                    <th>Items</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                    <th>Time</th>
-                    <th style="text-align:right;">Actions</th>
-                </tr>
-            </thead>
-            <tbody id="orders-tbody">
-                {% for order in orders %}
-                <tr class="order-row" data-status="{{ order.status }}"
-                    style="transition:background var(--transition);"
-                    onmouseover="this.style.background='var(--surface-top)'"
-                    onmouseout="this.style.background='transparent'">
-
-                    <td>
-                        <span style="font-family:var(--font-mono);font-size:13px;font-weight:500;color:var(--ember);">#{{ order.id }}</span>
-                    </td>
-
-                    <td>
-                        <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:100px;background:var(--surface-hi);border:1px solid var(--border);font-size:12px;color:var(--cream-soft);">
-                            <i data-lucide="armchair" style="width:11px;height:11px;color:var(--muted);"></i>
-                            Table {{ order.table.number }}
-                        </span>
-                    </td>
-
-                    <td style="color:var(--muted);font-size:13px;font-weight:300;">
-                        {% if order.items.all %}
-                            {% for item in order.items.all|slice:":1" %}{{ item.name }}{% endfor %}
-                            {% if order.items.count > 1 %}
-                                <span style="color:var(--ghost);font-size:12px;"> +{{ order.items.count|add:"-1" }} more</span>
-                            {% endif %}
-                        {% else %}
-                            <span style="color:var(--ghost);">—</span>
-                        {% endif %}
-                    </td>
-
-                    <td>
-                        <span style="font-family:var(--font-mono);font-size:14px;color:var(--cream);">
-                            <span style="font-size:10px;color:var(--muted);">MAD </span>{{ order.total|default:"0.00" }}
-                        </span>
-                    </td>
-
-                    <td>
-                        {% if order.status == 'served' %}
-                        <span class="badge badge-green"><span class="status-dot"></span>Served</span>
-                        {% elif order.status == 'Pending' %}
-                        <span class="badge badge-amber"><span class="status-dot pulse"></span>Pending</span>
-                        {% elif order.status == 'Cancelled' %}
-                        <span class="badge badge-red"><span class="status-dot"></span>Cancelled</span>
-                        {% else %}
-                        <span class="badge badge-muted"><span class="status-dot"></span>{{ order.status }}</span>
-                        {% endif %}
-                    </td>
-
-                    <td style="font-family:var(--font-mono);font-size:12px;color:var(--muted);">
-                        {% if forloop.counter == 1 %}Just now{% elif forloop.counter == 2 %}5m ago{% elif forloop.counter == 3 %}12m ago{% else %}{{ forloop.counter }}h ago{% endif %}
-                    </td>
-
-                    <td style="text-align:right;">
-                        <div style="display:flex;justify-content:flex-end;gap:6px;">
-                            <a href="{% url 'update_order' order.id %}" class="btn-icon" aria-label="Edit order">
-                                <i data-lucide="pencil" style="width:12px;height:12px;"></i>
-                            </a>
-                            <a href="{% url 'delete_order' order.id %}" class="btn-icon danger" aria-label="Delete order">
-                                <i data-lucide="trash-2" style="width:12px;height:12px;"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="7">
-                        <div class="empty-state">
-                            <div class="empty-icon"><i data-lucide="receipt" style="width:24px;height:24px;"></i></div>
-                            <div class="empty-title">No orders yet</div>
-                            <div class="empty-text">Create your first order to start tracking kitchen activity</div>
-                            <a href="{% url 'add_order' %}" class="btn btn-primary">
-                                <i data-lucide="clipboard-plus" style="width:14px;height:14px;"></i>
-                                Create First Order
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<script>
-    function filterStatus(status, btn) {
-        document.querySelectorAll('.order-row').forEach(row => {
-            if (status === 'all' || row.dataset.status === status) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
-
-        // Reset all pills
-        document.querySelectorAll('[onclick^="filterStatus"]').forEach(b => {
-            b.style.background = 'transparent';
-            b.style.color = 'var(--muted)';
-            b.style.borderColor = 'var(--border)';
-        });
-        // Activate clicked
-        btn.style.background = 'var(--ember)';
-        btn.style.color = '#fff';
-        btn.style.borderColor = 'var(--ember)';
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RestaurantOS - Orders</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&amp;family=Playfair+Display:wght@500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "inverse-primary": "#735c00",
+          "primary-fixed": "#ffe088",
+          "on-primary-container": "#554300",
+          "on-error-container": "#ffdad6",
+          "on-error": "#690005",
+          "tertiary-container": "#ff94a1",
+          "tertiary": "#ffbec4",
+          "surface-tint": "#e9c349",
+          "surface": "#111316",
+          "secondary": "#4edea3",
+          "on-primary": "#3c2f00",
+          "on-primary-fixed": "#241a00",
+          "inverse-surface": "#e2e2e6",
+          "error": "#ffb4ab",
+          "surface-container-high": "#282a2d",
+          "on-secondary-fixed-variant": "#005236",
+          "secondary-fixed": "#6ffbbe",
+          "primary-container": "#d4af37",
+          "tertiary-fixed": "#ffd9dc",
+          "on-tertiary-fixed-variant": "#910130",
+          "on-surface-variant": "#d0c5af",
+          "on-tertiary": "#670020",
+          "surface-container-highest": "#333538",
+          "secondary-container": "#00a572",
+          "on-tertiary-container": "#8e002f",
+          "surface-container-low": "#1a1c1f",
+          "secondary-fixed-dim": "#4edea3",
+          "outline-variant": "#4d4635",
+          "surface-bright": "#37393d",
+          "surface-container": "#1e2023",
+          "on-secondary-container": "#00311f",
+          "on-secondary": "#003824",
+          "surface-dim": "#111316",
+          "primary": "#f2ca50",
+          "background": "#111316",
+          "tertiary-fixed-dim": "#ffb2ba",
+          "on-primary-fixed-variant": "#574500",
+          "primary-fixed-dim": "#e9c349",
+          "surface-variant": "#333538",
+          "on-surface": "#e2e2e6",
+          "surface-container-lowest": "#0c0e11",
+          "on-tertiary-fixed": "#400010",
+          "on-secondary-fixed": "#002113",
+          "on-background": "#e2e2e6",
+          "error-container": "#93000a",
+          "outline": "#99907c",
+          "inverse-on-surface": "#2f3034"
+        },
+        "borderRadius": {
+          "DEFAULT": "0.125rem",
+          "lg": "0.25rem",
+          "xl": "0.5rem",
+          "full": "0.75rem"
+        },
+        "spacing": {
+          "xs": "4px",
+          "margin": "32px",
+          "md": "16px",
+          "gutter": "16px",
+          "grid-columns": "12",
+          "xl": "40px",
+          "lg": "24px",
+          "base": "4px",
+          "sm": "8px"
+        },
+        "fontFamily": {
+          "body-main": ["Outfit"],
+          "label-caps": ["Outfit"],
+          "h2-subhead": ["Playfair Display"],
+          "h1-header": ["Playfair Display"],
+          "display-hero": ["Playfair Display"],
+          "data-mono": ["JetBrains Mono"],
+          "body-sm": ["Outfit"]
+        },
+        "fontSize": {
+          "body-main": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+          "label-caps": ["11px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700" }],
+          "h2-subhead": ["24px", { "lineHeight": "1.4", "fontWeight": "500" }],
+          "h1-header": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+          "display-hero": ["48px", { "lineHeight": "1.2", "fontWeight": "700" }],
+          "data-mono": ["13px", { "lineHeight": "1.4", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+          "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }]
+        }
+      }
     }
+  }
 </script>
-{% endblock %}
+<style>
+        .glass-panel { background-color: rgba(30, 32, 35, 0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(212, 175, 55, 0.15); }
+        .sidebar-expanded { width: 16rem; }
+        .sidebar-collapsed { width: 5rem; }
+        .sidebar-transition { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .sidebar-collapsed .hide-collapsed { opacity: 0; width: 0; overflow: hidden; display: none; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-main antialiased min-h-screen flex overflow-x-hidden">
+<nav class="fixed left-0 top-0 h-full flex flex-col z-50 bg-surface-container border-r border-outline-variant/30 backdrop-blur-xl sidebar-expanded sidebar-transition shadow-xl group/sidebar" id="sidebar">
+<div class="p-lg flex items-center justify-between">
+<div class="flex items-center gap-2 overflow-hidden whitespace-nowrap">
+<span class="material-symbols-outlined text-primary text-[28px] shrink-0">restaurant</span>
+<div class="hide-collapsed flex flex-col transition-opacity duration-300">
+<h1 class="font-h2-subhead text-[20px] text-primary dark:text-primary leading-tight">RestaurantOS</h1>
+<p class="font-body-sm text-[12px] text-on-surface-variant leading-tight">Kitchen HQ</p>
+</div>
+</div>
+</div>
+<div class="flex-1 flex flex-col gap-sm py-md mt-4">
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-all duration-200 group" href="{% url 'dashboard' %}"><span class="material-symbols-outlined text-[24px] group-hover:text-primary transition-colors shrink-0" title="Dashboard">dashboard</span><span class="font-body-main font-medium hide-collapsed whitespace-nowrap transition-opacity duration-300">Dashboard</span></a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-all duration-200 group" href="{% url 'table_list' %}"><span class="material-symbols-outlined text-[24px] group-hover:text-primary transition-colors shrink-0" title="Tables">table_restaurant</span><span class="font-body-main font-medium hide-collapsed whitespace-nowrap transition-opacity duration-300">Tables</span></a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-all duration-200 group" href="{% url 'menu_list' %}"><span class="material-symbols-outlined text-[24px] group-hover:text-primary transition-colors shrink-0" title="Menu">restaurant_menu</span><span class="font-body-main font-medium hide-collapsed whitespace-nowrap transition-opacity duration-300">Menu</span></a>
+<a class="flex items-center gap-md bg-primary/10 text-primary border-r-4 border-primary py-3 px-lg transition-all duration-200 group relative" href="#"><span class="material-symbols-outlined text-[24px] shadow-primary/20 shrink-0" style="font-variation-settings: 'FILL' 1;" title="Orders">receipt_long</span><span class="font-body-main font-semibold hide-collapsed whitespace-nowrap transition-opacity duration-300">Orders</span></a>
+</div>
+<div class="mt-auto flex flex-col gap-sm py-md border-t border-outline-variant/30">
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors group" href="#"><span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors shrink-0" title="Settings">settings</span><span class="font-body-main font-medium hide-collapsed whitespace-nowrap transition-opacity duration-300">Settings</span></a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors group" href="{% url 'logout' %}"><span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors shrink-0" title="Logout">exit_to_app</span><span class="font-body-main font-medium hide-collapsed whitespace-nowrap transition-opacity duration-300">Logout</span></a>
+</div>
+</nav>
+<div class="ml-64 flex flex-col min-h-screen w-full transition-all duration-300" id="main-content">
+<header class="fixed top-0 right-0 w-[calc(100%-16rem)] flex justify-between items-center px-margin h-20 z-40 bg-surface/80 border-b border-outline-variant/30 backdrop-blur-md transition-all duration-300" id="topbar">
+<div class="flex items-center gap-xl">
+<div class="flex gap-lg items-center">
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors text-[13px] tracking-widest uppercase" href="{% url 'dashboard' %}">Overview</a>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<div class="flex gap-sm items-center">
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-primary transition-all rounded-full hover:bg-surface-bright"><span class="material-symbols-outlined text-[20px]">notifications</span></button>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-primary transition-all rounded-full hover:bg-surface-bright"><span class="material-symbols-outlined text-[20px]">help</span></button>
+</div>
+<div class="flex gap-md ml-sm border-l border-outline-variant/30 pl-lg items-center">
+<a href="{% url 'add_table' %}" class="px-4 py-1.5 border border-outline-variant/50 text-on-surface font-body-sm text-[13px] font-medium rounded-full hover:border-primary hover:text-primary transition-all bg-surface hover:bg-surface-bright">Add Table</a>
+<a href="{% url 'add_order' %}" class="px-4 py-1.5 bg-[#D4AF37] text-on-primary font-body-sm text-[13px] font-semibold rounded-full hover:bg-[#ffe088] transition-all shadow-[0_0_15px_rgba(212,175,55,0.2)]">Create Order</a>
+</div>
+</div>
+</header>
+<main class="flex-1 mt-20 p-margin flex justify-center w-full">
+<div class="w-full max-w-7xl flex flex-col gap-lg">
+<div class="mb-md flex justify-between items-end border-b border-outline-variant/20 pb-md">
+<div>
+<h2 class="font-h1-header text-[36px] text-on-surface tracking-tight">Order Management</h2>
+<p class="font-body-main text-[15px] text-on-surface-variant mt-2 font-light">Live overview of all kitchen tickets and floor service.</p>
+</div>
+<div class="flex gap-2 bg-surface-container-high/50 p-1 rounded-lg border border-outline-variant/20 backdrop-blur-sm">
+<form method="get" class="contents">
+<button type="submit" name="status" value="" class="px-4 py-1.5 bg-primary/10 text-primary font-body-sm text-[13px] font-medium rounded-md border border-primary/20 shadow-sm transition-all">All</button>
+<button type="submit" name="status" value="Pending" class="px-4 py-1.5 text-on-surface-variant font-body-sm text-[13px] font-medium rounded-md hover:bg-surface-bright hover:text-surface-tint transition-all">Pending</button>
+<button type="submit" name="status" value="served" class="px-4 py-1.5 text-on-surface-variant font-body-sm text-[13px] font-medium rounded-md hover:bg-surface-bright hover:text-secondary transition-all">Served</button>
+</form>
+</div>
+</div>
+<div class="glass-panel rounded-xl overflow-hidden flex flex-col shadow-2xl border border-outline-variant/20">
+<div class="grid grid-cols-12 gap-4 px-lg py-4 border-b border-outline-variant/30 bg-surface-container-lowest/80 backdrop-blur-md">
+<div class="col-span-2 font-label-caps text-[11px] text-on-surface-variant tracking-widest uppercase">Order ID</div>
+<div class="col-span-1 font-label-caps text-[11px] text-on-surface-variant tracking-widest uppercase">Table</div>
+<div class="col-span-4 font-label-caps text-[11px] text-on-surface-variant tracking-widest uppercase">Items Summary</div>
+<div class="col-span-2 font-label-caps text-[11px] text-on-surface-variant tracking-widest uppercase text-right">Total</div>
+<div class="col-span-2 font-label-caps text-[11px] text-on-surface-variant tracking-widest uppercase pl-4">Status</div>
+<div class="col-span-1 font-label-caps text-[11px] text-on-surface-variant tracking-widest uppercase text-right">Items</div>
+</div>
+<div class="flex flex-col bg-surface/40 divide-y divide-outline-variant/10">
+{% for order in orders %}
+<div class="grid grid-cols-12 gap-4 px-lg py-5 hover:bg-surface-container-high/50 transition-all duration-300 group cursor-pointer relative overflow-hidden {% if order.status == 'Pending' %}bg-surface-tint/5{% endif %}">
+<div class="absolute left-0 top-0 bottom-0 w-1 {% if order.status == 'Pending' %}bg-primary{% elif order.status == 'served' %}bg-secondary{% endif %} transition-colors"></div>
+<div class="col-span-2 flex items-center">
+<span class="font-data-mono text-[14px] {% if order.status == 'Pending' %}text-primary{% else %}text-on-surface-variant{% endif %} font-medium group-hover:text-primary-fixed transition-colors">#ORD-{{ order.id|stringformat:"04d" }}</span>
+</div>
+<div class="col-span-1 flex items-center">
+<span class="font-data-mono text-[12px] text-on-surface bg-surface-container px-2.5 py-1 rounded border border-outline-variant/30 shadow-sm group-hover:border-primary/30 transition-colors">T-{{ order.table.number|stringformat:"02d" }}</span>
+</div>
+<div class="col-span-4 flex items-center">
+<span class="font-body-main text-[14px] text-on-surface truncate group-hover:text-white transition-colors">{% for item in order.items.all %}{{ item.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</span>
+</div>
+<div class="col-span-2 flex items-center justify-end">
+<span class="font-data-mono text-[14px] text-on-surface font-medium">${{ order.total }}</span>
+</div>
+<div class="col-span-2 flex items-center pl-4">
+{% if order.status == 'Pending' %}
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/10 backdrop-blur-sm"><div class="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse"></div><span class="font-label-caps text-[10px] text-[#D4AF37] tracking-wider">Pending</span></div>
+{% elif order.status == 'served' %}
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-secondary/20 bg-secondary/5 backdrop-blur-sm"><div class="w-1.5 h-1.5 rounded-full bg-secondary"></div><span class="font-label-caps text-[10px] text-secondary tracking-wider">Served</span></div>
+{% endif %}
+</div>
+<div class="col-span-1 flex items-center justify-end gap-1">
+<a href="{% url 'update_order' order.id %}" class="p-1 rounded hover:bg-surface-bright transition-colors"><span class="material-symbols-outlined text-[16px] text-on-surface-variant hover:text-primary">edit</span></a>
+<a href="{% url 'delete_order' order.id %}" class="p-1 rounded hover:bg-surface-bright transition-colors"><span class="material-symbols-outlined text-[16px] text-on-surface-variant hover:text-error">delete</span></a>
+</div>
+</div>
+{% empty %}
+<div class="flex items-center justify-center py-xl">
+<p class="font-body-main text-body-main text-on-surface-variant">No orders yet.</p>
+</div>
+{% endfor %}
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

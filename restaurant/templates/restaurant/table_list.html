@@ -1,252 +1,236 @@
-{% extends 'restaurant/base.html' %}
-
-{% block title %}Tables{% endblock %}
-{% block title_text %}Floor Plan{% endblock %}
-{% block breadcrumb %}Home &rsaquo; Tables &mdash; <span style="color:var(--ember);">{{ tables|length }} tables</span>
-{% endblock %}
-
-{% block page_actions %}
-<div style="display:flex;gap:8px;align-items:center;">
-  <!-- View Toggle -->
-  <div
-    style="display:flex;background:var(--surface-hi);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px;gap:2px;">
-    <button onclick="switchView('floor',this)" id="btn-floor"
-      style="padding:5px 14px;border:none;border-radius:4px;font-family:var(--font-sans);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--transition);background:var(--ember);color:#fff;display:inline-flex;align-items:center;gap:6px;">
-      <i data-lucide="layout-dashboard" style="width:13px;height:13px;"></i> Floor
-    </button>
-    <button onclick="switchView('list',this)" id="btn-list"
-      style="padding:5px 14px;border:none;border-radius:4px;font-family:var(--font-sans);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--transition);background:transparent;color:var(--muted);display:inline-flex;align-items:center;gap:6px;">
-      <i data-lucide="list" style="width:13px;height:13px;"></i> List
-    </button>
-  </div>
-  <a href="{% url 'add_table' %}" class="btn btn-primary" style="height:38px;padding:0 16px;font-size:13px;">
-    <i data-lucide="plus" style="width:14px;height:14px;"></i>
-    Add Table
-  </a>
-</div>
-{% endblock %}
-
-{% block content %}
-
-<!-- Status Legend + Search -->
-<div style="display:flex;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:24px;">
-  <div style="display:flex;gap:16px;align-items:center;">
-    <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);">
-      <span style="width:8px;height:8px;border-radius:50%;background:var(--status-green);display:inline-block;"></span>
-      Free
-    </div>
-    <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);">
-      <span style="width:8px;height:8px;border-radius:50%;background:var(--ember);display:inline-block;"></span>
-      Occupied
-    </div>
-    <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);">
-      <span style="width:8px;height:8px;border-radius:50%;background:var(--status-blue);display:inline-block;"></span>
-      Reserved
-    </div>
-  </div>
-  <form method="get" style="margin-left:auto;position:relative;">
-    <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--ghost);display:flex;">
-      <i data-lucide="search" style="width:13px;height:13px;"></i>
-    </span>
-    <input type="text" name="q" placeholder="Table number…" value="{{ request.GET.q|default:'' }}"
-      style="height:36px;padding:0 12px 0 32px;background:var(--surface-hi);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--cream);font-size:13px;width:180px;outline:none;transition:all var(--transition);"
-      onfocus="this.style.borderColor='var(--ember)'" onblur="this.style.borderColor='var(--border)'">
-  </form>
-</div>
-
-<!-- ── FLOOR VIEW ── -->
-<div id="floor-view">
-  <div
-    style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:40px;min-height:420px;position:relative;overflow:hidden;">
-
-    <!-- Grid texture -->
-    <div style="position:absolute;inset:0;background-image:
-            linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-            background-size:48px 48px;pointer-events:none;"></div>
-
-    <!-- Corner labels -->
-    <div
-      style="position:absolute;top:16px;left:20px;font-family:var(--font-mono);font-size:9px;color:var(--ghost);letter-spacing:0.12em;">
-      ENTRANCE →</div>
-    <div
-      style="position:absolute;bottom:16px;right:20px;font-family:var(--font-mono);font-size:9px;color:var(--ghost);letter-spacing:0.12em;">
-      ← KITCHEN</div>
-
-    <div
-      style="position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:16px;justify-content:center;align-items:center;min-height:340px;">
-      {% for table in tables %}
-      {% with st=table.status %}
-      <div class="floor-table" style="
-                position:relative;
-                width:104px;
-                border-radius:12px;
-                border:2px solid {% if st == 'free' %}rgba(76,175,125,0.5){% elif st == 'occupied' %}rgba(196,96,26,0.6){% else %}rgba(90,154,232,0.5){% endif %};
-                background:{% if st == 'free' %}rgba(76,175,125,0.06){% elif st == 'occupied' %}rgba(196,96,26,0.08){% else %}rgba(90,154,232,0.06){% endif %};
-                padding:20px 12px 16px;
-                text-align:center;
-                cursor:pointer;
-                transition:all 250ms ease;
-                ">
-
-        <!-- Pulsing status dot -->
-        <div
-          style="position:absolute;top:10px;right:10px;width:8px;height:8px;border-radius:50%;
-                    background:{% if st == 'free' %}var(--status-green){% elif st == 'occupied' %}var(--ember){% else %}var(--status-blue){% endif %};
-                    {% if st == 'occupied' %}animation:pulse 1.5s ease-in-out infinite;{% elif st == 'free' %}animation:pulse 3s ease-in-out infinite;{% endif %}">
-        </div>
-
-        <!-- Seat indicators (top) -->
-        <div style="display:flex;justify-content:center;gap:4px;margin-bottom:10px;">
-          {% for i in "1234"|make_list %}
-          {% if forloop.counter <= table.seats|divisibleby:2 %} <div
-            style="width:10px;height:10px;border-radius:50%;background:{% if st == 'free' %}rgba(76,175,125,0.3){% elif st == 'occupied' %}rgba(196,96,26,0.4){% else %}rgba(90,154,232,0.3){% endif %};border:1px solid {% if st == 'free' %}rgba(76,175,125,0.4){% elif st == 'occupied' %}rgba(196,96,26,0.5){% else %}rgba(90,154,232,0.4){% endif %};">
-        </div>
-        {% endif %}
-        {% endfor %}
-      </div>
-
-      <div
-        style="font-family:var(--font-mono);font-size:22px;font-weight:500;color:var(--cream);letter-spacing:-0.5px;">
-        T{{ table.number }}</div>
-      <div style="font-size:10px;color:var(--muted);margin-top:3px;font-weight:300;">{{ table.seats }} seats</div>
-
-      <!-- Status label -->
-      <div
-        style="margin-top:8px;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;font-weight:500;
-                    color:{% if st == 'free' %}var(--status-green){% elif st == 'occupied' %}var(--ember){% else %}var(--status-blue){% endif %};">
-        {{ st|capfirst }}
-      </div>
-
-      <!-- Hover actions -->
-      <div class="floor-actions"
-        style="position:absolute;inset:0;border-radius:10px;background:rgba(17,16,9,0.9);backdrop-filter:blur(4px);opacity:0;transition:opacity 200ms ease;display:flex;align-items:center;justify-content:center;gap:8px;">
-        <a href="{% url 'update_table' table.id %}" class="btn btn-ghost"
-          style="height:30px;padding:0 12px;font-size:11px;border-color:rgba(255,255,255,0.15);">
-          <i data-lucide="pencil" style="width:11px;height:11px;"></i>
-        </a>
-        <a href="{% url 'delete_table' table.id %}"
-          style="height:30px;padding:0 12px;display:inline-flex;align-items:center;border-radius:var(--radius-sm);border:1px solid rgba(232,90,58,0.4);background:rgba(232,90,58,0.12);color:var(--status-red);font-size:11px;">
-          <i data-lucide="trash-2" style="width:11px;height:11px;"></i>
-        </a>
-      </div>
-    </div>
-    {% endwith %}
-    {% empty %}
-    <div class="empty-state">
-      <div class="empty-icon"><i data-lucide="armchair" style="width:24px;height:24px;"></i></div>
-      <div class="empty-title">No tables yet</div>
-      <div class="empty-text">Add tables to build your floor plan</div>
-      <a href="{% url 'add_table' %}" class="btn btn-primary">
-        <i data-lucide="plus" style="width:14px;height:14px;"></i>
-        Add First Table
-      </a>
-    </div>
-    {% endfor %}
-  </div>
-</div>
-</div>
-
-<!-- ── LIST VIEW ── -->
-<div id="list-view" style="display:none;">
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;">
-    {% for table in tables %}
-    {% with st=table.status %}
-    <div class="card" style="padding:20px;position:relative;overflow:hidden;">
-      <!-- Left accent bar -->
-      <div
-        style="position:absolute;left:0;top:0;bottom:0;width:3px;
-                background:{% if st == 'free' %}var(--status-green){% elif st == 'occupied' %}var(--ember){% else %}var(--status-blue){% endif %};border-radius:0 2px 2px 0;">
-      </div>
-
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-        <span style="font-family:var(--font-serif);font-style:italic;font-size:26px;color:var(--cream);">Table {{
-          table.number }}</span>
-        <span style="width:10px;height:10px;border-radius:50%;flex-shrink:0;
-                    background:{% if st == 'free' %}var(--status-green){% elif st == 'occupied' %}var(--ember){% else %}var(--status-blue){% endif %};
-                    {% if st != 'reserved' %}animation:pulse 2s ease-in-out infinite;{% endif %}">
-        </span>
-      </div>
-
-      <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-bottom:16px;">
-        <i data-lucide="users" style="width:13px;height:13px;"></i>
-        {{ table.seats }} seats
-      </div>
-
-      <!-- Ghost number watermark -->
-      <div
-        style="position:absolute;right:-8px;bottom:-10px;font-family:var(--font-mono);font-size:72px;font-weight:600;color:var(--cream);opacity:0.03;pointer-events:none;line-height:1;">
-        {{ table.number }}</div>
-
-      <div
-        style="display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--border);">
-        {% if st == 'free' %}
-        <span class="badge badge-green"><span class="status-dot"></span>Free</span>
-        {% elif st == 'occupied' %}
-        <span class="badge badge-amber"><span class="status-dot pulse"></span>Occupied</span>
-        {% else %}
-        <span class="badge badge-blue"><span class="status-dot"></span>Reserved</span>
-        {% endif %}
-        <div style="display:flex;gap:5px;">
-          <a href="{% url 'update_table' table.id %}" class="btn-icon" style="width:28px;height:28px;"><i
-              data-lucide="pencil" style="width:11px;height:11px;"></i></a>
-          <a href="{% url 'delete_table' table.id %}" class="btn-icon danger" style="width:28px;height:28px;"><i
-              data-lucide="trash-2" style="width:11px;height:11px;"></i></a>
-        </div>
-      </div>
-    </div>
-    {% endwith %}
-    {% empty %}
-    <div style="grid-column:1/-1;">
-      <div class="empty-state">
-        <div class="empty-icon"><i data-lucide="armchair" style="width:24px;height:24px;"></i></div>
-        <div class="empty-title">No tables yet</div>
-        <div class="empty-text">Add your first table to manage seating</div>
-        <a href="{% url 'add_table' %}" class="btn btn-primary">Add First Table</a>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-</div>
-
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RestaurantOS - Tables</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&amp;family=Outfit:wght@400;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#ffd9dc",
+                        "surface-tint": "#e9c349",
+                        "primary-container": "#d4af37",
+                        "tertiary-container": "#ff94a1",
+                        "on-error": "#690005",
+                        "background": "#111316",
+                        "primary-fixed-dim": "#e9c349",
+                        "inverse-primary": "#735c00",
+                        "outline-variant": "#4d4635",
+                        "surface": "#111316",
+                        "on-primary-fixed-variant": "#574500",
+                        "surface-variant": "#333538",
+                        "primary-fixed": "#ffe088",
+                        "inverse-surface": "#e2e2e6",
+                        "surface-bright": "#37393d",
+                        "error-container": "#93000a",
+                        "on-secondary": "#003824",
+                        "on-primary": "#3c2f00",
+                        "surface-container-highest": "#333538",
+                        "on-background": "#e2e2e6",
+                        "secondary-fixed-dim": "#4edea3",
+                        "on-primary-container": "#554300",
+                        "on-tertiary-container": "#8e002f",
+                        "on-surface-variant": "#d0c5af",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#005236",
+                        "surface-container": "#1e2023",
+                        "surface-container-low": "#1a1c1f",
+                        "surface-container-lowest": "#0c0e11",
+                        "on-tertiary": "#670020",
+                        "secondary-container": "#00a572",
+                        "inverse-on-surface": "#2f3034",
+                        "on-tertiary-fixed": "#400010",
+                        "error": "#ffb4ab",
+                        "on-secondary-container": "#00311f",
+                        "surface-dim": "#111316",
+                        "on-surface": "#e2e2e6",
+                        "outline": "#99907c",
+                        "tertiary": "#ffbec4",
+                        "secondary": "#4edea3",
+                        "surface-container-high": "#282a2d",
+                        "on-secondary-fixed": "#002113",
+                        "tertiary-fixed-dim": "#ffb2ba",
+                        "on-tertiary-fixed-variant": "#910130",
+                        "secondary-fixed": "#6ffbbe",
+                        "primary": "#f2ca50",
+                        "on-primary-fixed": "#241a00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "md": "16px",
+                        "xl": "40px",
+                        "xs": "4px",
+                        "margin": "32px",
+                        "sm": "8px",
+                        "lg": "24px",
+                        "grid-columns": "12",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Outfit"],
+                        "body-main": ["Outfit"],
+                        "label-caps": ["Outfit"],
+                        "data-mono": ["JetBrains Mono"],
+                        "h1-header": ["Playfair Display"],
+                        "h2-subhead": ["Playfair Display"],
+                        "display-hero": ["Playfair Display"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "body-main": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-caps": ["11px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "data-mono": ["13px", { "lineHeight": "1.4", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+                        "h1-header": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "h2-subhead": ["24px", { "lineHeight": "1.4", "fontWeight": "500" }],
+                        "display-hero": ["48px", { "lineHeight": "1.2", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
 <style>
-  .floor-table:hover {
-    transform: scale(1.06);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  }
-
-  .floor-table:hover .floor-actions {
-    opacity: 1 !important;
-  }
-
-  @keyframes pulse {
-
-    0%,
-    100% {
-      opacity: 1;
-    }
-
-    50% {
-      opacity: 0.3;
-    }
-  }
-</style>
-
-{% endblock %}
-
-{% block extra_js %}
-<script>
-  function switchView(view, btn) {
-    document.getElementById('floor-view').style.display = view === 'floor' ? 'block' : 'none';
-    document.getElementById('list-view').style.display = view === 'list' ? 'block' : 'none';
-
-    ['btn-floor', 'btn-list'].forEach(id => {
-      const b = document.getElementById(id);
-      b.style.background = 'transparent';
-      b.style.color = 'var(--muted)';
-    });
-    document.getElementById('btn-' + view).style.background = 'var(--ember)';
-    document.getElementById('btn-' + view).style.color = '#fff';
-  }
-</script>
-{% endblock %}
+        body {
+            background-color: #111316;
+            color: #e2e2e6;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .floor-table-card:hover .floor-actions {
+            opacity: 1 !important;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        .animate-pulse-custom {
+            animation: pulse 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-main antialiased selection:bg-primary selection:text-on-primary">
+<nav class="fixed left-0 top-0 h-full flex flex-col z-50 bg-surface-container dark:bg-surface-container docked full-height left-0 w-64 border-r border-outline-variant/30 backdrop-blur-xl flat no shadows">
+<div class="p-lg border-b border-outline-variant/30">
+<h1 class="font-h2-subhead text-h2-subhead text-primary dark:text-primary">RestaurantOS</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Kitchen HQ</p>
+</div>
+<div class="flex-1 overflow-y-auto py-md flex flex-col gap-sm">
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors font-body-main text-body-main" href="{% url 'dashboard' %}">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-md bg-primary/10 text-primary border-r-2 border-primary py-3 px-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors font-body-main text-body-main Active: opacity-90 scale-[0.99] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="table_restaurant" style="font-variation-settings: 'FILL' 1;">table_restaurant</span>
+<span>Tables</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors font-body-main text-body-main" href="{% url 'menu_list' %}">
+<span class="material-symbols-outlined" data-icon="restaurant_menu">restaurant_menu</span>
+<span>Menu</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors font-body-main text-body-main" href="{% url 'order_list' %}">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span>Orders</span>
+</a>
+</div>
+<div class="p-md border-t border-outline-variant/30 flex flex-col gap-sm">
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors font-body-main text-body-main" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors font-body-main text-body-main" href="{% url 'logout' %}">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span>Logout</span>
+</a>
+</div>
+</nav>
+<header class="fixed top-0 right-0 w-[calc(100%-16rem)] flex justify-between items-center px-margin py-md z-40 bg-surface/70 dark:bg-surface/70 border-b border-outline-variant/30 backdrop-blur-xl flat no shadows docked full-width top-0">
+<div class="flex items-center gap-xl">
+<span class="font-h1-header text-h1-header text-primary dark:text-primary">RestaurantOS</span>
+<nav class="hidden md:flex items-center gap-lg font-h2-subhead text-h2-subhead">
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors Click: glow-sm transition-all" href="{% url 'dashboard' %}">Overview</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex items-center gap-sm text-on-surface-variant">
+<button class="p-xs hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-xs hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+</div>
+<div class="flex items-center gap-sm border-l border-outline-variant/30 pl-md">
+<a href="{% url 'add_table' %}" class="px-md py-sm bg-transparent border border-outline-variant text-on-surface hover:text-primary hover:border-primary transition-colors font-body-sm text-body-sm rounded">Add Table</a>
+<a href="{% url 'add_order' %}" class="px-md py-sm bg-primary text-on-primary font-body-sm text-body-sm font-bold rounded hover:bg-primary-fixed transition-colors">Create Order</a>
+</div>
+</div>
+</header>
+<main class="ml-64 pt-[100px] p-margin min-h-screen">
+<div class="flex flex-wrap items-center justify-between gap-md mb-xl glass-panel p-md rounded-xl">
+<div class="flex items-center gap-md flex-1">
+<form method="get" class="relative w-64">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-sm pointer-events-none" data-icon="search">search</span>
+<input name="q" value="{{ request.GET.q|default:'' }}" class="w-full bg-surface-container border border-outline-variant rounded py-sm pl-xl pr-sm text-on-surface font-data-mono text-data-mono focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder:text-on-surface-variant/50" placeholder="Search tables..." type="text"/>
+</form>
+<div class="flex items-center gap-sm">
+<span class="px-sm py-xs border border-outline-variant rounded font-label-caps text-label-caps text-on-surface-variant flex items-center gap-xs"><span class="w-2 h-2 rounded-full bg-secondary"></span> Available</span>
+<span class="px-sm py-xs border border-outline-variant rounded font-label-caps text-label-caps text-on-surface-variant flex items-center gap-xs"><span class="w-2 h-2 rounded-full bg-primary"></span> Occupied</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-2xl p-lg border border-outline-variant/30 relative min-h-[700px] overflow-hidden shadow-inner">
+<div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px); background-size: 40px 40px;"></div>
+<div class="absolute top-0 left-1/4 w-1/2 h-4 bg-outline-variant/20 rounded-b-lg"></div>
+<div class="absolute top-lg left-1/4 w-1/2 text-center font-label-caps text-label-caps text-on-surface-variant/50 tracking-[0.2em]">KITCHEN PASS</div>
+<div class="absolute bottom-0 right-1/4 w-32 h-4 bg-outline-variant/20 rounded-t-lg"></div>
+<div class="absolute bottom-lg right-1/4 w-32 text-center font-label-caps text-label-caps text-on-surface-variant/50 tracking-[0.2em]">ENTRANCE</div>
+<div class="absolute left-0 top-1/2 w-4 h-1/3 -translate-y-1/2 bg-outline-variant/20 rounded-r-lg"></div>
+<div class="absolute left-lg top-1/2 -translate-y-1/2 -rotate-90 font-label-caps text-label-caps text-on-surface-variant/50 tracking-[0.2em] whitespace-nowrap">BAR AREA</div>
+<div class="relative z-10 w-full h-full p-8 min-h-[600px]">
+{% if tables %}
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+{% for table in tables %}
+{% with st=table.status %}
+<div class="floor-table-card bg-surface border-2 {% if st == 'free' %}border-secondary/40{% elif st == 'occupied' %}border-primary/50{% else %}border-outline-variant border-dashed{% endif %} rounded-xl flex flex-col items-center justify-center hover:bg-surface-container-high transition-all group cursor-pointer relative overflow-hidden min-h-[160px]">
+{% if st == 'occupied' %}<div class="absolute inset-0 bg-primary/5"></div>{% endif %}
+<span class="absolute top-3 right-3 w-3 h-3 rounded-full {% if st == 'free' %}bg-secondary shadow-[0_0_8px_rgba(78,222,163,0.8)]{% elif st == 'occupied' %}bg-primary shadow-[0_0_10px_rgba(242,202,80,1)] animate-pulse-custom{% else %}bg-outline{% endif %}"></span>
+<span class="font-data-mono {% if st == 'occupied' %}text-display-hero text-primary{% else %}text-h1-header text-on-surface{% endif %} group-hover:{% if st == 'free' %}text-secondary{% elif st == 'occupied' %}text-primary{% else %}text-on-surface{% endif %} transition-colors mb-xs">T{{ table.number }}</span>
+<div class="flex flex-col items-center {% if st == 'occupied' %}relative z-10{% endif %}">
+<span class="font-body-sm text-body-sm text-on-surface-variant">{{ table.seats }} Seats</span>
+{% if st == 'occupied' %}
+<span class="font-data-mono text-label-caps text-primary/80 mt-1">{{ st|capfirst }}</span>
+{% endif %}
+</div>
+<div class="floor-actions absolute inset-0 rounded-xl bg-surface/90 backdrop-blur-sm opacity-0 transition-opacity duration-200 flex items-center justify-center gap-3">
+<a href="{% url 'update_table' table.id %}" class="w-10 h-10 rounded-full bg-surface-bright border border-outline-variant/50 flex items-center justify-center text-on-surface hover:text-primary hover:border-primary transition-all"><span class="material-symbols-outlined text-sm">edit</span></a>
+<a href="{% url 'delete_table' table.id %}" class="w-10 h-10 rounded-full bg-error-container/20 border border-error/40 flex items-center justify-center text-error hover:bg-error-container/40 transition-all"><span class="material-symbols-outlined text-sm">delete</span></a>
+</div>
+</div>
+{% endwith %}
+{% endfor %}
+</div>
+{% else %}
+<div class="flex flex-col items-center justify-center min-h-[400px] gap-md">
+<span class="material-symbols-outlined text-6xl text-on-surface-variant/30">table_restaurant</span>
+<p class="font-body-main text-body-main text-on-surface-variant">No tables yet. Add your first table to get started.</p>
+<a href="{% url 'add_table' %}" class="px-md py-sm bg-primary text-on-primary font-body-sm text-body-sm font-bold rounded hover:bg-primary-fixed transition-colors">Add Table</a>
+</div>
+{% endif %}
+</div>
+</div>
+</main>
+</body></html>

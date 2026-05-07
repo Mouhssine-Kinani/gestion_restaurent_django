@@ -102,6 +102,10 @@ def order_list(request):
 
 @login_required
 def add_order(request):
+    menu_items = MenuItem.objects.all()
+    tables = Table.objects.all()
+    last_order = Order.objects.last()
+    next_order_id = (last_order.id + 1) if last_order else 1
     if request.method == 'POST':
         form = OrderForm(request.POST)
         if form.is_valid():
@@ -109,7 +113,7 @@ def add_order(request):
             return redirect('order_list')
     else:
         form = OrderForm()
-    return render(request, 'restaurant/add_order.html', {'form': form})
+    return render(request, 'restaurant/add_order.html', {'form': form, 'menu_items': menu_items, 'tables': tables, 'next_order_id': next_order_id})
 
 @login_required
 def update_order(request, id):
@@ -166,4 +170,10 @@ def dashboard(request):
     menu_items = MenuItem.objects.all().order_by('name')
     orders = Order.objects.all().order_by('-id')
 
-    return render(request, 'restaurant/dashboard.html',{'tables': tables, 'menu_items': menu_items, 'orders': orders})
+    total_revenue = sum(order.total for order in orders)
+    total_orders = orders.count()
+    active_tables = tables.filter(status='occupied').count()
+    total_tables = tables.count()
+    menu_count = menu_items.count()
+
+    return render(request, 'restaurant/dashboard.html', {'tables': tables, 'menu_items': menu_items, 'orders': orders, 'total_revenue': total_revenue, 'total_orders': total_orders, 'active_tables': active_tables, 'total_tables': total_tables, 'menu_count': menu_count})

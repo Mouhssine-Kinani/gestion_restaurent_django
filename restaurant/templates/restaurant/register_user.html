@@ -1,299 +1,151 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Register - RestaurantOS</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        :root {
-            --bg-base:        #0f0e0d;
-            --bg-surface:     #1a1815;
-            --bg-elevated:    #242019;
-            --bg-input:       #1e1c18;
-            --gold:           #c9a84c;
-            --gold-light:     #e8c97a;
-            --gold-dim:       #6b5520;
-            --cream:          #f5edd6;
-            --muted:          #7d7260;
-            --ghost:          #3d3830;
-            --status-red:     #e85a3a;
-            --status-green:   #4caf7d;
-            --font-display: 'Cormorant Garamond', serif;
-            --font-body:    'DM Sans', sans-serif;
-            --font-mono:    'DM Mono', monospace;
-            --radius-md:  12px;
-            --radius-xl:  28px;
-            --transition-fast:   150ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-base:   250ms cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        * { margin:0; padding:0; box-sizing: border-box; }
-
-        body {
-            font-family: var(--font-body);
-            background: var(--bg-base);
-            color: var(--cream);
-            min-height: 100vh;
-            display: flex;
-            margin: 0;
-        }
-
-        h1, h2, h3, .font-display { font-family: var(--font-display); }
-
-        /* LEFT: Brand Panel */
-        .brand-panel {
-            width: 50%;
-            min-height: 100vh;
-            background: var(--bg-surface);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 48px 32px;
-            overflow: hidden;
-        }
-
-        .brand-panel::before {
-            content: '';
-            position: absolute;
-            width: 400px; height: 400px;
-            border-radius: 50%;
-            background: var(--gold-dim);
-            opacity: 0.03;
-            top: -100px; left: -100px;
-        }
-        .brand-panel::after {
-            content: '';
-            position: absolute;
-            width: 300px; height: 300px;
-            border-radius: 50%;
-            background: var(--gold-dim);
-            opacity: 0.04;
-            bottom: -80px; right: -80px;
-        }
-
-        .brand-content { position: relative; z-index: 1; text-align: center; }
-        .brand-icon { width: 120px; height: 120px; margin: 0 auto 24px; color: var(--gold-dim); }
-        .brand-name { font-family: var(--font-display); font-style: italic; font-size: 42px; color: var(--cream); margin-bottom: 16px; }
-        .brand-tagline { font-size: 16px; color: var(--muted); max-width: 300px; line-height: 1.6; margin: 0 auto 40px; }
-        .brand-features { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-        .feature-pill { padding: 6px 14px; background: var(--bg-elevated); border: 1px solid var(--ghost); border-radius: 100px; font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
-        .brand-version { position: absolute; bottom: 24px; font-family: var(--font-mono); font-size: 11px; color: var(--ghost); }
-
-        /* RIGHT: Form Panel */
-        .form-panel {
-            width: 50%;
-            min-height: 100vh;
-            background: var(--bg-base);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 48px 32px;
-        }
-
-        .form-container { width: 100%; max-width: 360px; }
-
-        .form-header { text-align: center; margin-bottom: 40px; }
-        .form-header .welcome { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
-        .form-header h1 { font-family: var(--font-display); font-style: italic; font-size: 32px; color: var(--cream); }
-
-        .form-group { margin-bottom: 20px; }
-        .form-label { display: block; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 6px; }
-
-        .form-input {
-            width: 100%; height: 48px; padding: 12px 16px;
-            background: var(--bg-input); border: 1px solid var(--ghost);
-            border-radius: var(--radius-md); color: var(--cream);
-            font-family: var(--font-body); font-size: 14px; outline: none;
-            transition: all var(--transition-fast);
-        }
-        .form-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.12); }
-        .form-input::placeholder { color: var(--muted); }
-
-        .password-wrapper { position: relative; }
-        .password-toggle {
-            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-            background: none; border: none; color: var(--muted); cursor: pointer; padding: 4px; display: flex;
-        }
-
-        /* Password Strength */
-        .strength-meter { margin-top: 8px; }
-        .strength-segments { display: flex; gap: 4px; margin-bottom: 4px; }
-        .strength-seg { flex: 1; height: 4px; border-radius: 2px; background: var(--ghost); transition: background 0.3s; }
-        .strength-label { font-size: 11px; font-family: var(--font-body); transition: color 0.3s; }
-
-        .helptext { display: block; color: var(--muted); font-size: 12px; margin-top: 4px; }
-        .errorlist { color: var(--status-red); font-size: 12px; margin-top: 4px; list-style: none; padding: 0; }
-
-        .btn-primary {
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            width: 100%; height: 52px;
-            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
-            color: var(--bg-base); font-family: var(--font-body); font-weight: 600; font-size: 15px;
-            border: none; border-radius: var(--radius-md); cursor: pointer;
-            box-shadow: 0 4px 16px rgba(201,168,76,0.25); transition: all var(--transition-base);
-        }
-        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(201,168,76,0.35); }
-
-        .form-footer { text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--ghost); font-size: 13px; color: var(--muted); }
-        .form-footer a { color: var(--gold); text-decoration: none; font-weight: 500; }
-        .form-footer a:hover { color: var(--gold-light); }
-
-        .copyright { text-align: center; margin-top: 48px; font-family: var(--font-mono); font-size: 11px; color: var(--ghost); }
-
-        [i-lucide] { display: inline-flex; align-items: center; justify-content: center; }
-
-        @media (max-width: 768px) {
-            body { flex-direction: column; }
-            .brand-panel, .form-panel { width: 100%; min-height: auto; }
-        }
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RestaurantOS - Registration</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&amp;family=JetBrains+Mono:wght@300;400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@200..400,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "primary": "#f2ca50",
+                "secondary-fixed": "#6ffbbe",
+                "secondary-container": "#00a572",
+                "on-surface": "#e2e2e6",
+                "on-background": "#e2e2e6",
+                "surface-container-high": "#282a2d",
+                "tertiary": "#ffbec4",
+                "on-primary-fixed-variant": "#574500",
+                "background": "#111316",
+                "on-primary": "#3c2f00",
+                "inverse-on-surface": "#2f3034",
+                "surface-container-low": "#1a1c1f",
+                "on-primary-fixed": "#241a00",
+                "on-secondary": "#003824",
+                "surface-bright": "#37393d",
+                "on-secondary-fixed-variant": "#005236",
+                "surface-container": "#1e2023",
+                "on-tertiary-container": "#8e002f",
+                "error-container": "#93000a",
+                "on-primary-container": "#554300",
+                "secondary-fixed-dim": "#4edea3",
+                "primary-container": "#d4af37",
+                "tertiary-fixed-dim": "#ffb2ba",
+                "on-secondary-fixed": "#002113",
+                "on-error": "#690005",
+                "tertiary-container": "#ff94a1",
+                "on-tertiary-fixed-variant": "#910130",
+                "surface": "#111316",
+                "inverse-surface": "#e2e2e6",
+                "surface-variant": "#333538",
+                "surface-container-lowest": "#0c0e11",
+                "outline": "#99907c",
+                "surface-dim": "#111316",
+                "on-tertiary": "#670020",
+                "primary-fixed-dim": "#e9c349",
+                "outline-variant": "#4d4635",
+                "inverse-primary": "#735c00",
+                "tertiary-fixed": "#ffd9dc",
+                "on-secondary-container": "#00311f",
+                "primary-fixed": "#ffe088",
+                "on-tertiary-fixed": "#400010",
+                "secondary": "#4edea3",
+                "on-error-container": "#ffdad6",
+                "surface-container-highest": "#333538",
+                "error": "#ffb4ab",
+                "surface-tint": "#e9c349",
+                "on-surface-variant": "#d0c5af"
+        },
+        "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+        "spacing": { "gutter": "16px", "lg": "24px", "base": "4px", "xl": "40px", "sm": "8px", "md": "16px", "xs": "4px", "margin": "32px", "grid-columns": "12" },
+        "fontFamily": { "label-caps": ["Outfit"], "body-sm": ["Outfit"], "h1-header": ["Playfair Display"], "display-hero": ["Playfair Display"], "h2-subhead": ["Playfair Display"], "data-mono": ["JetBrains Mono"], "body-main": ["Outfit"] },
+        "fontSize": { "label-caps": ["11px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700" }], "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }], "h1-header": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }], "display-hero": ["48px", { "lineHeight": "1.2", "fontWeight": "700" }], "h2-subhead": ["24px", { "lineHeight": "1.4", "fontWeight": "500" }], "data-mono": ["13px", { "lineHeight": "1.4", "letterSpacing": "-0.02em", "fontWeight": "500" }], "body-main": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }] }
+      }
+    }
+  }
+</script>
+<style>
+        .glass-panel { background-color: rgba(17, 19, 22, 0.75); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(212, 175, 55, 0.25); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 30px rgba(212, 175, 55, 0.05); }
+        .gold-gradient-text { background: linear-gradient(135deg, #FFE088 0%, #D4AF37 50%, #735C00 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .input-premium { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .input-premium:focus-within { background: rgba(212, 175, 55, 0.05); border-color: rgba(212, 175, 55, 0.5); box-shadow: 0 0 20px rgba(212, 175, 55, 0.1); }
+        .input-premium input:-webkit-autofill,
+        .input-premium input:-webkit-autofill:hover,
+        .input-premium input:-webkit-autofill:focus,
+        .input-premium input:-webkit-autofill:active { -webkit-box-shadow: 0 0 0 30px #111316 inset !important; -webkit-text-fill-color: #e2e2e6 !important; transition: background-color 5000s ease-in-out 0s; }
+        .btn-gold { background: linear-gradient(135deg, #D4AF37 0%, #B49020 100%); position: relative; overflow: hidden; transition: all 0.3s ease; }
+        .btn-gold::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); transition: all 0.5s ease; }
+        .btn-gold:hover::before { left: 100%; }
+        .btn-gold:hover { box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3); transform: translateY(-1px); }
     </style>
 </head>
-<body>
-    <!-- LEFT: Brand Panel -->
-    <div class="brand-panel">
-        <div class="brand-content">
-            <div class="brand-icon">
-                <i data-lucide="utensils" style="width:120px;height:120px;"></i>
-            </div>
-            <div class="brand-name">RestaurantOS</div>
-            <p class="brand-tagline">Create your account to get started managing your restaurant.</p>
-            <div class="brand-features">
-                <div class="feature-pill">
-                    <i data-lucide="clipboard-list" style="width:14px;height:14px;color:var(--gold);"></i>
-                    Orders
-                </div>
-                <div class="feature-pill">
-                    <i data-lucide="book-open" style="width:14px;height:14px;color:var(--gold);"></i>
-                    Menu
-                </div>
-                <div class="feature-pill">
-                    <i data-lucide="armchair" style="width:14px;height:14px;color:var(--gold);"></i>
-                    Tables
-                </div>
-            </div>
-        </div>
-        <div class="brand-version">v1.0.0</div>
-    </div>
-
-    <!-- RIGHT: Form Panel -->
-    <div class="form-panel">
-        <div class="form-container">
-            <div class="form-header">
-                <div class="welcome">Get started</div>
-                <h1>Create your account</h1>
-            </div>
-
-            <form method="post" class="space-y-5" novalidate>
-                {% csrf_token %}
-
-                {% if form.non_field_errors %}
-                <div style="padding:12px 16px; background:rgba(232,90,58,0.1); border:1px solid rgba(232,90,58,0.3); border-radius:var(--radius-md); display:flex; gap:8px; align-items:center; font-size:13px; color:var(--status-red);">
-                    <i data-lucide="alert-circle" style="width:20px;height:20px;flex-shrink:0;"></i>
-                    <span>{{ form.non_field_errors }}</span>
-                </div>
-                {% endif %}
-
-                {% for field in form %}
-                <div class="form-group">
-                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                    {% if field.name == 'password1' or field.name == 'password2' %}
-                    <div class="password-wrapper">
-                        {{ field }}
-                        <button type="button" class="password-toggle" onclick="togglePassword(this)" aria-label="Toggle password visibility">
-                            <i data-lucide="eye" style="width:16px;height:16px;"></i>
-                        </button>
-                    </div>
-                    {% else %}
-                    {{ field }}
-                    {% endif %}
-                    {% if field.help_text %}<div class="helptext">{{ field.help_text|striptags }}</div>{% endif %}
-                    {% if field.errors %}<ul class="errorlist" role="alert">{% for error in field.errors %}<li>{{ error|striptags }}</li>{% endfor %}</ul>{% endif %}
-                </div>
-
-                {% if field.name == 'password1' %}
-                <div class="strength-meter">
-                    <div class="strength-segments">
-                        <div class="strength-seg" id="seg1"></div>
-                        <div class="strength-seg" id="seg2"></div>
-                        <div class="strength-seg" id="seg3"></div>
-                        <div class="strength-seg" id="seg4"></div>
-                    </div>
-                    <div class="strength-label" id="strength-text">Password strength</div>
-                </div>
-                {% endif %}
-                {% endfor %}
-
-                <button type="submit" class="btn-primary">
-                    <i data-lucide="user-plus" style="width:16px;height:16px;"></i>
-                    Create Account
-                </button>
-            </form>
-
-            <div class="form-footer">
-                Already have an account?
-                <a href="{% url 'login' %}">Sign in →</a>
-            </div>
-
-            <div class="copyright">&copy; 2026 RestaurantOS. All rights reserved.</div>
-        </div>
-    </div>
-
-    <script>
-        lucide.createIcons();
-
-        function togglePassword(btn) {
-            const wrapper = btn.closest('.password-wrapper');
-            const input = wrapper.querySelector('input');
-            const icon = btn.querySelector('i');
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.setAttribute('data-lucide', 'eye-off');
-            } else {
-                input.type = 'password';
-                icon.setAttribute('data-lucide', 'eye');
-            }
-            lucide.createIcons();
-        }
-
-        // Password strength
-        const pwInput = document.querySelector('input[name="password1"]') || document.getElementById('id_password1');
-        if (pwInput) {
-            pwInput.addEventListener('input', function() {
-                const val = this.value;
-                let score = 0;
-                if (val.length >= 8) score++;
-                if (/[a-z]/.test(val) && /[A-Z]/.test(val)) score++;
-                if (/\d/.test(val)) score++;
-                if (/[^A-Za-z0-9]/.test(val)) score++;
-
-                const segs = [document.getElementById('seg1'), document.getElementById('seg2'), document.getElementById('seg3'), document.getElementById('seg4')];
-                const colors = ['var(--status-red)', 'var(--amber)', 'var(--gold)', 'var(--status-green)'];
-                const labels = ['Weak', 'Fair', 'Good', 'Strong'];
-
-                segs.forEach((seg, i) => {
-                    if (i < score) {
-                        seg.style.background = colors[score - 1];
-                    } else {
-                        seg.style.background = 'var(--ghost)';
-                    }
-                });
-
-                const textEl = document.getElementById('strength-text');
-                if (val.length === 0) {
-                    textEl.textContent = 'Password strength';
-                    textEl.style.color = 'var(--muted)';
-                } else {
-                    textEl.textContent = labels[score - 1] || 'Weak';
-                    textEl.style.color = colors[score - 1] || 'var(--status-red)';
-                }
-            });
-        }
-    </script>
-</body>
-</html>
+<body class="bg-background text-on-background min-h-screen flex overflow-hidden">
+<div class="flex w-full min-h-screen relative">
+<div class="absolute inset-0 z-0 bg-surface-container-lowest">
+<img alt="Elegant restaurant interior" class="absolute inset-0 w-full h-full object-cover opacity-60" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABwLCmm_RHGO5xWSy-ITm5PhXB6NBZihaDCb3MFd-aQUR3TP5bHp86ILxv1xzg-H_L-vqmDSlS8rd_fi1m3gq-G5lKtas4NqBI4CFyJiL6WtwGrctYqis3Q0lUfGCDXUh-SEQ6ttBPcF4FFZxxmHsuC1a_s8X8cUTQBhR840BLiNQIdYh5f9wedLWRyao_rqMEF-vSB-ZS7yVXWseusiredZt37a5e8MZX9HKssgOoa04I8RFKH7hApF_r51edfETOVbJnpPwsPxQ"/>
+<div class="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-background/60"></div>
+<div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-background/0 to-background/0"></div>
+</div>
+<div class="flex w-full min-h-screen relative z-10">
+<div class="hidden lg:flex lg:w-5/12 relative flex-col justify-end p-xl pl-24 pb-32">
+<div class="mb-xl">
+<div class="w-12 h-[2px] bg-primary mb-md"></div>
+<h2 class="font-display-hero text-[56px] text-on-background mb-lg font-light leading-tight tracking-tight">Elevate Your<br/><i class="text-primary font-serif font-medium">Dining</i> Experience</h2>
+<p class="font-body-main text-[18px] text-on-surface-variant max-w-md font-light leading-relaxed">Join the world's most exclusive establishments using RestaurantOS to orchestrate unforgettable culinary journeys.</p>
+</div>
+</div>
+<div class="w-full lg:w-7/12 flex items-center justify-center p-md lg:p-xl">
+<div class="w-full max-w-[520px] glass-panel rounded-2xl p-lg sm:p-xl lg:p-[56px] relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/10 to-transparent pointer-events-none"></div>
+<div class="mb-12 text-center">
+<h1 class="font-h1-header text-[42px] gold-gradient-text mb-2 tracking-wide font-medium">RestaurantOS</h1>
+<p class="font-body-main text-[15px] text-on-surface-variant font-light">Create your management account</p>
+</div>
+{% if form.errors %}
+<div class="mb-lg p-md bg-error-container/20 border border-error/30 rounded-lg">
+<p class="font-body-sm text-body-sm text-error flex items-center gap-sm"><span class="material-symbols-outlined text-[18px]">error</span> Please correct the errors below.</p>
+</div>
+{% endif %}
+<form class="space-y-8 flex flex-col" method="post">
+{% csrf_token %}
+<div class="space-y-2">
+<label class="font-label-caps text-[11px] text-on-surface-variant uppercase tracking-[0.1em] ml-1 font-medium" for="username">Username / ID</label>
+<div class="relative group input-premium rounded-xl flex items-center h-[60px] px-md">
+<span class="material-symbols-outlined text-outline/50 group-focus-within:text-primary transition-colors text-[22px] font-light">person</span>
+<input class="w-full bg-transparent border-0 text-on-surface font-data-mono text-[14px] py-2 pl-4 pr-4 focus:outline-none focus:ring-0 placeholder-on-surface-variant/30" id="username" name="username" placeholder="e.g. m_scott_01" required="" type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-[11px] text-on-surface-variant uppercase tracking-[0.1em] ml-1 font-medium" for="password">Password</label>
+<div class="relative group input-premium rounded-xl flex items-center h-[60px] px-md">
+<span class="material-symbols-outlined text-outline/50 group-focus-within:text-primary transition-colors text-[22px] font-light">lock</span>
+<input class="w-full bg-transparent border-0 text-on-surface font-data-mono text-[14px] py-2 pl-4 pr-12 focus:outline-none focus:ring-0 placeholder-on-surface-variant/30 tracking-widest" id="password" name="password1" placeholder="••••••••" required="" type="password"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-[11px] text-on-surface-variant uppercase tracking-[0.1em] ml-1 font-medium" for="password-confirm">Confirm Password</label>
+<div class="relative group input-premium rounded-xl flex items-center h-[60px] px-md">
+<span class="material-symbols-outlined text-outline/50 group-focus-within:text-primary transition-colors text-[22px] font-light">lock_reset</span>
+<input class="w-full bg-transparent border-0 text-on-surface font-data-mono text-[14px] py-2 pl-4 pr-12 focus:outline-none focus:ring-0 placeholder-on-surface-variant/30 tracking-widest" id="password-confirm" name="password2" placeholder="••••••••" required="" type="password"/>
+</div>
+</div>
+<div class="pt-6">
+<button class="w-full btn-gold text-on-primary font-body-main font-medium py-[20px] px-lg rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background flex items-center justify-center gap-2 uppercase tracking-[0.1em] text-[13px]" type="submit">
+<span>Register Account</span>
+<span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+</div>
+</form>
+<div class="mt-10 text-center font-body-sm text-[14px] text-on-surface-variant/70">
+<span class="font-light">Already have an account?</span>
+<a class="text-primary hover:text-primary-fixed transition-colors ml-2 font-medium tracking-wide uppercase text-[12px]" href="{% url 'login' %}">Return to Login</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>

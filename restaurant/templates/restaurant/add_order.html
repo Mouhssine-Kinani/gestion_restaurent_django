@@ -1,227 +1,237 @@
-{% extends 'restaurant/base.html' %}
-
-{% block title %}New Order{% endblock %}
-
-{% block page_title %}
-<div style="display: flex; align-items: center; gap: 12px;">
-    <a href="{% url 'order_list' %}" style="color: var(--muted); padding: 4px; border-radius: var(--radius-sm); transition: all var(--transition-fast); text-decoration: none; display: inline-flex;" onmouseover="this.style.color='var(--cream)'; this.style.background='var(--bg-elevated)'" onmouseout="this.style.color='var(--muted)'; this.style.background='transparent'">
-        <i data-lucide="arrow-left" style="width:20px;height:20px;"></i>
-    </a>
-    <div>
-        <h1 class="topbar-title">New Order</h1>
-        <div class="topbar-breadcrumb">Create a new order for a table</div>
-    </div>
-</div>
-{% endblock %}
-
-{% block breadcrumb %}Home &rsaquo; Orders &rsaquo; New{% endblock %}
-
-{% block content %}
-<div style="display: grid; grid-template-columns: 1fr 380px; gap: 24px; height: calc(100vh - var(--topbar-height) - 64px);">
-
-    <!-- LEFT: Menu Browser -->
-    <div style="overflow-y: auto; padding-right: 8px;">
-        <!-- Search -->
-        <div style="position: relative; margin-bottom: 16px;">
-            <div style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--muted);">
-                <i data-lucide="search" style="width:16px;height:16px;"></i>
-            </div>
-            <input type="text" placeholder="Search menu items..." id="menu-search"
-                style="width: 100%; height: 40px; padding: 0 12px 0 36px; background: var(--bg-input); border: 1px solid var(--ghost); border-radius: 100px; color: var(--cream); font-size: 13px; font-family: var(--font-body); outline: none; transition: all var(--transition-fast);"
-                onfocus="this.style.borderColor='var(--gold)';" onblur="this.style.borderColor='var(--ghost)'">
-        </div>
-
-        <!-- Category Tabs -->
-        <div style="display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap;">
-            <button onclick="filterCategory('all', this)" style="padding: 6px 14px; border-radius: 100px; border: none; font-family: var(--font-body); font-size: 13px; font-weight: 500; cursor: pointer; transition: all var(--transition-fast); background: var(--gold); color: var(--bg-base);">All</button>
-            <button onclick="filterCategory('Starters', this)" style="padding: 6px 14px; border-radius: 100px; border: 1px solid var(--ghost); background: transparent; font-family: var(--font-body); font-size: 13px; font-weight: 500; cursor: pointer; transition: all var(--transition-fast); color: var(--muted);">Starters</button>
-            <button onclick="filterCategory('Mains', this)" style="padding: 6px 14px; border-radius: 100px; border: 1px solid var(--ghost); background: transparent; font-family: var(--font-body); font-size: 13px; font-weight: 500; cursor: pointer; transition: all var(--transition-fast); color: var(--muted);">Mains</button>
-            <button onclick="filterCategory('Desserts', this)" style="padding: 6px 14px; border-radius: 100px; border: 1px solid var(--ghost); background: transparent; font-family: var(--font-body); font-size: 13px; font-weight: 500; cursor: pointer; transition: all var(--transition-fast); color: var(--muted);">Desserts</button>
-            <button onclick="filterCategory('Drinks', this)" style="padding: 6px 14px; border-radius: 100px; border: 1px solid var(--ghost); background: transparent; font-family: var(--font-body); font-size: 13px; font-weight: 500; cursor: pointer; transition: all var(--transition-fast); color: var(--muted);">Drinks</button>
-        </div>
-
-        <!-- Menu Items Grid -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;" id="menu-grid">
-            {% for item in menu_items %}
-            <div class="menu-item-card" data-category="{{ item.category|default:'All' }}" style="background: var(--bg-surface); border: 1px solid var(--ghost); border-radius: var(--radius-md); padding: 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all var(--transition-base);"
-                onmouseover="this.style.borderColor='var(--gold-dim)'; this.style.background='var(--bg-elevated)'"
-                onmouseout="this.style.borderColor='var(--ghost)'; this.style.background='var(--bg-surface)'"
-                onclick="addToOrder({{ item.id }}, '{{ item.name|escapejs }}', {{ item.price }})">
-                <div style="width: 40px; height: 40px; border-radius: var(--radius-sm); background: rgba(201,168,76,0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                    <i data-lucide="chef-hat" style="width:18px;height:18px;color:var(--gold);"></i>
-                </div>
-                <div style="flex: 1; min-width: 0;">
-                    <div style="font-size: 14px; font-weight: 500; color: var(--cream); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ item.name }}</div>
-                    <div style="font-size: 12px; color: var(--muted); margin-top: 2px;">{{ item.description|truncatewords:4 }}</div>
-                </div>
-                <div style="font-family: var(--font-mono); font-size: 14px; font-weight: 500; color: var(--gold); flex-shrink: 0;">${{ item.price }}</div>
-            </div>
-            {% empty %}
-            <div style="grid-column: 1/-1; text-align: center; padding: 48px 24px;">
-                <div class="empty-state" style="padding: 24px;">
-                    <div class="empty-icon"><i data-lucide="book-open" style="width:32px;height:32px;"></i></div>
-                    <div class="empty-title" style="font-size: 20px;">No menu items</div>
-                    <div class="empty-text" style="margin-bottom: 16px;">Add items to your menu first</div>
-                    <a href="{% url 'add_menu_item' %}" class="btn-primary btn-sm">Add Item</a>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-
-    <!-- RIGHT: Order Summary (sticky) -->
-    <div style="background: var(--bg-surface); border-left: 1px solid var(--ghost); padding: 24px; overflow-y: auto; height: 100%; position: sticky; top: 0;">
-        <div style="margin-bottom: 20px;">
-            <h2 style="font-family: var(--font-display); font-style: italic; font-size: 22px; color: var(--cream); margin-bottom: 4px;">Current Order</h2>
-            <div style="font-family: var(--font-mono); font-size: 13px; color: var(--muted);">Order #<span id="order-number">--</span></div>
-        </div>
-
-        <!-- Table Select -->
-        <div style="margin-bottom: 20px;">
-            <label style="display: block; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 6px;">Select Table</label>
-            <select style="width: 100%; height: 40px; padding: 0 32px 0 12px; background: var(--bg-input); border: 1px solid var(--ghost); border-radius: var(--radius-md); color: var(--cream); font-size: 13px; font-family: var(--font-body); outline: none; cursor: pointer; appearance: none; background-image: url(&quot;data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%237d7260' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e&quot;); background-position: right 10px center; background-repeat: no-repeat; background-size: 16px 16px;">
-                <option value="">Choose a table...</option>
-                {% for table in tables %}
-                <option value="{{ table.id }}">Table {{ table.number }} ({{ table.seats }} seats) - {{ table.status|capfirst }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <!-- Order Items List -->
-        <div id="order-items" style="flex: 1; margin-bottom: 20px;">
-            <div id="empty-order" class="empty-state" style="padding: 32px 16px;">
-                <div class="empty-icon"><i data-lucide="receipt" style="width:32px;height:32px;"></i></div>
-                <div class="empty-title" style="font-size: 18px;">No items yet</div>
-                <div class="empty-text" style="font-size: 13px;">Select items from the menu</div>
-            </div>
-        </div>
-
-        <!-- Order Totals -->
-        <div style="border-top: 1px solid var(--ghost); padding-top: 16px;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; color: var(--muted);">
-                <span>Subtotal</span>
-                <span class="font-mono" id="subtotal">$0.00</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; color: var(--muted);">
-                <span>Tax (10%)</span>
-                <span class="font-mono" id="tax">$0.00</span>
-            </div>
-            <div style="height: 1px; background: var(--ghost); margin: 8px 0 12px;"></div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                <span style="font-family: var(--font-body); font-weight: 600; font-size: 16px; color: var(--cream);">TOTAL</span>
-                <span class="font-mono" style="font-size: 20px; font-weight: 500; color: var(--gold);" id="total">$0.00</span>
-            </div>
-
-            <!-- Notes -->
-            <div style="margin-bottom: 16px;">
-                <label style="display: block; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 6px;">Special Instructions</label>
-                <textarea style="width: 100%; height: 60px; padding: 8px 12px; background: var(--bg-input); border: 1px solid var(--ghost); border-radius: var(--radius-md); color: var(--cream); font-size: 13px; font-family: var(--font-body); outline: none; resize: none; transition: all var(--transition-fast);"
-                    onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--ghost)'"
-                    placeholder="Any special requests..."></textarea>
-            </div>
-
-            <button onclick="placeOrder()" class="btn-primary" style="width: 100%; height: 52px; font-size: 15px;">
-                <i data-lucide="clipboard-check" style="width:16px;height:16px;"></i>
-                Place Order
-            </button>
-        </div>
-    </div>
-</div>
-
-<script>
-    // Generate order number
-    document.getElementById('order-number').textContent = String(Math.floor(Math.random() * 9000) + 1000);
-
-    const orderItems = {};
-
-    function addToOrder(id, name, price) {
-        if (orderItems[id]) {
-            orderItems[id].qty += 1;
-        } else {
-            orderItems[id] = { name: name, price: price, qty: 1 };
-        }
-        renderOrder();
-    }
-
-    function removeFromOrder(id) {
-        delete orderItems[id];
-        renderOrder();
-    }
-
-    function updateQty(id, delta) {
-        if (!orderItems[id]) return;
-        orderItems[id].qty += delta;
-        if (orderItems[id].qty <= 0) { delete orderItems[id]; }
-        renderOrder();
-    }
-
-    function renderOrder() {
-        const container = document.getElementById('order-items');
-        const keys = Object.keys(orderItems);
-        if (keys.length === 0) {
-            container.innerHTML = `<div id="empty-order" class="empty-state" style="padding:32px 16px;"><div class="empty-icon"><i data-lucide="receipt" style="width:32px;height:32px;"></i></div><div class="empty-title" style="font-size:18px;">No items yet</div><div class="empty-text" style="font-size:13px;">Select items from the menu</div></div>`;
-            lucide.createIcons();
-            updateTotals();
-            return;
-        }
-
-        let html = '';
-        keys.forEach(id => {
-            const item = orderItems[id];
-            html += `
-            <div style="padding: 12px 0; border-bottom: 1px solid var(--ghost); animation: slideIn 200ms var(--transition-base) both;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                    <span style="font-size: 14px; color: var(--cream);">${item.name}</span>
-                    <button onclick="removeFromOrder(${id})" style="background: none; border: none; color: var(--status-red); cursor: pointer; font-size: 12px;">Remove</button>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <button onclick="updateQty(${id}, -1)" style="width: 24px; height: 24px; border-radius: 4px; border: 1px solid var(--ghost); background: transparent; color: var(--cream); cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center;">−</button>
-                        <span style="font-family: var(--font-mono); font-size: 13px; color: var(--cream); width: 20px; text-align: center;">${item.qty}</span>
-                        <button onclick="updateQty(${id}, 1)" style="width: 24px; height: 24px; border-radius: 4px; border: 1px solid var(--ghost); background: transparent; color: var(--cream); cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center;">+</button>
-                    </div>
-                    <span style="font-family: var(--font-mono); font-size: 13px; color: var(--gold);">$${(item.price * item.qty).toFixed(2)}</span>
-                </div>
-            </div>`;
-        });
-        container.innerHTML = html;
-
-        const style = document.createElement('style');
-        style.textContent = `@keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }`;
-        document.head.appendChild(style);
-
-        updateTotals();
-    }
-
-    function updateTotals() {
-        let subtotal = 0;
-        Object.values(orderItems).forEach(item => { subtotal += item.price * item.qty; });
-        const tax = subtotal * 0.1;
-        const total = subtotal + tax;
-        document.getElementById('subtotal').textContent = '$' + subtotal.toFixed(2);
-        document.getElementById('tax').textContent = '$' + tax.toFixed(2);
-        document.getElementById('total').textContent = '$' + total.toFixed(2);
-    }
-
-    function filterCategory(cat, btn) {
-        document.querySelectorAll('#menu-grid .menu-item-card').forEach(card => {
-            if (cat === 'all' || card.dataset.category === cat) {
-                card.style.display = 'flex';
-            } else {
-                card.style.display = 'none';
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RestaurantOS - Add Order</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Outfit:wght@300;400;500;600&amp;family=Playfair+Display:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                "tertiary-fixed": "#ffd9dc",
+                "surface-tint": "#e9c349",
+                "primary-container": "#d4af37",
+                "tertiary-container": "#ff94a1",
+                "on-error": "#690005",
+                "background": "#111316",
+                "primary-fixed-dim": "#e9c349",
+                "inverse-primary": "#735c00",
+                "outline-variant": "#4d4635",
+                "surface": "#111316",
+                "on-primary-fixed-variant": "#574500",
+                "surface-variant": "#333538",
+                "primary-fixed": "#ffe088",
+                "inverse-surface": "#e2e2e6",
+                "surface-bright": "#37393d",
+                "error-container": "#93000a",
+                "on-secondary": "#003824",
+                "on-primary": "#3c2f00",
+                "surface-container-highest": "#333538",
+                "on-background": "#e2e2e6",
+                "secondary-fixed-dim": "#4edea3",
+                "on-primary-container": "#554300",
+                "on-tertiary-container": "#8e002f",
+                "on-surface-variant": "#d0c5af",
+                "on-error-container": "#ffdad6",
+                "on-secondary-fixed-variant": "#005236",
+                "surface-container": "#1e2023",
+                "surface-container-low": "#1a1c1f",
+                "surface-container-lowest": "#0c0e11",
+                "on-tertiary": "#670020",
+                "secondary-container": "#00a572",
+                "inverse-on-surface": "#2f3034",
+                "on-tertiary-fixed": "#400010",
+                "error": "#ffb4ab",
+                "on-secondary-container": "#00311f",
+                "surface-dim": "#111316",
+                "on-surface": "#e2e2e6",
+                "outline": "#99907c",
+                "tertiary": "#ffbec4",
+                "secondary": "#4edea3",
+                "surface-container-high": "#282a2d",
+                "on-secondary-fixed": "#002113",
+                "tertiary-fixed-dim": "#ffb2ba",
+                "on-tertiary-fixed-variant": "#910130",
+                "secondary-fixed": "#6ffbbe",
+                "primary": "#f2ca50",
+                "on-primary-fixed": "#241a00"
+              },
+              "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+              },
+              "spacing": {
+                "base": "4px",
+                "md": "16px",
+                "xl": "40px",
+                "xs": "4px",
+                "margin": "32px",
+                "sm": "8px",
+                "lg": "24px",
+                "grid-columns": "12",
+                "gutter": "16px"
+              },
+              "fontFamily": {
+                "body-sm": ["Outfit"],
+                "body-main": ["Outfit"],
+                "label-caps": ["Outfit"],
+                "data-mono": ["JetBrains Mono"],
+                "h1-header": ["Playfair Display"],
+                "h2-subhead": ["Playfair Display"],
+                "display-hero": ["Playfair Display"]
+              },
+              "fontSize": {
+                "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                "body-main": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                "label-caps": ["11px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                "data-mono": ["13px", { "lineHeight": "1.4", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+                "h1-header": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                "h2-subhead": ["24px", { "lineHeight": "1.4", "fontWeight": "500" }],
+                "display-hero": ["48px", { "lineHeight": "1.2", "fontWeight": "700" }]
+              }
             }
-        });
-        document.querySelectorAll('#menu-grid + div button, .btn-icon').forEach(b => {
-            b.style.background = 'transparent'; b.style.color = 'var(--muted)'; b.style.border = '1px solid var(--ghost)';
-        });
-        btn.style.background = 'var(--gold)'; btn.style.color = 'var(--bg-base)'; btn.style.border = 'none';
-    }
-
-    function placeOrder() {
-        const tableSelect = document.querySelector('select');
-        if (!tableSelect.value) { alert('Please select a table first.'); return; }
-        if (Object.keys(orderItems).length === 0) { alert('Please add items to the order.'); return; }
-        alert('Order placed successfully! (Integration with Django form needed)');
-    }
-</script>
-{% endblock %}
+          }
+        }
+      </script>
+<style>
+        body { background-color: #111316; background-image: radial-gradient(circle at 15% 50%, rgba(242, 202, 80, 0.03), transparent 25%), radial-gradient(circle at 85% 30%, rgba(242, 202, 80, 0.02), transparent 25%); background-attachment: fixed; }
+        .glass-panel { background-color: rgba(30, 32, 35, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(30, 32, 35, 0.5); }
+        ::-webkit-scrollbar-thumb { background: rgba(77, 70, 53, 0.8); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #99907c; }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-main antialiased selection:bg-primary/20 selection:text-primary">
+<nav class="fixed left-0 top-0 h-full flex flex-col z-50 w-64 bg-surface-container dark:bg-surface-container border-r border-outline-variant/30 backdrop-blur-xl">
+<div class="px-margin py-xl flex flex-col items-center border-b border-outline-variant/30">
+<div class="w-16 h-16 rounded-full bg-surface-variant border border-outline-variant/50 overflow-hidden mb-md flex items-center justify-center"><span class="material-symbols-outlined text-primary text-3xl">restaurant</span></div>
+<h2 class="font-h2-subhead text-h2-subhead text-primary dark:text-primary mb-xs">RestaurantOS</h2>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Kitchen HQ</span>
+</div>
+<div class="flex-1 overflow-y-auto py-md flex flex-col gap-sm">
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors" href="{% url 'dashboard' %}"><span class="material-symbols-outlined">dashboard</span><span class="font-body-main text-body-main">Dashboard</span></a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors" href="{% url 'table_list' %}"><span class="material-symbols-outlined">table_restaurant</span><span class="font-body-main text-body-main">Tables</span></a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors" href="{% url 'menu_list' %}"><span class="material-symbols-outlined">restaurant_menu</span><span class="font-body-main text-body-main">Menu</span></a>
+<a class="flex items-center gap-md bg-primary/10 text-primary border-r-2 border-primary py-3 px-lg opacity-90 scale-[0.99] transition-all" href="#"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">receipt_long</span><span class="font-body-main text-body-main font-medium">Orders</span></a>
+</div>
+<div class="mt-auto border-t border-outline-variant/30 py-md flex flex-col gap-sm">
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors" href="#"><span class="material-symbols-outlined">settings</span><span class="font-body-main text-body-main">Settings</span></a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors" href="{% url 'logout' %}"><span class="material-symbols-outlined">logout</span><span class="font-body-main text-body-main">Logout</span></a>
+</div>
+</nav>
+<header class="fixed top-0 right-0 w-[calc(100%-16rem)] flex justify-between items-center px-margin py-md z-40 bg-surface/70 dark:bg-surface/70 border-b border-outline-variant/30 backdrop-blur-xl">
+<div class="flex items-center gap-lg">
+<nav class="hidden md:flex items-center gap-margin">
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors font-body-main text-body-main" href="{% url 'dashboard' %}">Overview</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex items-center gap-sm border-r border-outline-variant/30 pr-md mr-sm">
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-bright hover:text-primary transition-colors"><span class="material-symbols-outlined">notifications</span></button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-bright hover:text-primary transition-colors"><span class="material-symbols-outlined">help</span></button>
+</div>
+<a href="{% url 'add_table' %}" class="px-md py-2 border border-outline-variant text-on-surface rounded-lg hover:bg-surface-bright transition-colors font-body-sm text-body-sm hidden lg:block">Add Table</a>
+<button type="submit" form="order-form" class="px-lg py-2 bg-primary text-on-primary font-medium rounded-lg hover:bg-primary-fixed transition-colors font-body-sm text-body-sm shadow-[0_0_15px_rgba(242,202,80,0.2)]">Create Order</button>
+</div>
+</header>
+<main class="ml-64 pt-[88px] px-margin pb-margin min-h-screen">
+<div class="flex items-end justify-between mb-lg pt-md">
+<div>
+<h1 class="font-h1-header text-h1-header text-on-surface mb-xs">New Order</h1>
+<p class="font-body-main text-body-main text-on-surface-variant">Select items from the menu to build the order ticket.</p>
+</div>
+<div class="flex items-center gap-sm">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">Ticket #</span>
+<span class="font-data-mono text-h2-subhead text-primary">T-{{ next_order_id }}</span>
+</div>
+</div>
+<form id="order-form" method="post">
+{% csrf_token %}
+{% if form.errors %}
+<div class="mb-lg p-md bg-error-container/20 border border-error/30 rounded-lg">
+<p class="font-body-sm text-body-sm text-error">Please correct the errors below.</p>
+</div>
+{% endif %}
+<div class="grid grid-cols-12 gap-gutter items-start">
+<div class="col-span-12 xl:col-span-8 flex flex-col gap-md h-[calc(100vh-200px)]">
+<div class="glass-panel border border-outline-variant/30 rounded-xl p-md flex flex-wrap items-center justify-between gap-md">
+<div class="flex items-center gap-sm overflow-x-auto pb-1 -mb-1" style="scrollbar-width:none;">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider mr-sm">Select Table:</span>
+<select name="table" id="id_table" class="bg-surface-container-highest border border-outline-variant/40 rounded-lg py-2 px-3 font-data-mono text-data-mono text-on-surface focus:outline-none focus:border-primary/50 focus:bg-surface transition-all">
+{% for table in tables %}
+<option value="{{ table.id }}" class="bg-surface text-on-surface">Table {{ table.number }} ({{ table.seats }} seats)</option>
+{% endfor %}
+</select>
+</div>
+<div class="relative flex-grow max-w-xs">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+<input class="w-full bg-surface-container-highest border border-outline-variant/40 rounded-lg py-2 pl-9 pr-4 text-on-surface focus:outline-none focus:border-primary/50 focus:bg-surface transition-all font-data-mono text-data-mono" placeholder="Filter items..." type="text"/>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto pr-sm pb-xl">
+<div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-sm">
+{% for item in menu_items %}
+<div class="glass-panel border border-outline-variant/20 rounded-xl p-md flex flex-col justify-between hover:border-primary/30 transition-colors group cursor-pointer relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-transparent to-surface-container-highest opacity-50 pointer-events-none"></div>
+<div class="flex justify-between items-start mb-sm relative z-10">
+<div>
+<h3 class="font-h2-subhead text-body-main font-semibold text-on-surface mb-1 group-hover:text-primary transition-colors">{{ item.name }}</h3>
+</div>
+<span class="font-data-mono text-body-main text-secondary">${{ item.price }}</span>
+</div>
+<div class="flex items-center justify-between mt-md relative z-10">
+<div class="flex items-center gap-1">
+<span class="w-2 h-2 rounded-full {% if item.available == 'Yes' %}bg-secondary{% else %}bg-error{% endif %}"></span>
+<span class="font-label-caps text-label-caps text-outline">{% if item.available == 'Yes' %}Available{% else %}Sold Out{% endif %}</span>
+</div>
+<label class="flex items-center gap-xs cursor-pointer">
+<input type="checkbox" name="items" value="{{ item.id }}" class="w-4 h-4 rounded border-outline-variant bg-surface-container-highest text-primary focus:ring-primary"/>
+</label>
+</div>
+</div>
+{% empty %}
+<div class="col-span-full flex items-center justify-center h-32">
+<p class="font-body-main text-body-main text-on-surface-variant">No menu items available.</p>
+</div>
+{% endfor %}
+</div>
+</div>
+</div>
+<div class="col-span-12 xl:col-span-4 h-[calc(100vh-200px)] flex flex-col">
+<div class="glass-panel border border-outline-variant/40 rounded-xl flex flex-col h-full overflow-hidden shadow-xl">
+<div class="p-md border-b border-outline-variant/30 bg-surface-container-highest/50 flex justify-between items-center">
+<div>
+<span class="font-label-caps text-label-caps text-outline block mb-1">Status</span>
+<select name="status" id="id_status" class="bg-surface border border-outline-variant rounded px-2 py-1 font-data-mono text-data-mono text-on-surface focus:outline-none focus:border-primary">
+<option value="Pending" class="bg-surface text-on-surface">Pending</option>
+<option value="served" class="bg-surface text-on-surface">Served</option>
+</select>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-md flex flex-col gap-sm">
+<p class="font-body-sm text-body-sm text-on-surface-variant text-center py-lg">Select items from the menu to build the order.</p>
+</div>
+<div class="p-md border-t border-outline-variant/30 bg-surface-container-highest/80">
+<div class="flex gap-sm">
+<a href="{% url 'order_list' %}" class="flex-1 py-3 border border-outline-variant text-on-surface rounded-lg hover:bg-surface-bright transition-colors font-body-main text-body-main font-medium text-center">Cancel</a>
+<button type="submit" class="flex-[2] py-3 bg-primary text-on-primary rounded-lg hover:bg-primary-fixed transition-all font-body-main text-body-main font-medium shadow-[0_4px_14px_rgba(242,202,80,0.25)] flex justify-center items-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span> Send to Kitchen
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</form>
+</main>
+</body></html>

@@ -1,134 +1,126 @@
-{% extends 'restaurant/base.html' %}
-
-{% block title %}Edit Menu Item{% endblock %}
-
-{% block page_title %}
-<div style="display: flex; align-items: center; gap: 12px;">
-    <a href="{% url 'menu_list' %}" style="color: var(--muted); padding: 4px; border-radius: var(--radius-sm); transition: all var(--transition-fast); text-decoration: none; display: inline-flex;" onmouseover="this.style.color='var(--cream)'; this.style.background='var(--bg-elevated)'" onmouseout="this.style.color='var(--muted)'; this.style.background='transparent'">
-        <i data-lucide="arrow-left" style="width:20px;height:20px;"></i>
-    </a>
-    <div>
-        <h1 class="topbar-title">Edit Menu Item</h1>
-        <div class="topbar-breadcrumb">Editing: <span style="color:var(--gold); font-style:italic;">"{{ item.name }}"</span> &mdash; ID: #{{ item.id }}</div>
-    </div>
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RestaurantOS - Edit Menu Item</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#ffd9dc", "surface-tint": "#e9c349", "primary-container": "#d4af37", "tertiary-container": "#ff94a1", "on-error": "#690005", "background": "#111316", "primary-fixed-dim": "#e9c349", "inverse-primary": "#735c00", "outline-variant": "#4d4635", "surface": "#111316", "on-primary-fixed-variant": "#574500", "surface-variant": "#333538", "primary-fixed": "#ffe088", "inverse-surface": "#e2e2e6", "surface-bright": "#37393d", "error-container": "#93000a", "on-secondary": "#003824", "on-primary": "#3c2f00", "surface-container-highest": "#333538", "on-background": "#e2e2e6", "secondary-fixed-dim": "#4edea3", "on-primary-container": "#554300", "on-tertiary-container": "#8e002f", "on-surface-variant": "#d0c5af", "on-error-container": "#ffdad6", "on-secondary-fixed-variant": "#005236", "surface-container": "#1e2023", "surface-container-low": "#1a1c1f", "surface-container-lowest": "#0c0e11", "on-tertiary": "#670020", "secondary-container": "#00a572", "inverse-on-surface": "#2f3034", "on-tertiary-fixed": "#400010", "error": "#ffb4ab", "on-secondary-container": "#00311f", "surface-dim": "#111316", "on-surface": "#e2e2e6", "outline": "#99907c", "tertiary": "#ffbec4", "secondary": "#4edea3", "surface-container-high": "#282a2d", "on-secondary-fixed": "#002113", "tertiary-fixed-dim": "#ffb2ba", "on-tertiary-fixed-variant": "#910130", "secondary-fixed": "#6ffbbe", "primary": "#f2ca50", "on-primary-fixed": "#241a00"
+            },
+            "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+            "spacing": { "base": "4px", "md": "16px", "xl": "40px", "xs": "4px", "margin": "32px", "sm": "8px", "lg": "24px", "grid-columns": "12", "gutter": "16px" },
+            "fontFamily": { "body-sm": ["Outfit"], "body-main": ["Outfit"], "label-caps": ["Outfit"], "data-mono": ["JetBrains Mono"], "h1-header": ["Playfair Display"], "h2-subhead": ["Playfair Display"], "display-hero": ["Playfair Display"] },
+            "fontSize": { "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}], "body-main": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}], "label-caps": ["11px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700"}], "data-mono": ["13px", {"lineHeight": "1.4", "letterSpacing": "-0.02em", "fontWeight": "500"}], "h1-header": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}], "h2-subhead": ["24px", {"lineHeight": "1.4", "fontWeight": "500"}], "display-hero": ["48px", {"lineHeight": "1.2", "fontWeight": "700"}] }
+          }
+        }
+      }
+    </script>
+<style>
+        body { font-family: 'Outfit', sans-serif; background-color: theme('colors.background'); color: theme('colors.on-background'); }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex bg-background text-on-background">
+<nav class="fixed left-0 top-0 h-full flex flex-col z-50 w-64 bg-surface-container border-r border-outline-variant/30 backdrop-blur-xl">
+<div class="p-lg border-b border-outline-variant/30 flex items-center gap-md">
+<div>
+<h1 class="font-h2-subhead text-h2-subhead text-primary m-0">RestaurantOS</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase mt-1">Kitchen HQ</p>
 </div>
-{% endblock %}
-
-{% block breadcrumb %}Home &rsaquo; Menu &rsaquo; Edit{% endblock %}
-
-{% block content %}
-<!-- Edit Banner -->
-<div style="background: var(--bg-elevated); border-bottom: 1px solid var(--ghost); padding: 12px 24px; margin: -32px -32px 32px -32px; display: flex; align-items: center; gap: 12px;">
-    <i data-lucide="pencil" style="width:16px;height:16px;color:var(--gold);"></i>
-    <div style="flex:1;">
-        <span style="font-size:13px; color:var(--cream); font-weight:500;">Editing: </span>
-        <span style="font-size:13px; color:var(--gold); font-style:italic;">{{ item.name }}</span>
-    </div>
-    <span style="font-family:var(--font-mono); font-size:12px; color:var(--muted);">Last modified: {{ item.updated_at|timesince|default:"2 hours" }} ago by Admin</span>
 </div>
-
-<div style="display: grid; grid-template-columns: 1fr 380px; gap: 24px; align-items: start;">
-
-    <!-- LEFT: Form -->
-    <div class="card" style="padding: 32px;">
-        <form method="post" class="space-y-6" novalidate>
-            {% csrf_token %}
-
-            {% if form.non_field_errors %}
-            <div class="error-box">
-                <i data-lucide="alert-circle" style="width:20px;height:20px;flex-shrink:0;"></i>
-                <span>{{ form.non_field_errors }}</span>
-            </div>
-            {% endif %}
-
-            <div>
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
-                    <span style="font-family: var(--font-display); font-style: italic; font-size: 20px; color: var(--gold);">Basic Information</span>
-                    <div style="flex: 1; height: 1px; background: linear-gradient(90deg, var(--gold-dim), transparent);"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.name.id_for_label }}" class="form-label">{{ form.name.label }}</label>
-                    {{ form.name }}
-                    {% if form.name.errors %}<div class="error-text">{{ form.name.errors|striptags }}</div>{% endif %}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.category.id_for_label }}" class="form-label">{{ form.category.label }}</label>
-                    {{ form.category }}
-                    {% if form.category.errors %}<div class="error-text">{{ form.category.errors|striptags }}</div>{% endif %}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
-                    {{ form.description }}
-                    {% if form.description.errors %}<div class="error-text">{{ form.description.errors|striptags }}</div>{% endif %}
-                </div>
-            </div>
-
-            <div>
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
-                    <span style="font-family: var(--font-display); font-style: italic; font-size: 20px; color: var(--gold);">Pricing & Availability</span>
-                    <div style="flex: 1; height: 1px; background: linear-gradient(90deg, var(--gold-dim), transparent);"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.price.id_for_label }}" class="form-label">{{ form.price.label }}</label>
-                    <div style="display: flex;">
-                        {{ form.price }}
-                        <div style="display: flex; align-items: center; justify-content: center; width: 48px; background: var(--bg-elevated); border: 1px solid var(--ghost); border-left: none; border-radius: 0 var(--radius-md) var(--radius-md) 0; font-family: var(--font-mono); font-size: 13px; color: var(--muted);">MAD</div>
-                    </div>
-                    {% if form.price.errors %}<div class="error-text">{{ form.price.errors|striptags }}</div>{% endif %}
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">{{ form.available.label }}</label>
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <label style="display: flex; align-items: center; cursor: pointer;">
-                            <div style="width: 44px; height: 24px; border-radius: 100px; position: relative; transition: all var(--transition-fast); {% if item.available == 'Yes' %}background: var(--gold); box-shadow: 0 0 8px rgba(201,168,76,0.3);{% else %}background: var(--ghost);{% endif %}" id="toggle-bg-edit">
-                                <div style="width: 20px; height: 20px; border-radius: 50%; background: #fff; position: absolute; top: 2px; transition: all var(--transition-spring); {% if item.available == 'Yes' %}left: 22px;{% else %}left: 2px;{% endif %}" id="toggle-thumb-edit"></div>
-                            </div>
-                        </label>
-                        <span style="font-size: 13px; font-family: var(--font-body);" id="toggle-label-edit">{% if item.available == 'Yes' %}Available{% else %}Unavailable{% endif %}</span>
-                    </div>
-                    {{ form.available }}
-                    {% if form.available.errors %}<div class="error-text">{{ form.available.errors|striptags }}</div>{% endif %}
-                </div>
-            </div>
-
-            <div style="display: flex; gap: 12px; padding-top: 8px;">
-                <button type="submit" class="btn-primary" style="flex: 1; height: 48px;">
-                    <i data-lucide="save" style="width:16px;height:16px;"></i>
-                    Save Changes
-                </button>
-                <a href="{% url 'menu_list' %}" class="btn-ghost" style="padding: 0 24px; height: 48px; display: flex; align-items: center;">
-                    Cancel
-                </a>
-            </div>
-        </form>
-    </div>
-
-    <!-- RIGHT: Live Preview -->
-    <div style="position: sticky; top: calc(var(--topbar-height) + 24px);">
-        <div style="font-family: var(--font-body); font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 12px;">Preview</div>
-        <div class="card" style="overflow: hidden;">
-            <div style="height: 160px; background: linear-gradient(135deg, rgba(201,168,76,0.15) 0%, rgba(212,129,58,0.1) 100%); display: flex; align-items: center; justify-content: center;">
-                <i data-lucide="chef-hat" style="width:48px;height:48px;color:var(--gold-dim);opacity:0.6;"></i>
-            </div>
-            <div style="padding: 16px 20px;">
-                <h3 style="font-family: var(--font-display); font-style: italic; font-size: 20px; color: var(--cream); line-height: 1.2; margin-bottom: 6px;">{{ item.name }}</h3>
-                <p style="font-size: 13px; color: var(--muted); line-height: 1.4; height: 40px; overflow: hidden;">{{ item.description|default:"A delicious addition to our menu." }}</p>
-                <div style="display: flex; align-items: baseline; gap: 4px; margin-top: 12px;">
-                    <span style="font-family: var(--font-mono); font-size: 11px; color: var(--muted);">MAD</span>
-                    <span style="font-family: var(--font-mono); font-size: 18px; font-weight: 500; color: var(--gold);">{{ item.price }}</span>
-                </div>
-            </div>
-        </div>
-        <div style="margin-top: 12px;">
-            <a href="{% url 'menu_list' %}" style="font-size: 13px; color: var(--muted); text-decoration: none; font-family: var(--font-body);" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">
-                <i data-lucide="eye" style="width:14px;height:14px;display:inline;vertical-align:middle;"></i> View Original
-            </a>
-        </div>
-    </div>
+<div class="flex-1 overflow-y-auto py-md flex flex-col font-body-main text-body-main">
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-colors" href="{% url 'dashboard' %}"><span class="material-symbols-outlined">dashboard</span>Dashboard</a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-colors" href="{% url 'table_list' %}"><span class="material-symbols-outlined">table_restaurant</span>Tables</a>
+<a class="flex items-center gap-md bg-primary/10 text-primary border-r-2 border-primary py-3 px-lg opacity-90 scale-[0.99] transition-all" href="#"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">restaurant_menu</span>Menu</a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-colors" href="{% url 'order_list' %}"><span class="material-symbols-outlined">receipt_long</span>Orders</a>
 </div>
-{% endblock %}
+<div class="border-t border-outline-variant/30 py-md font-body-main text-body-main">
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-colors" href="#"><span class="material-symbols-outlined">settings</span>Settings</a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-colors" href="{% url 'logout' %}"><span class="material-symbols-outlined">logout</span>Logout</a>
+</div>
+</nav>
+<header class="fixed top-0 right-0 w-[calc(100%-16rem)] flex justify-between items-center px-margin py-md z-40 bg-surface-container border-b border-outline-variant/30 backdrop-blur-xl">
+<div class="flex items-center gap-lg font-h2-subhead text-h2-subhead">
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors" href="{% url 'dashboard' %}">Overview</a>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-bright"><span class="material-symbols-outlined">notifications</span></button>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-bright"><span class="material-symbols-outlined">help</span></button>
+<a href="{% url 'add_table' %}" class="px-4 py-2 border border-outline-variant text-on-surface rounded font-body-sm text-body-sm hover:bg-surface-bright transition-colors">Add Table</a>
+<a href="{% url 'add_order' %}" class="px-4 py-2 bg-primary text-on-primary font-bold rounded font-body-sm text-body-sm hover:bg-primary-fixed transition-colors shadow-[0_0_15px_rgba(242,202,80,0.2)]">Create Order</a>
+</div>
+</header>
+<main class="flex-1 ml-64 mt-[88px] p-margin bg-background">
+<form method="post">
+{% csrf_token %}
+<div class="mb-lg flex justify-between items-end border-b border-outline-variant/30 pb-lg">
+<div>
+<p class="font-label-caps text-label-caps text-primary uppercase mb-2 tracking-widest">Menu Management</p>
+<h2 class="font-h1-header text-h1-header text-on-surface m-0">Edit Menu Item</h2>
+</div>
+<div class="flex gap-md">
+<a href="{% url 'menu_list' %}" class="px-6 py-3 border border-outline-variant text-on-surface rounded font-body-main text-body-main hover:bg-surface-bright transition-colors backdrop-blur-sm">Cancel</a>
+<button type="submit" class="px-6 py-3 text-on-primary font-bold rounded font-body-main text-body-main hover:bg-primary-fixed transition-all shadow-[0_0_20px_rgba(242,202,80,0.3)]" style="background-color: #D4AF37;">Update Item</button>
+</div>
+</div>
+{% if form.errors %}
+<div class="mb-lg p-md bg-error-container/20 border border-error/30 rounded-lg">
+<p class="font-body-sm text-body-sm text-error">Please correct the errors below.</p>
+</div>
+{% endif %}
+<div class="grid grid-cols-12 gap-xl mt-xl">
+<div class="col-span-12 lg:col-span-7 space-y-xl">
+<div class="border border-outline-variant/30 rounded-xl p-xl bg-surface-container">
+<h3 class="font-h2-subhead text-h2-subhead text-on-surface mb-lg pb-sm border-b border-outline-variant/30">Core Details</h3>
+<div class="space-y-8">
+<div>
+<label class="block font-label-caps text-label-caps text-on-surface-variant uppercase mb-3" for="id_name">Item Name</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-md p-4 font-body-main text-body-main text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" type="text" id="id_name" name="name" value="{{ form.name.value|default:'' }}"/>
+</div>
+<div class="grid grid-cols-2 gap-lg">
+<div>
+<label class="block font-label-caps text-label-caps text-on-surface-variant uppercase mb-3" for="id_price">Price (USD)</label>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-data-mono">$</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-md py-4 pl-10 pr-4 font-data-mono text-data-mono text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" type="number" id="id_price" name="price" value="{{ form.price.value|default:'' }}"/>
+</div>
+</div>
+<div>
+<label class="block font-label-caps text-label-caps text-on-surface-variant uppercase mb-3" for="id_available">Status</label>
+<select id="id_available" name="available" class="w-full bg-surface-container-lowest border border-outline-variant rounded-md p-4 font-data-mono text-data-mono text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+<option value="Yes" {% if form.available.value == 'Yes' %}selected{% endif %}>Available</option>
+<option value="No" {% if form.available.value == 'No' %}selected{% endif %}>Unavailable</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="col-span-12 lg:col-span-5">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-lg tracking-widest flex items-center gap-2"><span class="material-symbols-outlined text-sm">visibility</span>Live Menu Preview</h3>
+<div class="border rounded-2xl overflow-hidden shadow-2xl relative group bg-surface-container border-outline-variant/30 flex flex-col">
+<div class="h-64 w-full relative">
+<img alt="Menu Item Preview" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWuXpDVkeY7U0Ck37me2dXPQEOglY1grFAVUas4ZP6RJXDke4S8ZQV0qu5MffsgVRMtYHNE3b5wZZCtuSqj4RPJJ8z5e3Xqooio5GGT4jzXWnPbeQbgVwQkob0-3TfvO3fDWTXcTMtv-X6i6108dQFxtqb_F_4lu8VClHMaqXG2fEB3dQYXaduU2MoxBOH3YGg7TWEAXBOWe70NGtvkX5k8rok4HrWXBAUz_h2Q-u0X3GYMSHN9vH36ZyEkD0z08I8jbDqp-Vmvb4"/>
+<div class="absolute top-4 right-4 bg-surface-container-lowest/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-outline-variant/50 flex items-center gap-2 shadow-lg">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<span class="font-label-caps text-label-caps text-secondary uppercase tracking-wider" id="preview-status">{% if form.available.value == 'Yes' %}Available{% else %}Unavailable{% endif %}</span>
+</div>
+</div>
+<div class="p-xl relative flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-md">
+<h4 class="font-h1-header text-h2-subhead text-on-surface m-0 leading-tight" id="preview-name">{{ form.name.value|default:'Item Name' }}</h4>
+<span class="font-data-mono text-data-mono text-primary bg-primary/10 px-3 py-1.5 rounded border border-primary/20" id="preview-price">${{ form.price.value|default:'0' }}</span>
+</div>
+<p class="font-body-main text-body-main text-on-surface-variant leading-relaxed mb-lg flex-1">Update the item details on the left.</p>
+</div>
+</div>
+</div>
+</div>
+</form>
+</main>
+</body></html>
