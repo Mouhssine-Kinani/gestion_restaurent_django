@@ -2,51 +2,517 @@
 
 {% block title %}Add Table{% endblock %}
 
+{% block page_title %}
+<div style="display: flex; align-items: center; gap: 14px;">
+  <a href="{% url 'table_list' %}"
+    style="color: var(--muted); width:36px; height:36px; border-radius:50%; border:1px solid var(--ghost); transition: all 0.2s; text-decoration: none; display: inline-flex; align-items:center; justify-content:center; flex-shrink:0;"
+    onmouseover="this.style.color='var(--gold)'; this.style.borderColor='var(--gold)'; this.style.background='rgba(201,168,76,0.08)'"
+    onmouseout="this.style.color='var(--muted)'; this.style.borderColor='var(--ghost)'; this.style.background='transparent'">
+    <i data-lucide="arrow-left" style="width:16px;height:16px;"></i>
+  </a>
+  <div>
+    <h1 class="topbar-title">Add Table</h1>
+    <div class="topbar-breadcrumb">Configure a new seating arrangement</div>
+  </div>
+</div>
+{% endblock %}
+
+{% block breadcrumb %}Home &rsaquo; Tables &rsaquo; Add{% endblock %}
+
 {% block content %}
-<div class="animate-fade-in">
-    <div class="flex items-center gap-4 mb-10">
-        <a href="{% url 'table_list' %}" class="p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-            </svg>
-        </a>
-        <div>
-            <h2 class="text-3xl font-bold text-white">Add Table</h2>
-            <p class="text-gray-400">Create a new table for customers</p>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Outfit:wght@300;400;500&display=swap');
+
+  .table-form-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 0;
+    max-width: 820px;
+    min-height: 500px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(201, 168, 76, 0.12);
+  }
+
+  .table-form-left {
+    background: var(--bg-surface);
+    padding: 44px 48px;
+    position: relative;
+  }
+
+  .table-form-left::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), var(--gold-dim), transparent);
+  }
+
+  .table-form-right {
+    background: linear-gradient(160deg, rgba(201, 168, 76, 0.1) 0%, rgba(212, 129, 58, 0.05) 50%, rgba(0, 0, 0, 0.25) 100%);
+    border-left: 1px solid rgba(201, 168, 76, 0.15);
+    padding: 40px 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .table-form-right::after {
+    content: '';
+    position: absolute;
+    bottom: -60px;
+    right: -60px;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(201, 168, 76, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .ornament-bg {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 300;
+    color: var(--gold);
+    opacity: 0.06;
+    font-size: 140px;
+    line-height: 1;
+    position: absolute;
+    top: 10px;
+    right: 16px;
+    pointer-events: none;
+    user-select: none;
+    letter-spacing: -4px;
+  }
+
+  .section-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(201, 168, 76, 0.35), transparent);
+  }
+
+  .field-row {
+    margin-bottom: 22px;
+  }
+
+  .field-label {
+    display: block;
+    font-family: 'Outfit', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .field-wrap {
+    position: relative;
+  }
+
+  .field-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gold);
+    opacity: 0.45;
+    pointer-events: none;
+    display: flex;
+  }
+
+  .table-form-left input,
+  .table-form-left select {
+    width: 100% !important;
+    height: 50px !important;
+    background: rgba(0, 0, 0, 0.25) !important;
+    border: 1px solid rgba(201, 168, 76, 0.18) !important;
+    border-radius: 10px !important;
+    color: var(--cream) !important;
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 14px !important;
+    padding: 0 16px 0 44px !important;
+    outline: none !important;
+    transition: all 0.2s !important;
+    box-sizing: border-box !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+  }
+
+  .table-form-left input:focus,
+  .table-form-left select:focus {
+    border-color: rgba(201, 168, 76, 0.6) !important;
+    background: rgba(201, 168, 76, 0.05) !important;
+    box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.08) !important;
+  }
+
+  .table-form-left select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23c9a84c' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") !important;
+    background-position: right 14px center !important;
+    background-repeat: no-repeat !important;
+    background-size: 16px !important;
+    padding-right: 40px !important;
+  }
+
+  .help-text {
+    font-family: 'Outfit', sans-serif;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 5px;
+    padding-left: 4px;
+  }
+
+  .form-error-text {
+    font-family: 'Outfit', sans-serif;
+    font-size: 11px;
+    color: #e05c5c;
+    margin-top: 5px;
+    padding-left: 4px;
+  }
+
+  .btn-create {
+    width: 100%;
+    height: 52px;
+    background: linear-gradient(135deg, #c9a84c 0%, #d4813a 100%);
+    border: none;
+    border-radius: 10px;
+    color: #1a1409;
+    font-family: 'Outfit', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 20px rgba(201, 168, 76, 0.22);
+    margin-bottom: 12px;
+  }
+
+  .btn-create:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(201, 168, 76, 0.32);
+  }
+
+  .btn-cancel {
+    width: 100%;
+    height: 44px;
+    background: transparent;
+    border: 1px solid rgba(201, 168, 76, 0.18);
+    border-radius: 10px;
+    color: var(--muted);
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .btn-cancel:hover {
+    border-color: rgba(201, 168, 76, 0.45);
+    color: var(--cream);
+  }
+
+  /* Sidebar */
+  .sidebar-preview-label {
+    font-family: 'Outfit', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.7;
+    margin-bottom: 20px;
+  }
+
+  .table-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 0;
+    padding: 24px;
+    border: 1px dashed rgba(201, 168, 76, 0.2);
+    border-radius: 14px;
+    margin-bottom: 16px;
+    background: rgba(0, 0, 0, 0.15);
+  }
+
+  .table-leg-top {
+    width: 64px;
+    height: 12px;
+    background: linear-gradient(90deg, rgba(201, 168, 76, 0.15), rgba(201, 168, 76, 0.3), rgba(201, 168, 76, 0.15));
+    border-radius: 6px 6px 0 0;
+    border: 1px solid rgba(201, 168, 76, 0.2);
+    border-bottom: none;
+  }
+
+  .table-surface {
+    width: 96px;
+    height: 52px;
+    background: linear-gradient(135deg, rgba(201, 168, 76, 0.2) 0%, rgba(201, 168, 76, 0.08) 100%);
+    border: 1px solid rgba(201, 168, 76, 0.3);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .table-number-display {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 30px;
+    color: var(--gold);
+    font-weight: 300;
+    transition: all 0.3s;
+  }
+
+  .table-leg-bottom {
+    width: 64px;
+    height: 12px;
+    background: linear-gradient(90deg, rgba(201, 168, 76, 0.15), rgba(201, 168, 76, 0.3), rgba(201, 168, 76, 0.15));
+    border-radius: 0 0 6px 6px;
+    border: 1px solid rgba(201, 168, 76, 0.2);
+    border-top: none;
+  }
+
+  .seats-visual-row {
+    display: flex;
+    gap: 5px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 140px;
+  }
+
+  .seat-pip {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: rgba(201, 168, 76, 0.5);
+    border: 1px solid rgba(201, 168, 76, 0.7);
+    transition: all 0.3s;
+  }
+
+  .sidebar-stat-box {
+    text-align: center;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    border: 1px solid rgba(201, 168, 76, 0.1);
+    margin-bottom: 12px;
+  }
+
+  .stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    font-weight: 300;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+
+  .stat-lbl {
+    font-family: 'Outfit', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .tip-box {
+    padding: 14px;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 10px;
+    border: 1px solid rgba(201, 168, 76, 0.08);
+  }
+
+  .tip-line {
+    font-family: 'Outfit', sans-serif;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.6;
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    margin-bottom: 8px;
+  }
+
+  .tip-line:last-child {
+    margin-bottom: 0;
+  }
+
+  .error-box-form {
+    background: rgba(224, 92, 92, 0.08);
+    border: 1px solid rgba(224, 92, 92, 0.25);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #e05c5c;
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+</style>
+
+<div class="table-form-wrapper">
+
+  <!-- LEFT: Form -->
+  <div class="table-form-left">
+    <div class="ornament-bg">#</div>
+    <div class="section-title">Table Configuration</div>
+
+    <form method="post" novalidate id="table-form">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+      <div class="error-box-form">
+        <i data-lucide="alert-circle" style="width:18px;height:18px;flex-shrink:0;"></i>
+        <span>{{ form.non_field_errors }}</span>
+      </div>
+      {% endif %}
+
+      <div class="field-row">
+        <label class="field-label">{{ form.number.label }}</label>
+        <div class="field-wrap">
+          <span class="field-icon"><i data-lucide="hash" style="width:15px;height:15px;"></i></span>
+          {{ form.number }}
         </div>
+        {% if form.number.help_text %}<div class="help-text">{{ form.number.help_text }}</div>{% endif %}
+        {% if form.number.errors %}<div class="form-error-text">{{ form.number.errors|striptags }}</div>{% endif %}
+      </div>
+
+      <div class="field-row">
+        <label class="field-label">{{ form.seats.label }}</label>
+        <div class="field-wrap">
+          <span class="field-icon"><i data-lucide="users" style="width:15px;height:15px;"></i></span>
+          {{ form.seats }}
+        </div>
+        {% if form.seats.help_text %}<div class="help-text">{{ form.seats.help_text }}</div>{% endif %}
+        {% if form.seats.errors %}<div class="form-error-text">{{ form.seats.errors|striptags }}</div>{% endif %}
+      </div>
+
+      <div class="field-row">
+        <label class="field-label">{{ form.status.label }}</label>
+        <div class="field-wrap">
+          <span class="field-icon"><i data-lucide="activity" style="width:15px;height:15px;"></i></span>
+          {{ form.status }}
+        </div>
+        {% if form.status.errors %}<div class="form-error-text">{{ form.status.errors|striptags }}</div>{% endif %}
+      </div>
+
+      <div style="margin-top: 36px;">
+        <button type="submit" class="btn-create">
+          <i data-lucide="plus-circle" style="width:16px;height:16px;"></i>
+          Create Table
+        </button>
+        <a href="{% url 'table_list' %}" class="btn-cancel">Cancel</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- RIGHT: Visual Sidebar -->
+  <div class="table-form-right">
+    <div>
+      <div class="sidebar-preview-label">Live Preview</div>
+
+      <div class="table-visual">
+        <div class="table-leg-top"></div>
+        <div class="table-surface">
+          <span class="table-number-display" id="prev-number">—</span>
+        </div>
+        <div class="table-leg-bottom"></div>
+        <div class="seats-visual-row" id="seats-visual"></div>
+      </div>
+
+      <div
+        style="text-align:center; font-family:'Outfit',sans-serif; font-size:11px; color:var(--muted); margin-bottom:16px; letter-spacing:0.08em;">
+        Status: <span id="prev-status" style="color:var(--gold);">—</span>
+      </div>
+
+      <div class="sidebar-stat-box">
+        <div class="stat-num" id="seat-count">—</div>
+        <div class="stat-lbl">Seats</div>
+      </div>
     </div>
+
+    <div class="tip-box">
+      <div class="tip-line">
+        <i data-lucide="info"
+          style="width:12px;height:12px; color:var(--gold); opacity:0.5; flex-shrink:0; margin-top:2px;"></i>
+        Tables set to <em style="color:var(--gold); font-style:normal;">Available</em> appear in new orders instantly.
+      </div>
+      <div class="tip-line">
+        <i data-lucide="key"
+          style="width:12px;height:12px; color:var(--gold); opacity:0.5; flex-shrink:0; margin-top:2px;"></i>
+        Use a unique number for easy floor identification.
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="max-w-xl">
-    <div class="glass-card rounded-2xl p-8 border-glow">
-        <form method="post" class="space-y-6">
-            {% csrf_token %}
-            
-            {% if form.non_field_errors %}
-            <div class="p-4 rounded-xl bg-red-500/20 border border-red-500/30">
-                <p class="text-red-400 text-sm">{{ form.non_field_errors }}</p>
-            </div>
-            {% endif %}
-            
-            {% for field in form %}
-            <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">{{ field.label }}</label>
-                {{ field }}
-                {% if field.errors %}
-                <p class="text-red-400 text-sm mt-1">{{ field.errors }}</p>
-                {% endif %}
-            </div>
-            {% endfor %}
-            
-            <div class="flex gap-4 pt-4">
-                <button type="submit" class="flex-1 py-4 bg-gradient-to-r from-accent-500 to-neon-orange rounded-xl font-bold text-dark-900 hover:shadow-[0_0_30px_rgba(251,191,36,0.4)] transition-all duration-300">
-                    Create Table
-                </button>
-                <a href="{% url 'table_list' %}" class="px-6 py-4 rounded-xl font-medium text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-300">
-                    Cancel
-                </a>
-            </div>
-        </form>
-    </div>
-</div>
+<script>
+  const numInput = document.querySelector('[name="number"]');
+  const seatsInput = document.querySelector('[name="seats"]');
+  const statusInput = document.querySelector('[name="status"]');
+
+  function updatePreview() {
+    const num = numInput ? numInput.value.trim() : '';
+    const seats = seatsInput ? parseInt(seatsInput.value) || 0 : 0;
+    const statusEl = statusInput ? statusInput.options[statusInput.selectedIndex] : null;
+    const status = statusEl ? statusEl.text : '';
+
+    document.getElementById('prev-number').textContent = num || '—';
+    document.getElementById('prev-status').textContent = status || '—';
+    document.getElementById('seat-count').textContent = seats || '—';
+
+    const row = document.getElementById('seats-visual');
+    row.innerHTML = '';
+    const max = Math.min(seats, 12);
+    for (let i = 0; i < max; i++) {
+      const d = document.createElement('div');
+      d.className = 'seat-pip';
+      row.appendChild(d);
+    }
+    if (seats > 12) {
+      const more = document.createElement('span');
+      more.style.cssText = 'font-size:10px;color:var(--muted);';
+      more.textContent = '+' + (seats - 12);
+      row.appendChild(more);
+    }
+  }
+
+  if (numInput) numInput.addEventListener('input', updatePreview);
+  if (seatsInput) seatsInput.addEventListener('input', updatePreview);
+  if (statusInput) statusInput.addEventListener('change', updatePreview);
+  updatePreview();
+</script>
+
 {% endblock %}

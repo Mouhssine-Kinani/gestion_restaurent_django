@@ -2,146 +2,437 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - RESTO</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        dark: {
-                            900: '#0a0a0f',
-                            800: '#12121a',
-                            700: '#1a1a25',
-                            600: '#252532',
-                            500: '#32324a',
-                        },
-                        accent: {
-                            400: '#fbbf24',
-                            500: '#f59e0b',
-                            600: '#d97706',
-                        },
-                        neon: {
-                            cyan: '#00f5ff',
-                            magenta: '#ff00ff',
-                            green: '#00ff88',
-                            orange: '#ff6b35',
-                        }
-                    },
-                    animation: {
-                        'glow': 'glow 2s ease-in-out infinite alternate',
-                        'float': 'float 3s ease-in-out infinite',
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                    }
-                }
-            }
-        }
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Login - RestaurantOS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
-        
-        * {
-            font-family: 'Outfit', sans-serif;
+        :root {
+            --bg-base:        #0f0e0d;
+            --bg-surface:     #1a1815;
+            --bg-elevated:    #242019;
+            --bg-input:       #1e1c18;
+            --gold:           #c9a84c;
+            --gold-light:     #e8c97a;
+            --gold-dim:       #6b5520;
+            --amber:          #d4813a;
+            --cream:          #f5edd6;
+            --muted:          #7d7260;
+            --ghost:          #3d3830;
+            --status-red:     #e85a3a;
+            --status-green:   #4caf7d;
+            --font-display: 'Cormorant Garamond', serif;
+            --font-body:    'DM Sans', sans-serif;
+            --font-mono:    'DM Mono', monospace;
+            --radius-md:  12px;
+            --radius-xl:  28px;
+            --transition-fast:   150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base:   250ms cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
+
+        * { margin:0; padding:0; box-sizing: border-box; }
+
         body {
-            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
+            font-family: var(--font-body);
+            background: var(--bg-base);
+            color: var(--cream);
             min-height: 100vh;
+            display: flex;
+            margin:0;
         }
-        
-        .glass {
-            background: rgba(26, 26, 37, 0.7);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+
+        h1, h2, h3, .font-display { font-family: var(--font-display); }
+
+        /* LEFT: Brand Panel */
+        .brand-panel {
+            width: 50%;
+            min-height: 100vh;
+            background: var(--bg-surface);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 32px;
+            overflow: hidden;
         }
-        
-        .text-gradient {
-            background: linear-gradient(90deg, #fbbf24, #ff6b35, #fbbf24);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-size: 200% auto;
-            animation: shimmer 3s linear infinite;
+
+        /* Decorative background circles */
+        .brand-panel::before {
+            content: '';
+            position: absolute;
+            width: 400px; height: 400px;
+            border-radius: 50%;
+            background: var(--gold-dim);
+            opacity: 0.03;
+            top: -100px; left: -100px;
         }
-        
-        @keyframes shimmer {
-            to { background-position: 200% center; }
+        .brand-panel::after {
+            content: '';
+            position: absolute;
+            width: 300px; height: 300px;
+            border-radius: 50%;
+            background: var(--gold-dim);
+            opacity: 0.04;
+            bottom: -80px; right: -80px;
         }
-        
-        .mesh-bg {
-            background: 
-                radial-gradient(at 40% 20%, rgba(251, 191, 36, 0.15) 0px, transparent 50%),
-                radial-gradient(at 80% 0%, rgba(0, 245, 255, 0.1) 0px, transparent 50%),
-                radial-gradient(at 0% 50%, rgba(255, 0, 255, 0.08) 0px, transparent 50%),
-                radial-gradient(at 80% 50%, rgba(0, 255, 136, 0.08) 0px, transparent 50%),
-                radial-gradient(at 0% 100%, rgba(255, 107, 53, 0.1) 0px, transparent 50%);
+
+        .brand-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
         }
-        
-        input[type="text"], input[type="password"] {
-            background: rgba(26, 26, 37, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            transition: all 0.3s ease;
+
+        .brand-icon {
+            width: 120px; height: 120px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 24px;
+            color: var(--gold-dim);
         }
-        
-        input[type="text"]:focus, input[type="password"]:focus {
+
+        .brand-name {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 42px;
+            color: var(--cream);
+            margin-bottom: 16px;
+        }
+
+        .brand-tagline {
+            font-family: var(--font-body);
+            font-size: 16px;
+            color: var(--muted);
+            max-width: 300px;
+            line-height: 1.6;
+            margin: 0 auto 40px;
+        }
+
+        .brand-features {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .feature-pill {
+            padding: 6px 14px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--ghost);
+            border-radius: 100px;
+            font-size: 12px;
+            color: var(--muted);
+            font-family: var(--font-body);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .brand-version {
+            position: absolute;
+            bottom: 24px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--ghost);
+        }
+
+        /* RIGHT: Form Panel */
+        .form-panel {
+            width: 50%;
+            min-height: 100vh;
+            background: var(--bg-base);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 32px;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 360px;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .form-header .welcome {
+            font-family: var(--font-body);
+            font-size: 13px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 8px;
+        }
+
+        .form-header h1 {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 32px;
+            color: var(--cream);
+        }
+
+        .form-group { margin-bottom: 20px; }
+
+        .form-label {
+            display: block;
+            font-family: var(--font-body);
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        .form-input {
+            width: 100%;
+            height: 48px;
+            padding: 12px 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--ghost);
+            border-radius: var(--radius-md);
+            color: var(--cream);
+            font-family: var(--font-body);
+            font-size: 14px;
             outline: none;
-            border-color: rgba(251, 191, 36, 0.5);
-            box-shadow: 0 0 20px rgba(251, 191, 36, 0.2);
+            transition: all var(--transition-fast);
         }
-        
-        .glow-accent {
-            box-shadow: 0 0 30px rgba(251, 191, 36, 0.2), 0 0 60px rgba(251, 191, 36, 0.1);
+
+        .form-input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
+        }
+
+        .form-input::placeholder { color: var(--muted); }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            transition: color var(--transition-fast);
+        }
+
+        .password-toggle:hover { color: var(--cream); }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: 16px; height: 16px;
+            accent-color: var(--gold);
+            cursor: pointer;
+        }
+
+        .remember-me label {
+            font-size: 13px;
+            color: var(--muted);
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            height: 52px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            color: var(--bg-base);
+            font-family: var(--font-body);
+            font-weight: 600;
+            font-size: 15px;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(201,168,76,0.25);
+            transition: all var(--transition-base);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 24px rgba(201,168,76,0.35);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(201,168,76,0.2);
+        }
+
+        .error-box {
+            padding: 12px 16px;
+            background: rgba(232,90,58,0.1);
+            border: 1px solid rgba(232,90,58,0.3);
+            border-radius: var(--radius-md);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            font-family: var(--font-body);
+            font-size: 13px;
+            color: var(--status-red);
+            margin-bottom: 16px;
+        }
+
+        .error-text {
+            font-family: var(--font-body);
+            font-size: 13px;
+            color: var(--status-red);
+            margin-top: 6px;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid var(--ghost);
+            font-size: 13px;
+            color: var(--muted);
+            font-family: var(--font-body);
+        }
+
+        .form-footer a {
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color var(--transition-fast);
+        }
+
+        .form-footer a:hover { color: var(--gold-light); }
+
+        .copyright {
+            text-align: center;
+            margin-top: 48px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--ghost);
+        }
+
+        [i-lucide] { display: inline-flex; align-items: center; justify-content: center; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .brand-panel, .form-panel { width: 100%; min-height: auto; }
+            .brand-panel { padding: 32px 24px; }
         }
     </style>
 </head>
-<body class="text-white min-h-screen mesh-bg flex items-center justify-center p-4">
-    <div class="w-full max-w-md">
-        <div class="text-center mb-10 animate-fade-in">
-            <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-accent-400 to-neon-orange mb-6 glow-accent">
-                <svg class="w-10 h-10 text-dark-900" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H12a1 1 0 100-2H6.414a1 1 0 00-1.017.089l-.893.892a1 1 0 01-.894 0l-.894-.892A1 1 0 013 14H2V1z"/>
-                </svg>
+<body>
+    <!-- LEFT: Brand Panel -->
+    <div class="brand-panel">
+        <div class="brand-content">
+            <div class="brand-icon">
+                <i data-lucide="utensils" style="width:120px;height:120px;"></i>
             </div>
-            <h1 class="text-4xl font-bold text-white mb-2">RESTO</h1>
-            <p class="text-gray-400">Welcome back! Sign in to continue.</p>
+            <div class="brand-name">RestaurantOS</div>
+            <p class="brand-tagline">Manage your kitchen, menu, and guests — all in one place.</p>
+            <div class="brand-features">
+                <div class="feature-pill">
+                    <i data-lucide="clipboard-list" style="width:14px;height:14px;color:var(--gold);"></i>
+                    Orders
+                </div>
+                <div class="feature-pill">
+                    <i data-lucide="book-open" style="width:14px;height:14px;color:var(--gold);"></i>
+                    Menu
+                </div>
+                <div class="feature-pill">
+                    <i data-lucide="armchair" style="width:14px;height:14px;color:var(--gold);"></i>
+                    Tables
+                </div>
+            </div>
         </div>
-        
-        <div class="glass rounded-2xl p-8 animate-slide-up">
-            <form method="post" class="space-y-6">
+        <div class="brand-version">v1.0.0</div>
+    </div>
+
+    <!-- RIGHT: Form Panel -->
+    <div class="form-panel">
+        <div class="form-container">
+            <div class="form-header">
+                <div class="welcome">Welcome back</div>
+                <h1>Sign in to continue</h1>
+            </div>
+
+            <form method="post" class="space-y-5" novalidate>
                 {% csrf_token %}
-                
+
                 {% if form.non_field_errors %}
-                <div class="p-4 rounded-xl bg-red-500/20 border border-red-500/30">
-                    <p class="text-red-400 text-sm">{{ form.non_field_errors }}</p>
+                <div class="error-box">
+                    <i data-lucide="alert-circle" style="width:20px;height:20px;flex-shrink:0;"></i>
+                    <span>{{ form.non_field_errors }}</span>
                 </div>
                 {% endif %}
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-2">Username</label>
-                    <input type="text" name="username" required placeholder="Enter your username"
-                        class="w-full px-4 py-3 rounded-xl placeholder-gray-500">
+
+                {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    {% if field.name == 'password' %}
+                    <div class="password-wrapper">
+                        {{ field }}
+                        <button type="button" class="password-toggle" onclick="togglePassword(this)" aria-label="Toggle password visibility">
+                            <i data-lucide="eye" style="width:16px;height:16px;"></i>
+                        </button>
+                    </div>
+                    {% else %}
+                    {{ field }}
+                    {% endif %}
+                    {% if field.errors %}
+                    <div class="error-text" role="alert">{{ field.errors|striptags }}</div>
+                    {% endif %}
                 </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
-                    <input type="password" name="password" required placeholder="Enter your password"
-                        class="w-full px-4 py-3 rounded-xl placeholder-gray-500">
+                {% endfor %}
+
+                <div class="remember-me">
+                    <input type="checkbox" id="remember" name="remember">
+                    <label for="remember">Remember me</label>
                 </div>
-                
-                <button type="submit" class="w-full py-4 bg-gradient-to-r from-accent-500 to-neon-orange rounded-xl font-bold text-dark-900 hover:shadow-[0_0_30px_rgba(251,191,36,0.4)] transition-all duration-300 transform hover:scale-[1.02]">
+
+                <button type="submit" class="btn-primary">
+                    <i data-lucide="log-in" style="width:16px;height:16px;"></i>
                     Sign In
                 </button>
             </form>
-            
-            <div class="mt-8 text-center">
-                <p class="text-gray-400">Don't have an account? 
-                    <a href="{% url 'register' %}" class="text-accent-400 hover:text-accent-300 font-medium transition-colors">Register here</a>
-                </p>
+
+            <div class="form-footer">
+                Don't have an account?
+                <a href="{% url 'register' %}">Create one →</a>
             </div>
+
+            <div class="copyright">&copy; 2026 RestaurantOS. All rights reserved.</div>
         </div>
-        
-        <p class="text-center text-sm text-gray-500 mt-8">&copy; 2024 RESTO. Crafted with fire.</p>
     </div>
+
+    <script>
+        lucide.createIcons();
+
+        function togglePassword(btn) {
+            const wrapper = btn.closest('.password-wrapper');
+            const input = wrapper.querySelector('input');
+            const icon = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                input.type = 'password';
+                icon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        }
+    </script>
 </body>
 </html>

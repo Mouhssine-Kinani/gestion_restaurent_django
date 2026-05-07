@@ -1,79 +1,252 @@
 {% extends 'restaurant/base.html' %}
 
 {% block title %}Tables{% endblock %}
+{% block title_text %}Floor Plan{% endblock %}
+{% block breadcrumb %}Home &rsaquo; Tables &mdash; <span style="color:var(--ember);">{{ tables|length }} tables</span>
+{% endblock %}
+
+{% block page_actions %}
+<div style="display:flex;gap:8px;align-items:center;">
+  <!-- View Toggle -->
+  <div
+    style="display:flex;background:var(--surface-hi);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px;gap:2px;">
+    <button onclick="switchView('floor',this)" id="btn-floor"
+      style="padding:5px 14px;border:none;border-radius:4px;font-family:var(--font-sans);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--transition);background:var(--ember);color:#fff;display:inline-flex;align-items:center;gap:6px;">
+      <i data-lucide="layout-dashboard" style="width:13px;height:13px;"></i> Floor
+    </button>
+    <button onclick="switchView('list',this)" id="btn-list"
+      style="padding:5px 14px;border:none;border-radius:4px;font-family:var(--font-sans);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--transition);background:transparent;color:var(--muted);display:inline-flex;align-items:center;gap:6px;">
+      <i data-lucide="list" style="width:13px;height:13px;"></i> List
+    </button>
+  </div>
+  <a href="{% url 'add_table' %}" class="btn btn-primary" style="height:38px;padding:0 16px;font-size:13px;">
+    <i data-lucide="plus" style="width:14px;height:14px;"></i>
+    Add Table
+  </a>
+</div>
+{% endblock %}
 
 {% block content %}
-<div class="animate-fade-in">
-    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-10">
-        <div>
-            <h2 class="text-4xl font-bold text-white mb-2">Tables</h2>
-            <p class="text-gray-400">Manage your restaurant seating</p>
-        </div>
-        <div class="flex flex-wrap items-center gap-4">
-            <form method="get" class="relative flex-1 min-w-[250px]">
-                <input type="text" name="q" placeholder="Search tables..." value="{{ request.GET.q|default:'' }}"
-                    class="w-full px-4 py-3 pl-12 rounded-xl bg-dark-700 border border-white/10 text-white placeholder-gray-500 focus:border-accent-500/50 focus:shadow-[0_0_20px_rgba(251,191,36,0.2)] transition-all duration-300">
-                <svg class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                </svg>
-            </form>
-            <a href="{% url 'add_table' %}" class="group px-6 py-3 bg-gradient-to-r from-accent-500 to-neon-orange rounded-xl font-semibold text-dark-900 hover:shadow-[0_0_30px_rgba(251,191,36,0.4)] transition-all duration-300">
-                <span class="flex items-center gap-2">
-                    <svg class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                    </svg>
-                    Add Table
-                </span>
-            </a>
-        </div>
+
+<!-- Status Legend + Search -->
+<div style="display:flex;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:24px;">
+  <div style="display:flex;gap:16px;align-items:center;">
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);">
+      <span style="width:8px;height:8px;border-radius:50%;background:var(--status-green);display:inline-block;"></span>
+      Free
     </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);">
+      <span style="width:8px;height:8px;border-radius:50%;background:var(--ember);display:inline-block;"></span>
+      Occupied
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);">
+      <span style="width:8px;height:8px;border-radius:50%;background:var(--status-blue);display:inline-block;"></span>
+      Reserved
+    </div>
+  </div>
+  <form method="get" style="margin-left:auto;position:relative;">
+    <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--ghost);display:flex;">
+      <i data-lucide="search" style="width:13px;height:13px;"></i>
+    </span>
+    <input type="text" name="q" placeholder="Table number…" value="{{ request.GET.q|default:'' }}"
+      style="height:36px;padding:0 12px 0 32px;background:var(--surface-hi);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--cream);font-size:13px;width:180px;outline:none;transition:all var(--transition);"
+      onfocus="this.style.borderColor='var(--ember)'" onblur="this.style.borderColor='var(--border)'">
+  </form>
 </div>
 
-<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-    {% for table in tables %}
-    <div class="group relative glass-card rounded-2xl p-5 hover-lift border-glow">
-        <div class="absolute top-0 left-0 right-0 h-1 rounded-t-2xl {% if table.status == 'available' %}bg-gradient-to-r from-green-400 to-neon-green{% elif table.status == 'occupied' %}bg-gradient-to-r from-red-400 to-orange-500{% else %}bg-gradient-to-r from-gray-400 to-gray-500{% endif %}"></div>
-        <div class="flex items-center justify-between mb-4">
-            <span class="text-3xl font-bold text-white">#{{ table.number }}</span>
-            <span class="w-3 h-3 rounded-full {% if table.status == 'available' %}bg-green-400 shadow-[0_0_15px_rgba(0,255,136,0.6)]{% elif table.status == 'occupied' %}bg-red-400 shadow-[0_0_15px_rgba(255,68,68,0.6)]{% else %}bg-gray-400{% endif %} animate-pulse"></span>
+<!-- ── FLOOR VIEW ── -->
+<div id="floor-view">
+  <div
+    style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:40px;min-height:420px;position:relative;overflow:hidden;">
+
+    <!-- Grid texture -->
+    <div style="position:absolute;inset:0;background-image:
+            linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size:48px 48px;pointer-events:none;"></div>
+
+    <!-- Corner labels -->
+    <div
+      style="position:absolute;top:16px;left:20px;font-family:var(--font-mono);font-size:9px;color:var(--ghost);letter-spacing:0.12em;">
+      ENTRANCE →</div>
+    <div
+      style="position:absolute;bottom:16px;right:20px;font-family:var(--font-mono);font-size:9px;color:var(--ghost);letter-spacing:0.12em;">
+      ← KITCHEN</div>
+
+    <div
+      style="position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:16px;justify-content:center;align-items:center;min-height:340px;">
+      {% for table in tables %}
+      {% with st=table.status %}
+      <div class="floor-table" style="
+                position:relative;
+                width:104px;
+                border-radius:12px;
+                border:2px solid {% if st == 'free' %}rgba(76,175,125,0.5){% elif st == 'occupied' %}rgba(196,96,26,0.6){% else %}rgba(90,154,232,0.5){% endif %};
+                background:{% if st == 'free' %}rgba(76,175,125,0.06){% elif st == 'occupied' %}rgba(196,96,26,0.08){% else %}rgba(90,154,232,0.06){% endif %};
+                padding:20px 12px 16px;
+                text-align:center;
+                cursor:pointer;
+                transition:all 250ms ease;
+                ">
+
+        <!-- Pulsing status dot -->
+        <div
+          style="position:absolute;top:10px;right:10px;width:8px;height:8px;border-radius:50%;
+                    background:{% if st == 'free' %}var(--status-green){% elif st == 'occupied' %}var(--ember){% else %}var(--status-blue){% endif %};
+                    {% if st == 'occupied' %}animation:pulse 1.5s ease-in-out infinite;{% elif st == 'free' %}animation:pulse 3s ease-in-out infinite;{% endif %}">
         </div>
-        <div class="flex items-center gap-2 mb-4">
-            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-            </svg>
-            <span class="text-gray-400">{{ table.seats }} seats</span>
+
+        <!-- Seat indicators (top) -->
+        <div style="display:flex;justify-content:center;gap:4px;margin-bottom:10px;">
+          {% for i in "1234"|make_list %}
+          {% if forloop.counter <= table.seats|divisibleby:2 %} <div
+            style="width:10px;height:10px;border-radius:50%;background:{% if st == 'free' %}rgba(76,175,125,0.3){% elif st == 'occupied' %}rgba(196,96,26,0.4){% else %}rgba(90,154,232,0.3){% endif %};border:1px solid {% if st == 'free' %}rgba(76,175,125,0.4){% elif st == 'occupied' %}rgba(196,96,26,0.5){% else %}rgba(90,154,232,0.4){% endif %};">
         </div>
-        <div class="flex items-center justify-between pt-3 border-t border-white/5">
-            <span class="text-xs font-medium px-2 py-1 rounded-lg capitalize {% if table.status == 'available' %}bg-green-500/20 text-green-400{% elif table.status == 'occupied' %}bg-red-500/20 text-red-400{% else %}bg-gray-500/20 text-gray-400{% endif %}">
-                {{ table.status }}
-            </span>
-            <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <a href="{% url 'update_table' table.id %}" class="p-2 rounded-lg bg-white/10 hover:bg-accent-500/30 transition-colors" title="Edit">
-                    <svg class="w-4 h-4 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                    </svg>
-                </a>
-                <a href="{% url 'delete_table' table.id %}" class="p-2 rounded-lg bg-white/10 hover:bg-red-500/30 transition-colors" title="Delete">
-                    <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                    </svg>
-                </a>
-            </div>
-        </div>
-    </div>
-    {% empty %}
-    <div class="col-span-full flex flex-col items-center justify-center py-20">
-        <div class="w-20 h-20 rounded-2xl bg-dark-600 flex items-center justify-center mb-6">
-            <svg class="w-10 h-10 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
-            </svg>
-        </div>
-        <h3 class="text-xl font-semibold text-white mb-2">No tables yet</h3>
-        <p class="text-gray-400 mb-6">Add tables to manage your seating</p>
-        <a href="{% url 'add_table' %}" class="px-6 py-3 bg-accent-500 rounded-xl font-semibold text-dark-900 hover:bg-accent-400 transition-colors">
-            Add First Table
+        {% endif %}
+        {% endfor %}
+      </div>
+
+      <div
+        style="font-family:var(--font-mono);font-size:22px;font-weight:500;color:var(--cream);letter-spacing:-0.5px;">
+        T{{ table.number }}</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:3px;font-weight:300;">{{ table.seats }} seats</div>
+
+      <!-- Status label -->
+      <div
+        style="margin-top:8px;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;font-weight:500;
+                    color:{% if st == 'free' %}var(--status-green){% elif st == 'occupied' %}var(--ember){% else %}var(--status-blue){% endif %};">
+        {{ st|capfirst }}
+      </div>
+
+      <!-- Hover actions -->
+      <div class="floor-actions"
+        style="position:absolute;inset:0;border-radius:10px;background:rgba(17,16,9,0.9);backdrop-filter:blur(4px);opacity:0;transition:opacity 200ms ease;display:flex;align-items:center;justify-content:center;gap:8px;">
+        <a href="{% url 'update_table' table.id %}" class="btn btn-ghost"
+          style="height:30px;padding:0 12px;font-size:11px;border-color:rgba(255,255,255,0.15);">
+          <i data-lucide="pencil" style="width:11px;height:11px;"></i>
         </a>
+        <a href="{% url 'delete_table' table.id %}"
+          style="height:30px;padding:0 12px;display:inline-flex;align-items:center;border-radius:var(--radius-sm);border:1px solid rgba(232,90,58,0.4);background:rgba(232,90,58,0.12);color:var(--status-red);font-size:11px;">
+          <i data-lucide="trash-2" style="width:11px;height:11px;"></i>
+        </a>
+      </div>
+    </div>
+    {% endwith %}
+    {% empty %}
+    <div class="empty-state">
+      <div class="empty-icon"><i data-lucide="armchair" style="width:24px;height:24px;"></i></div>
+      <div class="empty-title">No tables yet</div>
+      <div class="empty-text">Add tables to build your floor plan</div>
+      <a href="{% url 'add_table' %}" class="btn btn-primary">
+        <i data-lucide="plus" style="width:14px;height:14px;"></i>
+        Add First Table
+      </a>
     </div>
     {% endfor %}
+  </div>
 </div>
+</div>
+
+<!-- ── LIST VIEW ── -->
+<div id="list-view" style="display:none;">
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;">
+    {% for table in tables %}
+    {% with st=table.status %}
+    <div class="card" style="padding:20px;position:relative;overflow:hidden;">
+      <!-- Left accent bar -->
+      <div
+        style="position:absolute;left:0;top:0;bottom:0;width:3px;
+                background:{% if st == 'free' %}var(--status-green){% elif st == 'occupied' %}var(--ember){% else %}var(--status-blue){% endif %};border-radius:0 2px 2px 0;">
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <span style="font-family:var(--font-serif);font-style:italic;font-size:26px;color:var(--cream);">Table {{
+          table.number }}</span>
+        <span style="width:10px;height:10px;border-radius:50%;flex-shrink:0;
+                    background:{% if st == 'free' %}var(--status-green){% elif st == 'occupied' %}var(--ember){% else %}var(--status-blue){% endif %};
+                    {% if st != 'reserved' %}animation:pulse 2s ease-in-out infinite;{% endif %}">
+        </span>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-bottom:16px;">
+        <i data-lucide="users" style="width:13px;height:13px;"></i>
+        {{ table.seats }} seats
+      </div>
+
+      <!-- Ghost number watermark -->
+      <div
+        style="position:absolute;right:-8px;bottom:-10px;font-family:var(--font-mono);font-size:72px;font-weight:600;color:var(--cream);opacity:0.03;pointer-events:none;line-height:1;">
+        {{ table.number }}</div>
+
+      <div
+        style="display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--border);">
+        {% if st == 'free' %}
+        <span class="badge badge-green"><span class="status-dot"></span>Free</span>
+        {% elif st == 'occupied' %}
+        <span class="badge badge-amber"><span class="status-dot pulse"></span>Occupied</span>
+        {% else %}
+        <span class="badge badge-blue"><span class="status-dot"></span>Reserved</span>
+        {% endif %}
+        <div style="display:flex;gap:5px;">
+          <a href="{% url 'update_table' table.id %}" class="btn-icon" style="width:28px;height:28px;"><i
+              data-lucide="pencil" style="width:11px;height:11px;"></i></a>
+          <a href="{% url 'delete_table' table.id %}" class="btn-icon danger" style="width:28px;height:28px;"><i
+              data-lucide="trash-2" style="width:11px;height:11px;"></i></a>
+        </div>
+      </div>
+    </div>
+    {% endwith %}
+    {% empty %}
+    <div style="grid-column:1/-1;">
+      <div class="empty-state">
+        <div class="empty-icon"><i data-lucide="armchair" style="width:24px;height:24px;"></i></div>
+        <div class="empty-title">No tables yet</div>
+        <div class="empty-text">Add your first table to manage seating</div>
+        <a href="{% url 'add_table' %}" class="btn btn-primary">Add First Table</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+  .floor-table:hover {
+    transform: scale(1.06);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+
+  .floor-table:hover .floor-actions {
+    opacity: 1 !important;
+  }
+
+  @keyframes pulse {
+
+    0%,
+    100% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0.3;
+    }
+  }
+</style>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function switchView(view, btn) {
+    document.getElementById('floor-view').style.display = view === 'floor' ? 'block' : 'none';
+    document.getElementById('list-view').style.display = view === 'list' ? 'block' : 'none';
+
+    ['btn-floor', 'btn-list'].forEach(id => {
+      const b = document.getElementById(id);
+      b.style.background = 'transparent';
+      b.style.color = 'var(--muted)';
+    });
+    document.getElementById('btn-' + view).style.background = 'var(--ember)';
+    document.getElementById('btn-' + view).style.color = '#fff';
+  }
+</script>
 {% endblock %}

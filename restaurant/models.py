@@ -30,3 +30,7 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order {self.id} - Table {self.table.number} - {self.status}"
+
+    @property
+    def total(self):
+        return sum(item.price for item in self.items.all())

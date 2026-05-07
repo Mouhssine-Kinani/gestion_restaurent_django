@@ -2,51 +2,107 @@
 
 {% block title %}Edit Order{% endblock %}
 
-{% block content %}
-<div class="animate-fade-in">
-    <div class="flex items-center gap-4 mb-10">
-        <a href="{% url 'order_list' %}" class="p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-            </svg>
-        </a>
-        <div>
-            <h2 class="text-3xl font-bold text-white">Edit Order</h2>
-            <p class="text-gray-400">Update order details</p>
-        </div>
+{% block page_title %}
+<div style="display: flex; align-items: center; gap: 12px;">
+    <a href="{% url 'order_list' %}" style="color: var(--muted); padding: 4px; border-radius: var(--radius-sm); transition: all var(--transition-fast); text-decoration: none; display: inline-flex;" onmouseover="this.style.color='var(--cream)'; this.style.background='var(--bg-elevated)'" onmouseout="this.style.color='var(--muted)'; this.style.background='transparent'">
+        <i data-lucide="arrow-left" style="width:20px;height:20px;"></i>
+    </a>
+    <div>
+        <h1 class="topbar-title">Edit Order</h1>
+        <div class="topbar-breadcrumb">Editing: <span style="color:var(--gold); font-style:italic;">Order #{{ order.id }}</span> &mdash; Status: <span class="{% if order.status == 'served' %}badge-green{% elif order.status == 'Pending' %}badge-orange{% else %}badge-red{% endif %}" style="margin-left:4px;">{{ order.status }}</span></div>
     </div>
 </div>
+{% endblock %}
 
-<div class="max-w-xl">
-    <div class="glass-card rounded-2xl p-8 border-glow">
-        <form method="post" class="space-y-6">
+{% block breadcrumb %}Home &rsaquo; Orders &rsaquo; Edit{% endblock %}
+
+{% block content %}
+<!-- Edit Banner -->
+<div style="background: var(--bg-elevated); border-bottom: 1px solid var(--ghost); padding: 12px 24px; margin: -32px -32px 32px -32px; display: flex; align-items: center; gap: 12px;">
+    <i data-lucide="pencil" style="width:16px;height:16px;color:var(--gold);"></i>
+    <div style="flex:1;">
+        <span style="font-size:13px; color:var(--cream); font-weight:500;">Editing: </span>
+        <span style="font-size:13px; color:var(--gold); font-style:italic;">Order #{{ order.id }}</span>
+    </div>
+    <span style="font-family:var(--font-mono); font-size:12px; color:var(--muted);">Last modified: {{ order.updated_at|timesince|default:"2 hours" }} ago</span>
+</div>
+
+<div style="max-width: 640px;">
+    <div class="card" style="padding: 32px 40px;">
+        <!-- Status Selector (prominent) -->
+        <div style="margin-bottom: 28px;">
+            <div style="font-family: var(--font-body); font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 12px;">Current Status</div>
+            <div style="display: flex; gap: 8px;">
+                <label style="flex:1; cursor: pointer;">
+                    <input type="radio" name="status_display" value="Pending" {% if order.status == 'Pending' %}checked{% endif %} style="display:none;">
+                    <div onclick="selectStatus(this, 'Pending')" style="padding: 10px 16px; border-radius: var(--radius-md); border: 2px solid {% if order.status == 'Pending' %}var(--status-orange){% else %}var(--ghost){% endif %}; text-align: center; transition: all var(--transition-fast); font-size: 13px; color: {% if order.status == 'Pending' %}var(--status-orange){% else %}var(--muted){% endif %}; font-weight: 500;" class="status-option">
+                        <i data-lucide="clock" style="width:14px;height:14px;display:block;margin:0 auto 4px;"></i>
+                        Pending
+                    </div>
+                </label>
+                <label style="flex:1; cursor: pointer;">
+                    <input type="radio" name="status_display" value="served" {% if order.status == 'served' %}checked{% endif %} style="display:none;">
+                    <div onclick="selectStatus(this, 'served')" style="padding: 10px 16px; border-radius: var(--radius-md); border: 2px solid {% if order.status == 'served' %}var(--status-green){% else %}var(--ghost){% endif %}; text-align: center; transition: all var(--transition-fast); font-size: 13px; color: {% if order.status == 'served' %}var(--status-green){% else %}var(--muted){% endif %}; font-weight: 500;" class="status-option">
+                        <i data-lucide="check-circle" style="width:14px;height:14px;display:block;margin:0 auto 4px;"></i>
+                        Completed
+                    </div>
+                </label>
+                <label style="flex:1; cursor: pointer;">
+                    <input type="radio" name="status_display" value="Cancelled" {% if order.status == 'Cancelled' %}checked{% endif %} style="display:none;">
+                    <div onclick="selectStatus(this, 'Cancelled')" style="padding: 10px 16px; border-radius: var(--radius-md); border: 2px solid {% if order.status == 'Cancelled' %}var(--status-red){% else %}var(--ghost){% endif %}; text-align: center; transition: all var(--transition-fast); font-size: 13px; color: {% if order.status == 'Cancelled' %}var(--status-red){% else %}var(--muted){% endif %}; font-weight: 500;" class="status-option">
+                        <i data-lucide="x-circle" style="width:14px;height:14px;display:block;margin:0 auto 4px;"></i>
+                        Cancelled
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <form method="post" class="space-y-6" novalidate>
             {% csrf_token %}
-            
+
             {% if form.non_field_errors %}
-            <div class="p-4 rounded-xl bg-red-500/20 border border-red-500/30">
-                <p class="text-red-400 text-sm">{{ form.non_field_errors }}</p>
+            <div class="error-box">
+                <i data-lucide="alert-circle" style="width:20px;height:20px;flex-shrink:0;"></i>
+                <span>{{ form.non_field_errors }}</span>
             </div>
             {% endif %}
-            
-            {% for field in form %}
+
             <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">{{ field.label }}</label>
-                {{ field }}
-                {% if field.errors %}
-                <p class="text-red-400 text-sm mt-1">{{ field.errors }}</p>
-                {% endif %}
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                    <span style="font-family: var(--font-display); font-style: italic; font-size: 20px; color: var(--gold);">Order Details</span>
+                    <div style="flex: 1; height: 1px; background: linear-gradient(90deg, var(--gold-dim), transparent);"></div>
+                </div>
+
+                {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}<div class="error-text">{{ field.errors|striptags }}</div>{% endif %}
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
-            
-            <div class="flex gap-4 pt-4">
-                <button type="submit" class="flex-1 py-4 bg-gradient-to-r from-accent-500 to-neon-orange rounded-xl font-bold text-dark-900 hover:shadow-[0_0_30px_rgba(251,191,36,0.4)] transition-all duration-300">
+
+            <div style="display: flex; gap: 12px; padding-top: 8px;">
+                <button type="submit" class="btn-primary" style="flex: 1; height: 48px;">
+                    <i data-lucide="save" style="width:16px;height:16px;"></i>
                     Save Changes
                 </button>
-                <a href="{% url 'order_list' %}" class="px-6 py-4 rounded-xl font-medium text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-300">
+                <a href="{% url 'order_list' %}" class="btn-ghost" style="padding: 0 24px; height: 48px; display: flex; align-items: center;">
                     Cancel
                 </a>
             </div>
         </form>
     </div>
 </div>
+
+<script>
+    function selectStatus(el, value) {
+        document.querySelectorAll('.status-option').forEach(opt => {
+            opt.style.borderColor = 'var(--ghost)';
+            opt.style.color = 'var(--muted)';
+        });
+        el.style.borderColor = el.querySelector('i').style.color || 'var(--gold)';
+        el.style.color = 'var(--cream)';
+    }
+</script>
 {% endblock %}

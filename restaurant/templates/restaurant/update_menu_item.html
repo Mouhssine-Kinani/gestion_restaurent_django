@@ -2,51 +2,133 @@
 
 {% block title %}Edit Menu Item{% endblock %}
 
-{% block content %}
-<div class="animate-fade-in">
-    <div class="flex items-center gap-4 mb-10">
-        <a href="{% url 'menu_list' %}" class="p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-            </svg>
-        </a>
-        <div>
-            <h2 class="text-3xl font-bold text-white">Edit Menu Item</h2>
-            <p class="text-gray-400">Update dish details</p>
-        </div>
+{% block page_title %}
+<div style="display: flex; align-items: center; gap: 12px;">
+    <a href="{% url 'menu_list' %}" style="color: var(--muted); padding: 4px; border-radius: var(--radius-sm); transition: all var(--transition-fast); text-decoration: none; display: inline-flex;" onmouseover="this.style.color='var(--cream)'; this.style.background='var(--bg-elevated)'" onmouseout="this.style.color='var(--muted)'; this.style.background='transparent'">
+        <i data-lucide="arrow-left" style="width:20px;height:20px;"></i>
+    </a>
+    <div>
+        <h1 class="topbar-title">Edit Menu Item</h1>
+        <div class="topbar-breadcrumb">Editing: <span style="color:var(--gold); font-style:italic;">"{{ item.name }}"</span> &mdash; ID: #{{ item.id }}</div>
     </div>
 </div>
+{% endblock %}
 
-<div class="max-w-xl">
-    <div class="glass-card rounded-2xl p-8 border-glow">
-        <form method="post" class="space-y-6">
+{% block breadcrumb %}Home &rsaquo; Menu &rsaquo; Edit{% endblock %}
+
+{% block content %}
+<!-- Edit Banner -->
+<div style="background: var(--bg-elevated); border-bottom: 1px solid var(--ghost); padding: 12px 24px; margin: -32px -32px 32px -32px; display: flex; align-items: center; gap: 12px;">
+    <i data-lucide="pencil" style="width:16px;height:16px;color:var(--gold);"></i>
+    <div style="flex:1;">
+        <span style="font-size:13px; color:var(--cream); font-weight:500;">Editing: </span>
+        <span style="font-size:13px; color:var(--gold); font-style:italic;">{{ item.name }}</span>
+    </div>
+    <span style="font-family:var(--font-mono); font-size:12px; color:var(--muted);">Last modified: {{ item.updated_at|timesince|default:"2 hours" }} ago by Admin</span>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 380px; gap: 24px; align-items: start;">
+
+    <!-- LEFT: Form -->
+    <div class="card" style="padding: 32px;">
+        <form method="post" class="space-y-6" novalidate>
             {% csrf_token %}
-            
+
             {% if form.non_field_errors %}
-            <div class="p-4 rounded-xl bg-red-500/20 border border-red-500/30">
-                <p class="text-red-400 text-sm">{{ form.non_field_errors }}</p>
+            <div class="error-box">
+                <i data-lucide="alert-circle" style="width:20px;height:20px;flex-shrink:0;"></i>
+                <span>{{ form.non_field_errors }}</span>
             </div>
             {% endif %}
-            
-            {% for field in form %}
+
             <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">{{ field.label }}</label>
-                {{ field }}
-                {% if field.errors %}
-                <p class="text-red-400 text-sm mt-1">{{ field.errors }}</p>
-                {% endif %}
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                    <span style="font-family: var(--font-display); font-style: italic; font-size: 20px; color: var(--gold);">Basic Information</span>
+                    <div style="flex: 1; height: 1px; background: linear-gradient(90deg, var(--gold-dim), transparent);"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.name.id_for_label }}" class="form-label">{{ form.name.label }}</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}<div class="error-text">{{ form.name.errors|striptags }}</div>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.category.id_for_label }}" class="form-label">{{ form.category.label }}</label>
+                    {{ form.category }}
+                    {% if form.category.errors %}<div class="error-text">{{ form.category.errors|striptags }}</div>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
+                    {{ form.description }}
+                    {% if form.description.errors %}<div class="error-text">{{ form.description.errors|striptags }}</div>{% endif %}
+                </div>
             </div>
-            {% endfor %}
-            
-            <div class="flex gap-4 pt-4">
-                <button type="submit" class="flex-1 py-4 bg-gradient-to-r from-accent-500 to-neon-orange rounded-xl font-bold text-dark-900 hover:shadow-[0_0_30px_rgba(251,191,36,0.4)] transition-all duration-300">
+
+            <div>
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                    <span style="font-family: var(--font-display); font-style: italic; font-size: 20px; color: var(--gold);">Pricing & Availability</span>
+                    <div style="flex: 1; height: 1px; background: linear-gradient(90deg, var(--gold-dim), transparent);"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.price.id_for_label }}" class="form-label">{{ form.price.label }}</label>
+                    <div style="display: flex;">
+                        {{ form.price }}
+                        <div style="display: flex; align-items: center; justify-content: center; width: 48px; background: var(--bg-elevated); border: 1px solid var(--ghost); border-left: none; border-radius: 0 var(--radius-md) var(--radius-md) 0; font-family: var(--font-mono); font-size: 13px; color: var(--muted);">MAD</div>
+                    </div>
+                    {% if form.price.errors %}<div class="error-text">{{ form.price.errors|striptags }}</div>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">{{ form.available.label }}</label>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <div style="width: 44px; height: 24px; border-radius: 100px; position: relative; transition: all var(--transition-fast); {% if item.available == 'Yes' %}background: var(--gold); box-shadow: 0 0 8px rgba(201,168,76,0.3);{% else %}background: var(--ghost);{% endif %}" id="toggle-bg-edit">
+                                <div style="width: 20px; height: 20px; border-radius: 50%; background: #fff; position: absolute; top: 2px; transition: all var(--transition-spring); {% if item.available == 'Yes' %}left: 22px;{% else %}left: 2px;{% endif %}" id="toggle-thumb-edit"></div>
+                            </div>
+                        </label>
+                        <span style="font-size: 13px; font-family: var(--font-body);" id="toggle-label-edit">{% if item.available == 'Yes' %}Available{% else %}Unavailable{% endif %}</span>
+                    </div>
+                    {{ form.available }}
+                    {% if form.available.errors %}<div class="error-text">{{ form.available.errors|striptags }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; padding-top: 8px;">
+                <button type="submit" class="btn-primary" style="flex: 1; height: 48px;">
+                    <i data-lucide="save" style="width:16px;height:16px;"></i>
                     Save Changes
                 </button>
-                <a href="{% url 'menu_list' %}" class="px-6 py-4 rounded-xl font-medium text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-300">
+                <a href="{% url 'menu_list' %}" class="btn-ghost" style="padding: 0 24px; height: 48px; display: flex; align-items: center;">
                     Cancel
                 </a>
             </div>
         </form>
+    </div>
+
+    <!-- RIGHT: Live Preview -->
+    <div style="position: sticky; top: calc(var(--topbar-height) + 24px);">
+        <div style="font-family: var(--font-body); font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 12px;">Preview</div>
+        <div class="card" style="overflow: hidden;">
+            <div style="height: 160px; background: linear-gradient(135deg, rgba(201,168,76,0.15) 0%, rgba(212,129,58,0.1) 100%); display: flex; align-items: center; justify-content: center;">
+                <i data-lucide="chef-hat" style="width:48px;height:48px;color:var(--gold-dim);opacity:0.6;"></i>
+            </div>
+            <div style="padding: 16px 20px;">
+                <h3 style="font-family: var(--font-display); font-style: italic; font-size: 20px; color: var(--cream); line-height: 1.2; margin-bottom: 6px;">{{ item.name }}</h3>
+                <p style="font-size: 13px; color: var(--muted); line-height: 1.4; height: 40px; overflow: hidden;">{{ item.description|default:"A delicious addition to our menu." }}</p>
+                <div style="display: flex; align-items: baseline; gap: 4px; margin-top: 12px;">
+                    <span style="font-family: var(--font-mono); font-size: 11px; color: var(--muted);">MAD</span>
+                    <span style="font-family: var(--font-mono); font-size: 18px; font-weight: 500; color: var(--gold);">{{ item.price }}</span>
+                </div>
+            </div>
+        </div>
+        <div style="margin-top: 12px;">
+            <a href="{% url 'menu_list' %}" style="font-size: 13px; color: var(--muted); text-decoration: none; font-family: var(--font-body);" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">
+                <i data-lucide="eye" style="width:14px;height:14px;display:inline;vertical-align:middle;"></i> View Original
+            </a>
+        </div>
     </div>
 </div>
 {% endblock %}

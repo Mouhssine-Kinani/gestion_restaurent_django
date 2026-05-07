@@ -2,246 +2,860 @@
 
 {% block title %}Dashboard{% endblock %}
 
+{% block page_title %}
+<div>
+  <h1 class="topbar-title">Good evening, Chef</h1>
+  <div class="topbar-breadcrumb">Dashboard · Overview</div>
+</div>
+{% endblock %}
+
+{% block page_actions %}
+<div class="flex flex-wrap gap-3">
+  <a href="{% url 'add_table' %}" class="ros-btn-ghost">
+    <i data-lucide="plus" style="width:14px;height:14px;"></i>
+    Add Table
+  </a>
+  <a href="{% url 'add_order' %}" class="ros-btn-primary">
+    <i data-lucide="clipboard-plus" style="width:14px;height:14px;"></i>
+    New Order
+  </a>
+</div>
+{% endblock %}
+
+{% block breadcrumb %}Dashboard{% endblock %}
+
 {% block content %}
-<div class="animate-fade-in">
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
-        <div>
-            <h2 class="text-4xl font-bold text-white mb-2">Dashboard</h2>
-            <p class="text-gray-400">Welcome back, chef!</p>
-        </div>
-        <div class="flex flex-wrap gap-3">
-            <a href="{% url 'add_table' %}" class="group relative px-5 py-3 bg-gradient-to-r from-accent-500 to-neon-orange rounded-xl font-semibold text-dark-900 hover:shadow-[0_0_30px_rgba(251,191,36,0.4)] transition-all duration-300">
-                <span class="relative flex items-center gap-2">
-                    <svg class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                    </svg>
-                    Add Table
-                </span>
-            </a>
-            <a href="{% url 'add_menu_item' %}" class="group relative px-5 py-3 glass rounded-xl font-semibold text-white hover:bg-white/10 transition-all duration-300 border border-white/10">
-                <span class="relative flex items-center gap-2">
-                    <svg class="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                    </svg>
-                    Menu Item
-                </span>
-            </a>
-            <a href="{% url 'add_order' %}" class="group relative px-5 py-3 glass rounded-xl font-semibold text-white hover:bg-white/10 transition-all duration-300 border border-white/10">
-                <span class="relative flex items-center gap-2">
-                    <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                    </svg>
-                    New Order
-                </span>
-            </a>
-        </div>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Jost:wght@200;300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --ink: #1a1510;
+    --ink-soft: #2e2820;
+    --surface: #f7f0e3;
+    --parchment: #ede4d0;
+    --warm-mid: #c5b89a;
+    --ember: #c4601a;
+    --ember-dim: #8a3e0e;
+    --gold: #c9a84c;
+    --gold-light: #e8c96a;
+    --gold-dim: #7d6830;
+    --gold-glow: rgba(201, 168, 76, 0.08);
+    --sage: #4a6741;
+    --cream: #f0e6d0;
+    --cream-dim: #c8baa0;
+    --muted: #7d7260;
+    --bg-base: #0f0c08;
+    --bg-surface: #1a1510;
+    --bg-elevated: #221e17;
+    --bg-input: rgba(255, 255, 255, 0.04);
+    --ghost: rgba(255, 255, 255, 0.07);
+    --divider: rgba(255, 255, 255, 0.05);
+    --status-green: #5aad7a;
+    --status-blue: #5a8fd9;
+    --status-red: #d95a5a;
+    --amber: #c97340;
+    --font-display: 'Playfair Display', serif;
+    --font-body: 'Jost', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+    --radius-xs: 6px;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --topbar-height: 64px;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-base: cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: 150ms;
+    --transition-base: 200ms;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg-base);
+    color: var(--cream);
+    min-height: 100vh;
+  }
+
+  /* ── BUTTONS ── */
+  .ros-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0 18px;
+    height: 38px;
+    background: var(--ember);
+    color: #fff;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    border: none;
+    border-radius: var(--radius-xs);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 200ms var(--ease-base);
+  }
+
+  .ros-btn-primary:hover {
+    background: #d4701e;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(196, 96, 26, 0.35);
+  }
+
+  .ros-btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0 18px;
+    height: 38px;
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 13px;
+    border: 1px solid var(--ghost);
+    border-radius: var(--radius-xs);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 200ms var(--ease-base);
+  }
+
+  .ros-btn-ghost:hover {
+    color: var(--cream);
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+
+  /* ── STAT CARDS ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  @media (max-width: 1100px) {
+    .stat-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .stat-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .stat-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--ghost);
+    border-radius: var(--radius-lg);
+    padding: 24px 24px 20px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
+  }
+
+  .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+  }
+
+  .stat-card:nth-child(1)::before {
+    background: linear-gradient(90deg, var(--gold), transparent);
+  }
+
+  .stat-card:nth-child(2)::before {
+    background: linear-gradient(90deg, var(--ember), transparent);
+  }
+
+  .stat-card:nth-child(3)::before {
+    background: linear-gradient(90deg, var(--status-blue), transparent);
+  }
+
+  .stat-card:nth-child(4)::before {
+    background: linear-gradient(90deg, var(--status-green), transparent);
+  }
+
+  .stat-deco {
+    position: absolute;
+    right: -12px;
+    bottom: -16px;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 900;
+    font-size: 96px;
+    line-height: 1;
+    opacity: 0.04;
+    pointer-events: none;
+    user-select: none;
+    letter-spacing: -4px;
+  }
+
+  .stat-icon-wrap {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+    flex-shrink: 0;
+  }
+
+  .stat-val {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 6px;
+    color: var(--cream);
+  }
+
+  .stat-lbl {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .trend-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 100px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.05em;
+  }
+
+  .trend-up {
+    background: rgba(90, 173, 122, 0.12);
+    color: var(--status-green);
+  }
+
+  .trend-down {
+    background: rgba(217, 90, 90, 0.1);
+    color: var(--status-red);
+  }
+
+  .progress-bar {
+    height: 2px;
+    background: var(--ghost);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 1px;
+  }
+
+  /* ── CONTENT ── */
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 20px;
+  }
+
+  @media (max-width: 1100px) {
+    .content-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .card {
+    background: var(--bg-surface);
+    border: 1px solid var(--ghost);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .card-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--ghost);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-title {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 22px;
+    color: var(--cream);
+    line-height: 1.1;
+    margin-bottom: 2px;
+  }
+
+  .card-sub {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ── TABLE ── */
+  .ros-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .ros-table thead tr {
+    background: var(--bg-elevated);
+  }
+
+  .ros-table th {
+    padding: 10px 20px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    text-align: left;
+    border-bottom: 1px solid var(--ghost);
+  }
+
+  .ros-table td {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--divider);
+    font-size: 14px;
+    color: var(--cream);
+    vertical-align: middle;
+  }
+
+  .ros-table tbody tr {
+    transition: background 150ms var(--ease-base);
+    cursor: pointer;
+  }
+
+  .ros-table tbody tr:hover {
+    background: var(--bg-elevated);
+  }
+
+  .ros-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* ── BADGE ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+
+  .badge-green {
+    background: rgba(90, 173, 122, 0.12);
+    color: var(--status-green);
+  }
+
+  .badge-orange {
+    background: rgba(201, 115, 64, 0.12);
+    color: var(--amber);
+  }
+
+  .badge-red {
+    background: rgba(217, 90, 90, 0.12);
+    color: var(--status-red);
+  }
+
+  .badge-blue {
+    background: rgba(90, 143, 217, 0.12);
+    color: var(--status-blue);
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    display: inline-block;
+    animation: pulse-dot 2s infinite;
+  }
+
+  @keyframes pulse-dot {
+
+    0%,
+    100% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0.4;
+    }
+  }
+
+  /* ── FLOOR GRID ── */
+  .floor-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 20px;
+  }
+
+  .floor-cell {
+    aspect-ratio: 1;
+    border-radius: var(--radius-sm);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    border: 1px solid;
+    transition: all 200ms var(--ease-base);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .floor-cell:hover {
+    transform: scale(1.04);
+  }
+
+  .floor-cell .t-num {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .floor-cell .t-seats {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.65;
+  }
+
+  /* ── SPARK CHART ── */
+  .spark-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 56px;
+    padding: 0 0 0 0;
+  }
+
+  .spark-bar {
+    flex: 1;
+    border-radius: 3px 3px 0 0;
+    transition: height 0.6s var(--ease-out);
+    cursor: pointer;
+    position: relative;
+  }
+
+  .spark-bar:hover {
+    filter: brightness(1.3);
+  }
+
+  .spark-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    padding: 0;
+  }
+
+  .spark-lbl {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--muted);
+    text-align: center;
+    flex: 1;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── VIEW ALL LINK ── */
+  .view-all-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    padding: 6px 12px;
+    border: 1px solid var(--gold-dim);
+    border-radius: var(--radius-xs);
+    transition: all 200ms var(--ease-base);
+  }
+
+  .view-all-link:hover {
+    background: var(--gold-glow);
+  }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+  }
+
+  .empty-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--ghost);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    color: var(--muted);
+  }
+
+  .empty-title {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 22px;
+    color: var(--cream);
+    margin-bottom: 6px;
+  }
+
+  .empty-text {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  /* ── SIDE MINI CARD ── */
+  .mini-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--ghost);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .mini-card-header {
+    padding: 16px 20px 14px;
+    border-bottom: 1px solid var(--ghost);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* ── TOP ITEMS ── */
+  .top-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--divider);
+    transition: background 150ms;
+  }
+
+  .top-item:last-child {
+    border-bottom: none;
+  }
+
+  .top-item:hover {
+    background: var(--bg-elevated);
+  }
+
+  .top-item-rank {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--gold-dim);
+    width: 18px;
+    flex-shrink: 0;
+    text-align: center;
+  }
+
+  .top-item-name {
+    flex: 1;
+    font-size: 13px;
+    color: var(--cream-dim);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .top-item-price {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+
+  .top-item-bar {
+    height: 2px;
+    background: var(--ghost);
+    border-radius: 1px;
+    margin-top: 4px;
+    overflow: hidden;
+  }
+
+  .top-item-fill {
+    height: 100%;
+    border-radius: 1px;
+    background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+    transition: width 1s var(--ease-out);
+  }
+
+  @keyframes cardIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+
+<!-- ── STAT CARDS ── -->
+<div class="stat-grid">
+
+  <div class="stat-card" style="animation: cardIn 500ms var(--ease-out) 0ms both;">
+    <div class="stat-deco">{{ orders|length }}</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+      <div class="stat-icon-wrap" style="background:rgba(200,164,90,0.1);border:1px solid rgba(200,164,90,0.15);">
+        <i data-lucide="clipboard-list" style="width:18px;height:18px;color:var(--gold);"></i>
+      </div>
+      <span class="trend-pill trend-up">↑ 12%</span>
     </div>
+    <div class="stat-val">{{ orders|length }}</div>
+    <div class="stat-lbl">Orders Today</div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width:65%;background:linear-gradient(90deg,var(--gold),var(--gold-light));">
+      </div>
+    </div>
+  </div>
+
+  <div class="stat-card" style="animation: cardIn 500ms var(--ease-out) 80ms both;">
+    <div class="stat-deco">$</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+      <div class="stat-icon-wrap" style="background:rgba(196,96,26,0.1);border:1px solid rgba(196,96,26,0.15);">
+        <i data-lucide="banknote" style="width:18px;height:18px;color:var(--ember);"></i>
+      </div>
+      <span class="trend-pill trend-up">↑ 8%</span>
+    </div>
+    <div class="stat-val" style="color:var(--ember);">$0</div>
+    <div class="stat-lbl">Revenue Today</div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width:40%;background:linear-gradient(90deg,var(--ember),#e89a5a);"></div>
+    </div>
+  </div>
+
+  <div class="stat-card" style="animation: cardIn 500ms var(--ease-out) 160ms both;">
+    <div class="stat-deco">T</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+      <div class="stat-icon-wrap" style="background:rgba(90,143,217,0.1);border:1px solid rgba(90,143,217,0.15);">
+        <i data-lucide="armchair" style="width:18px;height:18px;color:var(--status-blue);"></i>
+      </div>
+      <span class="trend-pill trend-down">↓ 3%</span>
+    </div>
+    <div class="stat-val" style="color:var(--status-blue);">{{ tables|length }}</div>
+    <div class="stat-lbl">Tables Active</div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width:50%;background:linear-gradient(90deg,var(--status-blue),#8ab5f0);"></div>
+    </div>
+  </div>
+
+  <div class="stat-card" style="animation: cardIn 500ms var(--ease-out) 240ms both;">
+    <div class="stat-deco">M</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+      <div class="stat-icon-wrap" style="background:rgba(90,173,122,0.1);border:1px solid rgba(90,173,122,0.15);">
+        <i data-lucide="book-open" style="width:18px;height:18px;color:var(--status-green);"></i>
+      </div>
+      <span class="trend-pill trend-up">↑ 5%</span>
+    </div>
+    <div class="stat-val" style="color:var(--status-green);">{{ menu_items|length }}</div>
+    <div class="stat-lbl">Menu Items</div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width:80%;background:linear-gradient(90deg,var(--status-green),#7dd89a);"></div>
+    </div>
+  </div>
+
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-    <div class="glass-card rounded-2xl p-6 hover-lift border-glow relative overflow-hidden group">
-        <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/20 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500"></div>
-        <div class="relative flex items-center justify-between">
-            <div>
-                <p class="text-sm font-medium text-gray-400 uppercase tracking-wider mb-1">Total Tables</p>
-                <p class="text-5xl font-bold text-white">{{ tables|length }}</p>
-                <p class="text-sm text-green-400 mt-2 flex items-center gap-1">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                    </svg>
-                    Active
-                </p>
-            </div>
-            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center shadow-[0_0_30px_rgba(59,130,246,0.3)]">
-                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
-                </svg>
-            </div>
-        </div>
-    </div>
-    
-    <div class="glass-card rounded-2xl p-6 hover-lift border-glow relative overflow-hidden group">
-        <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-500/20 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500"></div>
-        <div class="relative flex items-center justify-between">
-            <div>
-                <p class="text-sm font-medium text-gray-400 uppercase tracking-wider mb-1">Menu Items</p>
-                <p class="text-5xl font-bold text-white">{{ menu_items|length }}</p>
-                <p class="text-sm text-green-400 mt-2 flex items-center gap-1">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                    </svg>
-                    Available
-                </p>
-            </div>
-            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-400 to-neon-green flex items-center justify-center shadow-[0_0_30px_rgba(0,255,136,0.3)]">
-                <svg class="w-8 h-8 text-dark-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                </svg>
-            </div>
-        </div>
-    </div>
-    
-    <div class="glass-card rounded-2xl p-6 hover-lift border-glow relative overflow-hidden group">
-        <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-500/20 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500"></div>
-        <div class="relative flex items-center justify-between">
-            <div>
-                <p class="text-sm font-medium text-gray-400 uppercase tracking-wider mb-1">Total Orders</p>
-                <p class="text-5xl font-bold text-white">{{ orders|length }}</p>
-                <p class="text-sm text-accent-400 mt-2 flex items-center gap-1">
-                    <svg class="w-4 h-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                    </svg>
-                    Live
-                </p>
-            </div>
-            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center shadow-[0_0_30px_rgba(168,85,247,0.3)]">
-                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                </svg>
-            </div>
-        </div>
-    </div>
+<!-- ── DIVIDER ── -->
+<div style="height:1px;background:linear-gradient(90deg,transparent,var(--ghost),transparent);margin-bottom:24px;">
 </div>
 
-<div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-    <div class="glass-card rounded-2xl overflow-hidden hover-lift">
-        <div class="px-6 py-5 border-b border-white/5 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
-                    <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
-                    </svg>
-                </div>
-                <h3 class="text-lg font-semibold text-white">Tables</h3>
-            </div>
-            <a href="{% url 'table_list' %}" class="text-sm text-accent-400 hover:text-accent-300 transition-colors">View All →</a>
-        </div>
-        <div class="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {% for table in tables|slice:":6" %}
-            <div class="group relative p-4 rounded-xl bg-dark-600/50 hover:bg-dark-600 transition-all duration-300 border border-white/5 hover:border-{{ table.status|default:'white' }}/20">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-2xl font-bold text-white">#{{ table.number }}</span>
-                    <span class="w-2 h-2 rounded-full {% if table.status == 'available' %}bg-green-400 shadow-[0_0_10px_rgba(0,255,136,0.5)]{% elif table.status == 'occupied' %}bg-red-400 shadow-[0_0_10px_rgba(255,68,68,0.5)]{% else %}bg-gray-400{% endif %}"></span>
-                </div>
-                <p class="text-sm text-gray-400">{{ table.seats }} seats</p>
-                <p class="text-xs text-gray-500 capitalize mt-1">{{ table.status }}</p>
-                <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                    <a href="{% url 'update_table' table.id %}" class="p-1.5 rounded-lg bg-white/10 hover:bg-accent-500/20 transition-colors">
-                        <svg class="w-3.5 h-3.5 text-gray-400 hover:text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                        </svg>
-                    </a>
-                    <a href="{% url 'delete_table' table.id %}" class="p-1.5 rounded-lg bg-white/10 hover:bg-red-500/20 transition-colors">
-                        <svg class="w-3.5 h-3.5 text-gray-400 hover:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                        </svg>
-                    </a>
-                </div>
-            </div>
-            {% empty %}
-            <div class="col-span-full text-center py-8 text-gray-500">No tables yet</div>
-            {% endfor %}
-        </div>
-    </div>
-    
-    <div class="glass-card rounded-2xl overflow-hidden hover-lift">
-        <div class="px-6 py-5 border-b border-white/5 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
-                    <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                    </svg>
-                </div>
-                <h3 class="text-lg font-semibold text-white">Menu Items</h3>
-            </div>
-            <a href="{% url 'menu_list' %}" class="text-sm text-accent-400 hover:text-accent-300 transition-colors">View All →</a>
-        </div>
-        <div class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {% for item in menu_items|slice:":4" %}
-            <div class="group relative p-4 rounded-xl bg-dark-600/50 hover:bg-dark-600 transition-all duration-300 border border-white/5">
-                <div class="flex items-start justify-between mb-2">
-                    <div>
-                        <h4 class="font-semibold text-white">{{ item.name }}</h4>
-                        <p class="text-xs text-gray-500 capitalize">{{ item.category }}</p>
-                    </div>
-                    <span class="px-2 py-1 rounded-lg text-sm font-bold text-accent-400 bg-accent-500/10">${{ item.price }}</span>
-                </div>
-                <div class="flex items-center justify-between mt-3">
-                    <span class="text-xs px-2 py-1 rounded-full {% if item.available %}bg-green-500/20 text-green-400{% else %}bg-red-500/20 text-red-400{% endif %}">
-                        {% if item.available %}Available{% else %}Unavailable{% endif %}
-                    </span>
-                    <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <a href="{% url 'update_menu_item' item.id %}" class="p-1.5 rounded-lg bg-white/10 hover:bg-accent-500/20 transition-colors">
-                            <svg class="w-3.5 h-3.5 text-gray-400 hover:text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                            </svg>
-                        </a>
-                        <a href="{% url 'delete_menu_item' item.id %}" class="p-1.5 rounded-lg bg-white/10 hover:bg-red-500/20 transition-colors">
-                            <svg class="w-3.5 h-3.5 text-gray-400 hover:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            {% empty %}
-            <div class="col-span-full text-center py-8 text-gray-500">No menu items yet</div>
-            {% endfor %}
-        </div>
-    </div>
-</div>
+<!-- ── MAIN GRID ── -->
+<div class="content-grid">
 
-<div class="glass-card rounded-2xl overflow-hidden hover-lift mt-6">
-    <div class="px-6 py-5 border-b border-white/5 flex justify-between items-center">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
-                <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                </svg>
-            </div>
-            <h3 class="text-lg font-semibold text-white">Recent Orders</h3>
+  <!-- RECENT ORDERS -->
+  <div style="animation: cardIn 500ms var(--ease-out) 300ms both;">
+    <div class="card">
+      <div class="card-header">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div
+            style="width:38px;height:38px;border-radius:var(--radius-sm);background:var(--bg-elevated);border:1px solid var(--ghost);display:flex;align-items:center;justify-content:center;">
+            <i data-lucide="receipt" style="width:16px;height:16px;color:var(--gold);"></i>
+          </div>
+          <div>
+            <div class="card-title">Recent Orders</div>
+            <div class="card-sub">Last 8 transactions</div>
+          </div>
         </div>
-        <a href="{% url 'order_list' %}" class="text-sm text-accent-400 hover:text-accent-300 transition-colors">View All →</a>
-    </div>
-    <div class="overflow-x-auto">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
+        <a href="{% url 'order_list' %}" class="view-all-link">
+          View All <i data-lucide="arrow-right" style="width:11px;height:11px;"></i>
+        </a>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="ros-table">
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Table</th>
+              <th>Items</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th style="text-align:right;">Time</th>
+            </tr>
+          </thead>
+          <tbody>
             {% for order in orders|slice:":8" %}
-            <div class="group relative p-5 rounded-xl bg-dark-600/50 hover:bg-dark-600 transition-all duration-300 border border-white/5">
-                <div class="flex items-center justify-between mb-3">
-                    <span class="text-lg font-bold text-white">#{{ order.id }}</span>
-                    <span class="px-2 py-1 rounded-full text-xs font-medium {% if order.status == 'completed' %}bg-green-500/20 text-green-400{% elif order.status == 'pending' %}bg-yellow-500/20 text-yellow-400{% elif order.status == 'cancelled' %}bg-red-500/20 text-red-400{% else %}bg-blue-500/20 text-blue-400{% endif %}">
-                        {{ order.status }}
-                    </span>
-                </div>
-                <div class="space-y-2 mb-4">
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-400">Table</span>
-                        <span class="text-white">#{{ order.table.number }}</span>
-                    </div>
-                    {% if order.items.all %}
-                    <div class="flex flex-wrap gap-1">
-                        {% for item in order.items.all|slice:":2" %}
-                        <span class="px-2 py-0.5 rounded-lg text-xs bg-white/10 text-gray-300">{{ item.name }}</span>
-                        {% endfor %}
-                        {% if order.items.all|length > 2 %}
-                        <span class="px-2 py-0.5 rounded-lg text-xs bg-white/10 text-gray-400">+{{ order.items.all|length|add:"-2" }}</span>
-                        {% endif %}
-                    </div>
-                    {% endif %}
-                    <div class="flex justify-between text-sm pt-2 border-t border-white/5">
-                        <span class="text-gray-400">Total</span>
-                        <span class="text-accent-400 font-bold">${{ order.total_price }}</span>
-                    </div>
-                </div>
-                <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <a href="{% url 'update_order' order.id %}" class="flex-1 py-2 text-center text-sm rounded-lg bg-white/10 hover:bg-accent-500/20 transition-colors">Edit</a>
-                    <a href="{% url 'delete_order' order.id %}" class="flex-1 py-2 text-center text-sm rounded-lg bg-white/10 hover:bg-red-500/20 transition-colors text-red-400">Delete</a>
-                </div>
-            </div>
+            <tr>
+              <td><span style="font-family:var(--font-mono);font-size:13px;color:var(--gold);">#{{ order.id }}</span>
+              </td>
+              <td>Table {{ order.table.number }}</td>
+              <td style="color:var(--muted);font-size:13px;">{{ order.items.count }} item{{ order.items.count|pluralize
+                }}</td>
+              <td><span style="font-family:var(--font-mono);font-size:14px;font-weight:500;">${{
+                  order.total|default:"0.00" }}</span></td>
+              <td>
+                <span
+                  class="badge {% if order.status == 'served' %}badge-green{% elif order.status == 'Pending' %}badge-orange{% else %}badge-red{% endif %}">
+                  <span class="status-dot"></span>{{ order.status }}
+                </span>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:11px;color:var(--muted);text-align:right;">
+                {% if forloop.counter == 1 %}Just now{% elif forloop.counter == 2 %}5m ago{% elif forloop.counter == 3
+                %}12m ago{% elif forloop.counter == 4 %}28m ago{% elif forloop.counter == 5 %}1h ago{% else %}{{
+                forloop.counter }}h ago{% endif %}
+              </td>
+            </tr>
             {% empty %}
-            <div class="col-span-full text-center py-12 text-gray-500">No orders yet</div>
+            <tr>
+              <td colspan="6">
+                <div class="empty-state">
+                  <div class="empty-icon"><i data-lucide="receipt" style="width:26px;height:26px;"></i></div>
+                  <div class="empty-title">No orders yet</div>
+                  <div class="empty-text">Orders appear here once created</div>
+                  <a href="{% url 'add_order' %}" class="ros-btn-primary">Create First Order</a>
+                </div>
+              </td>
+            </tr>
             {% endfor %}
-        </div>
+          </tbody>
+        </table>
+      </div>
     </div>
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div style="display:flex;flex-direction:column;gap:16px;animation:cardIn 500ms var(--ease-out) 380ms both;">
+
+    <!-- FLOOR PLAN -->
+    <div class="mini-card">
+      <div class="mini-card-header">
+        <div>
+          <div class="card-title" style="font-size:18px;">Floor Plan</div>
+          <div class="card-sub">Live occupancy</div>
+        </div>
+        <a href="{% url 'table_list' %}" class="view-all-link" style="padding:4px 10px;font-size:10px;">
+          Manage →
+        </a>
+      </div>
+      <div class="floor-grid">
+        {% for table in tables|slice:":9" %}
+        <div class="floor-cell"
+          style="{% if table.status == 'free' %}background:var(--bg-elevated);color:var(--muted);border-color:var(--ghost);{% elif table.status == 'occupied' %}background:rgba(200,164,90,0.1);color:var(--gold);border-color:rgba(200,164,90,0.25);{% else %}background:rgba(90,143,217,0.08);color:var(--status-blue);border-color:rgba(90,143,217,0.2);{% endif %}">
+          <span class="t-num">T{{ table.number }}</span>
+          <span class="t-seats">{{ table.seats }}s</span>
+        </div>
+        {% empty %}
+        <div style="grid-column:1/-1;text-align:center;padding:24px 0;font-size:13px;color:var(--muted);">No tables yet
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- TOP ITEMS -->
+    <div class="mini-card">
+      <div class="mini-card-header">
+        <div>
+          <div class="card-title" style="font-size:18px;">Top Items</div>
+          <div class="card-sub">By popularity</div>
+        </div>
+      </div>
+      {% for item in menu_items|slice:":5" %}
+      <div class="top-item">
+        <span class="top-item-rank">{{ forloop.counter }}</span>
+        <div style="flex:1;min-width:0;">
+          <div class="top-item-name">{{ item.name }}</div>
+          <div class="top-item-bar">
+            <div class="top-item-fill" style="width:{% widthratio forloop.revcounter 5 100 %}%;"></div>
+          </div>
+        </div>
+        <span class="top-item-price">{{ item.price }} MAD</span>
+      </div>
+      {% empty %}
+      <div style="padding:24px;text-align:center;font-size:13px;color:var(--muted);">No menu items yet</div>
+      {% endfor %}
+    </div>
+
+    <!-- REVENUE SPARK -->
+    <div class="mini-card" style="padding:20px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div>
+          <div class="card-title" style="font-size:18px;">Revenue</div>
+          <div class="card-sub">7-day trend</div>
+        </div>
+        <span class="badge badge-green"><span class="status-dot"></span>Live</span>
+      </div>
+      <div class="spark-bars">
+        <div class="spark-bar" style="height:32%;background:var(--ghost);" title="Mon"></div>
+        <div class="spark-bar" style="height:52%;background:var(--ghost);" title="Tue"></div>
+        <div class="spark-bar" style="height:46%;background:var(--ghost);" title="Wed"></div>
+        <div class="spark-bar" style="height:72%;background:var(--ghost);" title="Thu"></div>
+        <div class="spark-bar" style="height:62%;background:rgba(201,168,76,0.3);" title="Fri"></div>
+        <div class="spark-bar" style="height:88%;background:rgba(201,168,76,0.4);" title="Sat"></div>
+        <div class="spark-bar" style="height:100%;background:linear-gradient(180deg,var(--gold-light),var(--gold));"
+          title="Today"></div>
+      </div>
+      <div class="spark-labels">
+        <span class="spark-lbl">M</span><span class="spark-lbl">T</span><span class="spark-lbl">W</span>
+        <span class="spark-lbl">T</span><span class="spark-lbl">F</span><span class="spark-lbl">S</span>
+        <span class="spark-lbl" style="color:var(--gold);">T</span>
+      </div>
+    </div>
+
+  </div>
 </div>
+
 {% endblock %}

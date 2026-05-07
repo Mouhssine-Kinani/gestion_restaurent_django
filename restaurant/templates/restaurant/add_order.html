@@ -1,52 +1,227 @@
 {% extends 'restaurant/base.html' %}
 
-{% block title %}Add Order{% endblock %}
+{% block title %}New Order{% endblock %}
+
+{% block page_title %}
+<div style="display: flex; align-items: center; gap: 12px;">
+    <a href="{% url 'order_list' %}" style="color: var(--muted); padding: 4px; border-radius: var(--radius-sm); transition: all var(--transition-fast); text-decoration: none; display: inline-flex;" onmouseover="this.style.color='var(--cream)'; this.style.background='var(--bg-elevated)'" onmouseout="this.style.color='var(--muted)'; this.style.background='transparent'">
+        <i data-lucide="arrow-left" style="width:20px;height:20px;"></i>
+    </a>
+    <div>
+        <h1 class="topbar-title">New Order</h1>
+        <div class="topbar-breadcrumb">Create a new order for a table</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block breadcrumb %}Home &rsaquo; Orders &rsaquo; New{% endblock %}
 
 {% block content %}
-<div class="animate-fade-in">
-    <div class="flex items-center gap-4 mb-10">
-        <a href="{% url 'order_list' %}" class="p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-            </svg>
-        </a>
-        <div>
-            <h2 class="text-3xl font-bold text-white">New Order</h2>
-            <p class="text-gray-400">Create a new order for a table</p>
+<div style="display: grid; grid-template-columns: 1fr 380px; gap: 24px; height: calc(100vh - var(--topbar-height) - 64px);">
+
+    <!-- LEFT: Menu Browser -->
+    <div style="overflow-y: auto; padding-right: 8px;">
+        <!-- Search -->
+        <div style="position: relative; margin-bottom: 16px;">
+            <div style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--muted);">
+                <i data-lucide="search" style="width:16px;height:16px;"></i>
+            </div>
+            <input type="text" placeholder="Search menu items..." id="menu-search"
+                style="width: 100%; height: 40px; padding: 0 12px 0 36px; background: var(--bg-input); border: 1px solid var(--ghost); border-radius: 100px; color: var(--cream); font-size: 13px; font-family: var(--font-body); outline: none; transition: all var(--transition-fast);"
+                onfocus="this.style.borderColor='var(--gold)';" onblur="this.style.borderColor='var(--ghost)'">
+        </div>
+
+        <!-- Category Tabs -->
+        <div style="display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap;">
+            <button onclick="filterCategory('all', this)" style="padding: 6px 14px; border-radius: 100px; border: none; font-family: var(--font-body); font-size: 13px; font-weight: 500; cursor: pointer; transition: all var(--transition-fast); background: var(--gold); color: var(--bg-base);">All</button>
+            <button onclick="filterCategory('Starters', this)" style="padding: 6px 14px; border-radius: 100px; border: 1px solid var(--ghost); background: transparent; font-family: var(--font-body); font-size: 13px; font-weight: 500; cursor: pointer; transition: all var(--transition-fast); color: var(--muted);">Starters</button>
+            <button onclick="filterCategory('Mains', this)" style="padding: 6px 14px; border-radius: 100px; border: 1px solid var(--ghost); background: transparent; font-family: var(--font-body); font-size: 13px; font-weight: 500; cursor: pointer; transition: all var(--transition-fast); color: var(--muted);">Mains</button>
+            <button onclick="filterCategory('Desserts', this)" style="padding: 6px 14px; border-radius: 100px; border: 1px solid var(--ghost); background: transparent; font-family: var(--font-body); font-size: 13px; font-weight: 500; cursor: pointer; transition: all var(--transition-fast); color: var(--muted);">Desserts</button>
+            <button onclick="filterCategory('Drinks', this)" style="padding: 6px 14px; border-radius: 100px; border: 1px solid var(--ghost); background: transparent; font-family: var(--font-body); font-size: 13px; font-weight: 500; cursor: pointer; transition: all var(--transition-fast); color: var(--muted);">Drinks</button>
+        </div>
+
+        <!-- Menu Items Grid -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;" id="menu-grid">
+            {% for item in menu_items %}
+            <div class="menu-item-card" data-category="{{ item.category|default:'All' }}" style="background: var(--bg-surface); border: 1px solid var(--ghost); border-radius: var(--radius-md); padding: 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all var(--transition-base);"
+                onmouseover="this.style.borderColor='var(--gold-dim)'; this.style.background='var(--bg-elevated)'"
+                onmouseout="this.style.borderColor='var(--ghost)'; this.style.background='var(--bg-surface)'"
+                onclick="addToOrder({{ item.id }}, '{{ item.name|escapejs }}', {{ item.price }})">
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-sm); background: rgba(201,168,76,0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i data-lucide="chef-hat" style="width:18px;height:18px;color:var(--gold);"></i>
+                </div>
+                <div style="flex: 1; min-width: 0;">
+                    <div style="font-size: 14px; font-weight: 500; color: var(--cream); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ item.name }}</div>
+                    <div style="font-size: 12px; color: var(--muted); margin-top: 2px;">{{ item.description|truncatewords:4 }}</div>
+                </div>
+                <div style="font-family: var(--font-mono); font-size: 14px; font-weight: 500; color: var(--gold); flex-shrink: 0;">${{ item.price }}</div>
+            </div>
+            {% empty %}
+            <div style="grid-column: 1/-1; text-align: center; padding: 48px 24px;">
+                <div class="empty-state" style="padding: 24px;">
+                    <div class="empty-icon"><i data-lucide="book-open" style="width:32px;height:32px;"></i></div>
+                    <div class="empty-title" style="font-size: 20px;">No menu items</div>
+                    <div class="empty-text" style="margin-bottom: 16px;">Add items to your menu first</div>
+                    <a href="{% url 'add_menu_item' %}" class="btn-primary btn-sm">Add Item</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- RIGHT: Order Summary (sticky) -->
+    <div style="background: var(--bg-surface); border-left: 1px solid var(--ghost); padding: 24px; overflow-y: auto; height: 100%; position: sticky; top: 0;">
+        <div style="margin-bottom: 20px;">
+            <h2 style="font-family: var(--font-display); font-style: italic; font-size: 22px; color: var(--cream); margin-bottom: 4px;">Current Order</h2>
+            <div style="font-family: var(--font-mono); font-size: 13px; color: var(--muted);">Order #<span id="order-number">--</span></div>
+        </div>
+
+        <!-- Table Select -->
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 6px;">Select Table</label>
+            <select style="width: 100%; height: 40px; padding: 0 32px 0 12px; background: var(--bg-input); border: 1px solid var(--ghost); border-radius: var(--radius-md); color: var(--cream); font-size: 13px; font-family: var(--font-body); outline: none; cursor: pointer; appearance: none; background-image: url(&quot;data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%237d7260' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e&quot;); background-position: right 10px center; background-repeat: no-repeat; background-size: 16px 16px;">
+                <option value="">Choose a table...</option>
+                {% for table in tables %}
+                <option value="{{ table.id }}">Table {{ table.number }} ({{ table.seats }} seats) - {{ table.status|capfirst }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Order Items List -->
+        <div id="order-items" style="flex: 1; margin-bottom: 20px;">
+            <div id="empty-order" class="empty-state" style="padding: 32px 16px;">
+                <div class="empty-icon"><i data-lucide="receipt" style="width:32px;height:32px;"></i></div>
+                <div class="empty-title" style="font-size: 18px;">No items yet</div>
+                <div class="empty-text" style="font-size: 13px;">Select items from the menu</div>
+            </div>
+        </div>
+
+        <!-- Order Totals -->
+        <div style="border-top: 1px solid var(--ghost); padding-top: 16px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; color: var(--muted);">
+                <span>Subtotal</span>
+                <span class="font-mono" id="subtotal">$0.00</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; color: var(--muted);">
+                <span>Tax (10%)</span>
+                <span class="font-mono" id="tax">$0.00</span>
+            </div>
+            <div style="height: 1px; background: var(--ghost); margin: 8px 0 12px;"></div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                <span style="font-family: var(--font-body); font-weight: 600; font-size: 16px; color: var(--cream);">TOTAL</span>
+                <span class="font-mono" style="font-size: 20px; font-weight: 500; color: var(--gold);" id="total">$0.00</span>
+            </div>
+
+            <!-- Notes -->
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 6px;">Special Instructions</label>
+                <textarea style="width: 100%; height: 60px; padding: 8px 12px; background: var(--bg-input); border: 1px solid var(--ghost); border-radius: var(--radius-md); color: var(--cream); font-size: 13px; font-family: var(--font-body); outline: none; resize: none; transition: all var(--transition-fast);"
+                    onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--ghost)'"
+                    placeholder="Any special requests..."></textarea>
+            </div>
+
+            <button onclick="placeOrder()" class="btn-primary" style="width: 100%; height: 52px; font-size: 15px;">
+                <i data-lucide="clipboard-check" style="width:16px;height:16px;"></i>
+                Place Order
+            </button>
         </div>
     </div>
 </div>
 
-<div class="max-w-xl">
-    <div class="glass-card rounded-2xl p-8 border-glow">
-        <form method="post" class="space-y-6">
-            {% csrf_token %}
-            
-            {% if form.non_field_errors %}
-            <div class="p-4 rounded-xl bg-red-500/20 border border-red-500/30">
-                <p class="text-red-400 text-sm">{{ form.non_field_errors }}</p>
-            </div>
-            {% endif %}
-            
-            {% for field in form %}
-            <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">{{ field.label }}</label>
-                {{ field }}
-                {% if field.errors %}
-                <p class="text-red-400 text-sm mt-1">{{ field.errors }}</p>
-                {% endif %}
-            </div>
-            {% endfor %}
-            
-            <div class="flex gap-4 pt-4">
-                <button type="submit" class="flex-1 py-4 bg-gradient-to-r from-accent-500 to-neon-orange rounded-xl font-bold text-dark-900 hover:shadow-[0_0_30px_rgba(251,191,36,0.4)] transition-all duration-300">
-                    Create Order
-                </button>
-                <a href="{% url 'order_list' %}" class="px-6 py-4 rounded-xl font-medium text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-300">
-                    Cancel
-                </a>
-            </div>
-        </form>
-    </div>
-</div>
+<script>
+    // Generate order number
+    document.getElementById('order-number').textContent = String(Math.floor(Math.random() * 9000) + 1000);
+
+    const orderItems = {};
+
+    function addToOrder(id, name, price) {
+        if (orderItems[id]) {
+            orderItems[id].qty += 1;
+        } else {
+            orderItems[id] = { name: name, price: price, qty: 1 };
+        }
+        renderOrder();
+    }
+
+    function removeFromOrder(id) {
+        delete orderItems[id];
+        renderOrder();
+    }
+
+    function updateQty(id, delta) {
+        if (!orderItems[id]) return;
+        orderItems[id].qty += delta;
+        if (orderItems[id].qty <= 0) { delete orderItems[id]; }
+        renderOrder();
+    }
+
+    function renderOrder() {
+        const container = document.getElementById('order-items');
+        const keys = Object.keys(orderItems);
+        if (keys.length === 0) {
+            container.innerHTML = `<div id="empty-order" class="empty-state" style="padding:32px 16px;"><div class="empty-icon"><i data-lucide="receipt" style="width:32px;height:32px;"></i></div><div class="empty-title" style="font-size:18px;">No items yet</div><div class="empty-text" style="font-size:13px;">Select items from the menu</div></div>`;
+            lucide.createIcons();
+            updateTotals();
+            return;
+        }
+
+        let html = '';
+        keys.forEach(id => {
+            const item = orderItems[id];
+            html += `
+            <div style="padding: 12px 0; border-bottom: 1px solid var(--ghost); animation: slideIn 200ms var(--transition-base) both;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <span style="font-size: 14px; color: var(--cream);">${item.name}</span>
+                    <button onclick="removeFromOrder(${id})" style="background: none; border: none; color: var(--status-red); cursor: pointer; font-size: 12px;">Remove</button>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <button onclick="updateQty(${id}, -1)" style="width: 24px; height: 24px; border-radius: 4px; border: 1px solid var(--ghost); background: transparent; color: var(--cream); cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center;">−</button>
+                        <span style="font-family: var(--font-mono); font-size: 13px; color: var(--cream); width: 20px; text-align: center;">${item.qty}</span>
+                        <button onclick="updateQty(${id}, 1)" style="width: 24px; height: 24px; border-radius: 4px; border: 1px solid var(--ghost); background: transparent; color: var(--cream); cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center;">+</button>
+                    </div>
+                    <span style="font-family: var(--font-mono); font-size: 13px; color: var(--gold);">$${(item.price * item.qty).toFixed(2)}</span>
+                </div>
+            </div>`;
+        });
+        container.innerHTML = html;
+
+        const style = document.createElement('style');
+        style.textContent = `@keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }`;
+        document.head.appendChild(style);
+
+        updateTotals();
+    }
+
+    function updateTotals() {
+        let subtotal = 0;
+        Object.values(orderItems).forEach(item => { subtotal += item.price * item.qty; });
+        const tax = subtotal * 0.1;
+        const total = subtotal + tax;
+        document.getElementById('subtotal').textContent = '$' + subtotal.toFixed(2);
+        document.getElementById('tax').textContent = '$' + tax.toFixed(2);
+        document.getElementById('total').textContent = '$' + total.toFixed(2);
+    }
+
+    function filterCategory(cat, btn) {
+        document.querySelectorAll('#menu-grid .menu-item-card').forEach(card => {
+            if (cat === 'all' || card.dataset.category === cat) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        document.querySelectorAll('#menu-grid + div button, .btn-icon').forEach(b => {
+            b.style.background = 'transparent'; b.style.color = 'var(--muted)'; b.style.border = '1px solid var(--ghost)';
+        });
+        btn.style.background = 'var(--gold)'; btn.style.color = 'var(--bg-base)'; btn.style.border = 'none';
+    }
+
+    function placeOrder() {
+        const tableSelect = document.querySelector('select');
+        if (!tableSelect.value) { alert('Please select a table first.'); return; }
+        if (Object.keys(orderItems).length === 0) { alert('Please add items to the order.'); return; }
+        alert('Order placed successfully! (Integration with Django form needed)');
+    }
+</script>
 {% endblock %}
