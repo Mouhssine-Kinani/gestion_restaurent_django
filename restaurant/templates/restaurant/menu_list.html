@@ -162,9 +162,9 @@
 </div>
 <a href="{% url 'add_menu_item' %}" class="bg-primary text-surface px-6 py-2.5 rounded-full font-body-main font-semibold hover:bg-primary/90 transition-all flex items-center gap-2 shadow-[0_4px_14px_0_rgba(212,175,55,0.2)] hover:shadow-[0_6px_20px_rgba(212,175,55,0.25)] hover:-translate-y-0.5"><span class="material-symbols-outlined text-[20px]" data-icon="add">add</span>Add Menu Item</a>
 </div>
-<form method="get" class="flex gap-3 mb-lg overflow-x-auto pb-4 scrollbar-hide">
-<input type="text" name="q" placeholder="Search menu items..." value="{{ request.GET.q|default:'' }}" class="bg-surface-container text-on-surface-variant border border-outline-variant/30 hover:border-primary/50 hover:text-on-surface px-6 py-2 rounded-full font-label-caps text-[12px] transition-all whitespace-nowrap outline-none focus:border-primary"/>
-</form>
+                <form method="get" class="flex gap-3 mb-lg overflow-x-auto pb-4 scrollbar-hide">
+                    <input type="text" name="q" placeholder="Search menu items..." value="{{ request.GET.q|default:'' }}" class="bg-surface-container text-on-surface-variant border border-outline-variant/30 hover:border-primary/50 hover:text-on-surface px-6 py-2 rounded-full font-label-caps text-[12px] transition-all whitespace-nowrap outline-none focus:border-primary" oninput="this.form.submit()"/>
+                </form>
 <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-6 pb-xl">
 {% for item in menu_items %}
 <div class="glass-panel rounded-2xl p-5 flex gap-5 transition-all hover:bg-surface-container/80 hover:border-outline-variant/50 group hover:shadow-xl relative overflow-hidden {% if item.available == 'No' %}opacity-70{% endif %}">
@@ -191,7 +191,7 @@
 <div class="flex items-center gap-3">
 <span class="flex items-center gap-1.5 font-body-sm text-[12px] font-medium {% if item.available == 'Yes' %}text-secondary{% else %}text-error{% endif %}">
 <span class="w-1.5 h-1.5 rounded-full {% if item.available == 'Yes' %}bg-secondary{% else %}bg-error{% endif %}"></span>
-{% if item.available == 'Yes' %}Available{% else %}86'd{% endif %}
+                    {% if item.available == 'Yes' %}Available{% else %}Unavailable{% endif %}
 </span>
 <div class="flex gap-1">
 <a href="{% url 'update_menu_item' item.id %}" class="p-1.5 rounded bg-surface-container-higher border border-outline-variant/30 hover:border-primary/50 transition-colors"><span class="material-symbols-outlined text-[16px] text-on-surface-variant hover:text-primary">edit</span></a>

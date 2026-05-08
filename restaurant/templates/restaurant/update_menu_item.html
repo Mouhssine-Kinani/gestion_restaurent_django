@@ -113,10 +113,10 @@
 <div class="border rounded-2xl overflow-hidden shadow-2xl relative group bg-surface-container border-outline-variant/30 flex flex-col">
 <div class="h-64 w-full relative">
 <img id="preview-image" alt="Menu Item Preview" class="w-full h-full object-cover" src="{% if form.instance.image %}{{ form.instance.image.url }}{% else %}https://lh3.googleusercontent.com/aida-public/AB6AXuCWuXpDVkeY7U0Ck37me2dXPQEOglY1grFAVUas4ZP6RJXDke4S8ZQV0qu5MffsgVRMtYHNE3b5wZZCtuSqj4RPJJ8z5e3Xqooio5GGT4jzXWnPbeQbgVwQkob0-3TfvO3fDWTXcTMtv-X6i6108dQFxtqb_F_4lu8VClHMaqXG2fEB3dQYXaduU2MoxBOH3YGg7TWEAXBOWe70NGtvkX5k8rok4HrWXBAUz_h2Q-u0X3GYMSHN9vH36ZyEkD0z08I8jbDqp-Vmvb4{% endif %}"/>
-<div class="absolute top-4 right-4 bg-surface-container-lowest/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-outline-variant/50 flex items-center gap-2 shadow-lg">
-<div class="w-2 h-2 rounded-full bg-secondary"></div>
-<span class="font-label-caps text-label-caps text-secondary uppercase tracking-wider" id="preview-status">{% if form.available.value == 'Yes' %}Available{% else %}Unavailable{% endif %}</span>
-</div>
+                <div class="absolute top-4 right-4 bg-surface-container-lowest/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-outline-variant/50 flex items-center gap-2 shadow-lg" id="preview-avail-badge">
+                    <div class="w-2 h-2 rounded-full bg-secondary" id="preview-avail-dot"></div>
+                    <span class="font-label-caps text-label-caps text-secondary uppercase tracking-wider" id="preview-avail-text">{% if form.available.value == 'Yes' %}Available{% else %}Unavailable{% endif %}</span>
+                </div>
 </div>
 <div class="p-xl relative flex-1 flex flex-col">
 <div class="flex justify-between items-start mb-md">
@@ -131,8 +131,38 @@
 </form>
 <script>
 (function() {
+  const nameInput = document.getElementById('id_name');
+  const priceInput = document.getElementById('id_price');
   const imageInput = document.getElementById('id_image');
+  const availSelect = document.getElementById('id_available');
+  const previewName = document.getElementById('preview-name');
+  const previewPrice = document.getElementById('preview-price');
   const previewImage = document.getElementById('preview-image');
+  const previewAvailText = document.getElementById('preview-avail-text');
+  const previewAvailDot = document.getElementById('preview-avail-dot');
+  if (nameInput && previewName) {
+    nameInput.addEventListener('input', function() {
+      previewName.textContent = this.value || 'Item Name';
+    });
+  }
+  if (priceInput && previewPrice) {
+    priceInput.addEventListener('input', function() {
+      previewPrice.textContent = '$' + (this.value || '0');
+    });
+  }
+  if (availSelect && previewAvailText) {
+    availSelect.addEventListener('change', function() {
+      if (this.value === 'No') {
+        previewAvailText.textContent = 'Unavailable';
+        previewAvailText.className = 'font-label-caps text-label-caps text-error uppercase tracking-wider';
+        if (previewAvailDot) previewAvailDot.className = 'w-2 h-2 rounded-full bg-error';
+      } else {
+        previewAvailText.textContent = 'Available';
+        previewAvailText.className = 'font-label-caps text-label-caps text-secondary uppercase tracking-wider';
+        if (previewAvailDot) previewAvailDot.className = 'w-2 h-2 rounded-full bg-secondary';
+      }
+    });
+  }
   if (imageInput && previewImage) {
     imageInput.addEventListener('change', function() {
       if (this.files && this.files[0]) {

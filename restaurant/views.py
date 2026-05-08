@@ -1,9 +1,12 @@
+import json
+from datetime import timedelta
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
-from .models import Table, MenuItem, Order
-from .forms import TableForm, MenuItemForm, OrderForm
+from django.utils import timezone
+from .models import Table, MenuItem, Order, OrderItem
+from .forms import TableForm, MenuItemForm, OrderForm, OrderCreateForm
 from django.contrib.auth.decorators import login_required
 
 # ======== Tables ========
@@ -11,7 +14,8 @@ from django.contrib.auth.decorators import login_required
 def table_list(request):
     query = request.GET.get('q')
     if query:
-        tables = Table.objects.filter(number__icontains=query)
+        tables = Table.objects.filter(number__icontains=query) | Table.objects.filter(seats__icontains=query)
+        tables = tables.distinct().order_by('number')
     else:
         tables = Table.objects.all().order_by('number')
     return render(request, 'restaurant/table_list.html', {'tables': tables})
@@ -107,13 +111,26 @@ def add_order(request):
     last_order = Order.objects.last()
     next_order_id = (last_order.id + 1) if last_order else 1
     if request.method == 'POST':
-        form = OrderForm(request.POST)
+        form = OrderCreateForm(request.POST)
         if form.is_valid():
-            form.save()
+            order = form.save()
+            item_quantities = json.loads(request.POST.get('item_quantities', '[]'))
+            for iq in item_quantities:
+                OrderItem.objects.create(
+                    order=order,
+                    item_id=iq['id'],
+                    quantity=iq.get('qty', 1)
+                )
             return redirect('order_list')
+        else:
+            item_quantities_raw = request.POST.get('item_quantities', '[]')
     else:
-        form = OrderForm()
-    return render(request, 'restaurant/add_order.html', {'form': form, 'menu_items': menu_items, 'tables': tables, 'next_order_id': next_order_id})
+        form = OrderCreateForm()
+        item_quantities_raw = '[]'
+    return render(request, 'restaurant/add_order.html', {
+        'form': form, 'menu_items': menu_items, 'tables': tables,
+        'next_order_id': next_order_id, 'item_quantities_raw': item_quantities_raw
+    })
 
 @login_required
 def update_order(request, id):
@@ -180,4 +197,21 @@ def dashboard(request):
     total_tables = tables.count()
     menu_count = menu_items.count()
 
-    return render(request, 'restaurant/dashboard.html', {'tables': tables, 'menu_items': menu_items, 'orders': orders, 'total_revenue': total_revenue, 'total_orders': total_orders, 'active_tables': active_tables, 'total_tables': total_tables, 'menu_count': menu_count})
+    today = timezone.now().date()
+    daily_revenue = []
+    labels = []
+    for i in range(6, -1, -1):
+        day = today - timedelta(days=i)
+        day_orders = Order.objects.filter(created_at__date=day)
+        revenue = sum(o.total for o in day_orders)
+        daily_revenue.append(revenue)
+        labels.append(day.strftime('%a'))
+
+    max_revenue = max(daily_revenue) if daily_revenue else 1
+    return render(request, 'restaurant/dashboard.html', {
+        'tables': tables, 'menu_items': menu_items, 'orders': orders,
+        'total_revenue': total_revenue, 'total_orders': total_orders,
+        'active_tables': active_tables, 'total_tables': total_tables,
+        'menu_count': menu_count, 'daily_revenue': daily_revenue,
+        'revenue_labels': labels, 'max_revenue': max_revenue
+    })

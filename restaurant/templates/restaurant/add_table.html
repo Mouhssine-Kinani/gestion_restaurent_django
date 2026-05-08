@@ -139,7 +139,7 @@
 <div>
 <label class="block font-label-caps text-[10px] text-on-surface-variant mb-xs uppercase tracking-widest font-semibold" for="id_status">Operational Status</label>
 <div class="relative group">
-<select class="w-full bg-surface-container/50 border border-outline-variant/50 rounded-lg pl-md pr-12 py-3 font-body-sm text-[14px] text-on-surface focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none group-focus-within:border-primary/50" id="id_status" name="status">
+                <select class="w-full bg-surface-container/50 border border-outline-variant/50 rounded-lg pl-md pr-12 py-3 font-body-sm text-[14px] text-on-surface focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none group-focus-within:border-primary/50 cursor-pointer" id="id_status" name="status">
 <option class="bg-surface text-on-surface" value="free" {% if form.status.value == 'free' %}selected{% endif %}>Free</option>
 <option class="bg-surface text-on-surface" value="occupied" {% if form.status.value == 'occupied' %}selected{% endif %}>Occupied</option>
 </select>
@@ -183,5 +183,32 @@
 </div>
 </form>
 </main>
-</div>
+    </div>
+    <script>
+    (function() {
+        const numInput = document.getElementById('id_number');
+        const seatsInput = document.getElementById('id_seats');
+        const statusSelect = document.getElementById('id_status');
+        const previewNum = document.getElementById('preview-number');
+        const previewSeats = document.getElementById('preview-seats');
+        const previewStatus = document.getElementById('preview-status');
+        function updatePreview() {
+            const num = numInput ? numInput.value : '';
+            previewNum.textContent = num ? 'T-' + num : 'T-?';
+            const seats = seatsInput ? seatsInput.value : '';
+            previewSeats.textContent = seats || '?';
+            const status = statusSelect ? statusSelect.value : 'free';
+            if (status === 'free') {
+                previewStatus.textContent = 'Available';
+                previewStatus.className = 'font-body-sm text-[12px] text-secondary font-medium px-2 py-0.5 bg-secondary/10 rounded-full';
+            } else {
+                previewStatus.textContent = 'Occupied';
+                previewStatus.className = 'font-body-sm text-[12px] text-primary font-medium px-2 py-0.5 bg-primary/10 rounded-full';
+            }
+        }
+        if (numInput) numInput.addEventListener('input', updatePreview);
+        if (seatsInput) seatsInput.addEventListener('input', updatePreview);
+        if (statusSelect) statusSelect.addEventListener('change', updatePreview);
+    })();
+    </script>
 </body></html>

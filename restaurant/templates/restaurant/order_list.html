@@ -182,7 +182,7 @@
 <span class="font-data-mono text-[12px] text-on-surface bg-surface-container px-2.5 py-1 rounded border border-outline-variant/30 shadow-sm group-hover:border-primary/30 transition-colors">T-{{ order.table.number|stringformat:"02d" }}</span>
 </div>
 <div class="col-span-4 flex items-center">
-<span class="font-body-main text-[14px] text-on-surface truncate group-hover:text-white transition-colors">{% for item in order.items.all %}{{ item.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</span>
+                    <span class="font-body-main text-[14px] text-on-surface truncate group-hover:text-white transition-colors">{% with ois=order.order_items.all %}{% if ois %}{% for oi in ois %}{{ oi.item.name }} x{{ oi.quantity }}{% if not forloop.last %}, {% endif %}{% endfor %}{% else %}{% for item in order.items.all %}{{ item.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% endwith %}</span>
 </div>
 <div class="col-span-2 flex items-center justify-end">
 <span class="font-data-mono text-[14px] text-on-surface font-medium">${{ order.total }}</span>

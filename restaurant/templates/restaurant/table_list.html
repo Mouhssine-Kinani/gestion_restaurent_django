@@ -182,10 +182,10 @@
 <main class="ml-64 pt-[100px] p-margin min-h-screen">
 <div class="flex flex-wrap items-center justify-between gap-md mb-xl glass-panel p-md rounded-xl">
 <div class="flex items-center gap-md flex-1">
-<form method="get" class="relative w-64">
-<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-sm pointer-events-none" data-icon="search">search</span>
-<input name="q" value="{{ request.GET.q|default:'' }}" class="w-full bg-surface-container border border-outline-variant rounded py-sm pl-xl pr-sm text-on-surface font-data-mono text-data-mono focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder:text-on-surface-variant/50" placeholder="Search tables..." type="text"/>
-</form>
+            <form method="get" class="relative w-64" id="table-search-form">
+                <span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-sm pointer-events-none" data-icon="search">search</span>
+                <input name="q" value="{{ request.GET.q|default:'' }}" class="w-full bg-surface-container border border-outline-variant rounded py-sm pl-xl pr-sm text-on-surface font-data-mono text-data-mono focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder:text-on-surface-variant/50" placeholder="Search tables by number or seats..." type="text" oninput="this.form.submit()"/>
+            </form>
 <div class="flex items-center gap-sm">
 <span class="px-sm py-xs border border-outline-variant rounded font-label-caps text-label-caps text-on-surface-variant flex items-center gap-xs"><span class="w-2 h-2 rounded-full bg-secondary"></span> Available</span>
 <span class="px-sm py-xs border border-outline-variant rounded font-label-caps text-label-caps text-on-surface-variant flex items-center gap-xs"><span class="w-2 h-2 rounded-full bg-primary"></span> Occupied</span>

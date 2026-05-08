@@ -181,26 +181,37 @@
 </div>
 <div class="flex-1 overflow-y-auto pr-sm pb-xl">
 <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-sm" id="menu-items-grid">
-{% for item in menu_items %}
-<div class="glass-panel border border-outline-variant/20 rounded-xl p-md flex flex-col justify-between hover:border-primary/30 transition-colors group cursor-pointer relative overflow-hidden menu-item-card" data-id="{{ item.id }}" data-name="{{ item.name }}" data-price="{{ item.price }}">
-<div class="absolute inset-0 bg-gradient-to-br from-transparent to-surface-container-highest opacity-50 pointer-events-none"></div>
-<div class="flex justify-between items-start mb-sm relative z-10">
-<div>
-<h3 class="font-h2-subhead text-body-main font-semibold text-on-surface mb-1 group-hover:text-primary transition-colors">{{ item.name }}</h3>
-</div>
-<span class="font-data-mono text-body-main text-secondary">${{ item.price }}</span>
-</div>
-<div class="flex items-center justify-between mt-md relative z-10">
-<div class="flex items-center gap-1">
-<span class="w-2 h-2 rounded-full {% if item.available == 'Yes' %}bg-secondary{% else %}bg-error{% endif %}"></span>
-<span class="font-label-caps text-label-caps text-outline">{% if item.available == 'Yes' %}Available{% else %}Sold Out{% endif %}</span>
-</div>
-<label class="flex items-center gap-xs cursor-pointer">
-<input type="checkbox" name="items" value="{{ item.id }}" class="item-checkbox w-4 h-4 rounded border-outline-variant bg-surface-container-highest text-primary focus:ring-primary"/>
-</label>
-</div>
-</div>
-{% empty %}
+                    {% for item in menu_items %}
+                    <div class="glass-panel border border-outline-variant/20 rounded-xl p-md flex flex-col justify-between hover:border-primary/30 transition-colors group relative overflow-hidden menu-item-card" data-id="{{ item.id }}" data-name="{{ item.name }}" data-price="{{ item.price }}" data-available="{{ item.available }}">
+                        <div class="absolute inset-0 bg-gradient-to-br from-transparent to-surface-container-highest opacity-50 pointer-events-none"></div>
+                        <div class="flex justify-between items-start mb-sm relative z-10">
+                            <div>
+                                <h3 class="font-h2-subhead text-body-main font-semibold text-on-surface mb-1 group-hover:text-primary transition-colors">{{ item.name }}</h3>
+                            </div>
+                            <span class="font-data-mono text-body-main text-secondary">${{ item.price }}</span>
+                        </div>
+                        <div class="flex items-center justify-between mt-md relative z-10">
+                            <div class="flex items-center gap-1">
+                                <span class="w-2 h-2 rounded-full {% if item.available == 'Yes' %}bg-secondary{% else %}bg-error{% endif %}"></span>
+                                <span class="font-label-caps text-label-caps text-outline">{% if item.available == 'Yes' %}Available{% else %}Sold Out{% endif %}</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <button type="button" class="item-add-btn w-8 h-8 rounded-full bg-primary/20 text-primary hover:bg-primary/40 transition-all flex items-center justify-center {% if item.available == 'No' %}opacity-30 pointer-events-none{% endif %}" onclick="addItem('{{ item.id }}','{{ item.name|escapejs }}',{{ item.price }})">
+                                    <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL'1">add</span>
+                                </button>
+                                <div class="item-stepper items-center gap-1 bg-surface-container-highest rounded-full border border-outline-variant/40 px-1 py-0.5 hidden">
+                                    <button type="button" class="w-6 h-6 rounded-full bg-surface-bright text-on-surface hover:bg-primary/30 hover:text-primary transition-all flex items-center justify-center" onclick="removeItem('{{ item.id }}')">
+                                        <span class="material-symbols-outlined text-xs">remove</span>
+                                    </button>
+                                    <span class="item-qty text-data-mono font-data-mono text-on-surface w-5 text-center text-sm">0</span>
+                                    <button type="button" class="w-6 h-6 rounded-full bg-surface-bright text-on-surface hover:bg-primary/30 hover:text-primary transition-all flex items-center justify-center" onclick="addItem('{{ item.id }}','{{ item.name|escapejs }}',{{ item.price }})">
+                                        <span class="material-symbols-outlined text-xs">add</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
 <div class="col-span-full flex items-center justify-center h-32">
 <p class="font-body-main text-body-main text-on-surface-variant">No menu items available.</p>
 </div>
@@ -209,114 +220,137 @@
 </div>
 </div>
 <div class="col-span-12 xl:col-span-4 h-[calc(100vh-200px)] flex flex-col">
-<div class="glass-panel border border-outline-variant/40 rounded-xl flex flex-col h-full overflow-hidden shadow-xl">
-<div class="p-md border-b border-outline-variant/30 bg-surface-container-highest/50 flex justify-between items-center">
-<div>
-<span class="font-label-caps text-label-caps text-outline block mb-1">Status</span>
-<select name="status" id="id_status" class="bg-surface border border-outline-variant rounded px-2 py-1 font-data-mono text-data-mono text-on-surface focus:outline-none focus:border-primary">
-<option value="Pending" class="bg-surface text-on-surface">Pending</option>
-<option value="served" class="bg-surface text-on-surface">Served</option>
-</select>
-</div>
-<div>
-<span class="font-label-caps text-label-caps text-outline block mb-1">Items</span>
-<span class="font-data-mono text-data-mono text-primary" id="item-count">0</span>
-</div>
-</div>
-<div class="flex-1 overflow-y-auto p-md flex flex-col gap-sm" id="selected-items-list">
-<p class="font-body-sm text-body-sm text-on-surface-variant text-center py-lg" id="empty-message">Select items from the menu to build the order.</p>
-</div>
-<div class="p-md border-t border-outline-variant/30 bg-surface-container-highest/80">
-<div class="space-y-2 mb-4">
-<div class="flex justify-between font-data-mono text-data-mono text-on-surface-variant">
-<span>Subtotal</span>
-<span id="order-subtotal">$0</span>
-</div>
-<div class="h-px w-full bg-outline-variant/30 my-2"></div>
-<div class="flex justify-between items-center">
-<span class="font-body-main text-body-main font-medium text-on-surface">Total</span>
-<span class="font-data-mono text-h2-subhead text-primary font-bold" id="order-total">$0</span>
-</div>
-</div>
-<div class="flex gap-sm">
-<a href="{% url 'order_list' %}" class="flex-1 py-3 border border-outline-variant text-on-surface rounded-lg hover:bg-surface-bright transition-colors font-body-main text-body-main font-medium text-center">Cancel</a>
-<button type="submit" class="flex-[2] py-3 bg-primary text-on-primary rounded-lg hover:bg-primary-fixed transition-all font-body-main text-body-main font-medium shadow-[0_4px_14px_rgba(242,202,80,0.25)] flex justify-center items-center gap-2">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span> Send to Kitchen
-</button>
-</div>
-</div>
-</div>
+                <div class="glass-panel border border-outline-variant/40 rounded-xl flex flex-col h-full overflow-hidden shadow-xl">
+                        <div class="p-md border-b border-outline-variant/30 bg-surface-container-highest/50 flex justify-between items-center">
+                            <div>
+                                <span class="font-label-caps text-label-caps text-outline block mb-1">Status</span>
+                                <select name="status" id="id_status" class="bg-surface border border-outline-variant rounded px-2 py-1 font-data-mono text-data-mono text-on-surface focus:outline-none focus:border-primary">
+                                    <option value="Pending" class="bg-surface text-on-surface">Pending</option>
+                                    <option value="served" class="bg-surface text-on-surface">Served</option>
+                                </select>
+                            </div>
+                            <div>
+                                <span class="font-label-caps text-label-caps text-outline block mb-1">Items</span>
+                                <span class="font-data-mono text-data-mono text-primary" id="item-count">0</span>
+                            </div>
+                        </div>
+                        <div class="flex-1 overflow-y-auto p-md flex flex-col gap-sm" id="selected-items-list">
+                            <p class="font-body-sm text-body-sm text-on-surface-variant text-center py-lg" id="empty-message">Tap + on menu items to build the order.</p>
+                        </div>
+                        <div class="p-md border-t border-outline-variant/30 bg-surface-container-highest/80">
+                            <div class="space-y-2 mb-4">
+                                <div class="flex justify-between font-data-mono text-data-mono text-on-surface-variant">
+                                    <span>Subtotal</span>
+                                    <span id="order-subtotal">$0</span>
+                                </div>
+                                <div class="h-px w-full bg-outline-variant/30 my-2"></div>
+                                <div class="flex justify-between items-center">
+                                    <span class="font-body-main text-body-main font-medium text-on-surface">Total</span>
+                                    <span class="font-data-mono text-h2-subhead text-primary font-bold" id="order-total">$0</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-sm">
+                                <a href="{% url 'order_list' %}" class="flex-1 py-3 border border-outline-variant text-on-surface rounded-lg hover:bg-surface-bright transition-colors font-body-main text-body-main font-medium text-center">Cancel</a>
+                                <button type="submit" class="flex-[2] py-3 bg-primary text-on-primary rounded-lg hover:bg-primary-fixed transition-all font-body-main text-body-main font-medium shadow-[0_4px_14px_rgba(242,202,80,0.25)] flex justify-center items-center gap-2">
+                                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span> Send to Kitchen
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="item-quantities" name="item_quantities" value="{{ item_quantities_raw }}">
 </div>
 </div>
 </form>
 </main>
-<script>
+    <script>
 (function() {
-  const checkboxes = document.querySelectorAll('.item-checkbox');
+  const items = {};
   const selectedList = document.getElementById('selected-items-list');
-  const emptyMessage = document.getElementById('empty-message');
   const itemCount = document.getElementById('item-count');
   const orderSubtotal = document.getElementById('order-subtotal');
   const orderTotal = document.getElementById('order-total');
-  const itemData = {};
+  const hiddenField = document.getElementById('item-quantities');
 
-  document.querySelectorAll('.menu-item-card').forEach(function(card) {
-    itemData[card.dataset.id] = {
-      name: card.dataset.name,
-      price: parseFloat(card.dataset.price)
-    };
-  });
+  window.addItem = function(id, name, price) {
+    if (items[id]) {
+      items[id].qty++;
+    } else {
+      items[id] = { id: parseInt(id), name: name, price: parseFloat(price), qty: 1 };
+    }
+    updateUI();
+  };
 
-  function updateOrderSummary() {
-    let selected = [];
-    checkboxes.forEach(function(cb) {
-      if (cb.checked) {
-        selected.push({
-          id: cb.value,
-          name: itemData[cb.value].name,
-          price: itemData[cb.value].price
-        });
+  window.removeItem = function(id) {
+    if (items[id]) {
+      items[id].qty--;
+      if (items[id].qty <= 0) {
+        delete items[id];
+      }
+    }
+    updateUI();
+  };
+
+  function updateUI() {
+    const vals = Object.values(items);
+    hiddenField.value = JSON.stringify(vals);
+    document.querySelectorAll('.menu-item-card').forEach(function(card) {
+      const id = card.dataset.id;
+      const item = items[id];
+      const qty = item ? item.qty : 0;
+      const addBtn = card.querySelector('.item-add-btn');
+      const stepper = card.querySelector('.item-stepper');
+      const qtyEl = card.querySelector('.item-qty');
+      if (qty > 0) {
+        if (addBtn) addBtn.style.display = 'none';
+        if (stepper) { stepper.style.display = 'flex'; }
+        if (qtyEl) qtyEl.textContent = qty;
+        card.classList.add('selected');
+      } else {
+        if (addBtn) addBtn.style.display = 'flex';
+        if (stepper) stepper.style.display = 'none';
+        if (qtyEl) qtyEl.textContent = '0';
+        card.classList.remove('selected');
       }
     });
+    updateSummary();
+  }
 
-    if (selected.length === 0) {
-      selectedList.innerHTML = '<p class="font-body-sm text-body-sm text-on-surface-variant text-center py-lg" id="empty-message">Select items from the menu to build the order.</p>';
+  function updateSummary() {
+    const vals = Object.values(items);
+    if (vals.length === 0) {
+      selectedList.innerHTML = '<p class="font-body-sm text-body-sm text-on-surface-variant text-center py-lg">Tap + on menu items to build the order.</p>';
       itemCount.textContent = '0';
       orderSubtotal.textContent = '$0';
       orderTotal.textContent = '$0';
       return;
     }
-
     let html = '';
     let subtotal = 0;
-
-    selected.forEach(function(item) {
-      subtotal += item.price;
-      html += '<div class="flex justify-between items-start pb-sm border-b border-outline-variant/20">';
+    let totalQty = 0;
+    vals.forEach(function(item) {
+      const lineTotal = item.price * item.qty;
+      subtotal += lineTotal;
+      totalQty += item.qty;
+      html += '<div class="flex items-center justify-between pb-sm border-b border-outline-variant/20 py-1">';
       html += '<div class="flex-1 pr-sm">';
-      html += '<h4 class="font-body-main text-body-sm font-medium text-on-surface mb-1">' + item.name + '</h4>';
+      html += '<h4 class="font-body-main text-body-sm font-medium text-on-surface">' + item.name + '</h4>';
+      html += '<div class="flex items-center gap-1 mt-1">';
+      html += '<button type="button" class="w-5 h-5 rounded-full bg-surface-bright text-on-surface-variant hover:bg-primary/30 hover:text-primary transition-all flex items-center justify-center" onclick="removeItem(\'' + item.id + '\')"><span class="material-symbols-outlined text-[10px]">remove</span></button>';
+      html += '<span class="font-data-mono text-data-mono text-on-surface w-4 text-center">' + item.qty + '</span>';
+      html += '<button type="button" class="w-5 h-5 rounded-full bg-surface-bright text-on-surface-variant hover:bg-primary/30 hover:text-primary transition-all flex items-center justify-center" onclick="addItem(\'' + item.id + '\',\'' + item.name.replace(/'/g,"\\'") + '\',' + item.price + ')"><span class="material-symbols-outlined text-[10px]">add</span></button>';
       html += '</div>';
-      html += '<div class="flex items-center gap-2">';
-      html += '<span class="font-data-mono text-data-mono text-on-surface">$' + item.price.toFixed(2) + '</span>';
+      html += '</div>';
+      html += '<div class="flex flex-col items-end">';
+      html += '<span class="font-data-mono text-data-mono text-on-surface">$' + lineTotal.toFixed(2) + '</span>';
+      html += '<span class="font-label-caps text-[10px] text-on-surface-variant">$' + item.price.toFixed(2) + ' ea</span>';
       html += '</div>';
       html += '</div>';
     });
-
     selectedList.innerHTML = html;
-    itemCount.textContent = selected.length;
+    itemCount.textContent = totalQty;
     orderSubtotal.textContent = '$' + subtotal.toFixed(2);
     orderTotal.textContent = '$' + subtotal.toFixed(2);
   }
-
-  checkboxes.forEach(function(cb) {
-    cb.addEventListener('change', function() {
-      var card = this.closest('.menu-item-card');
-      if (card) {
-        card.classList.toggle('selected', this.checked);
-      }
-      updateOrderSummary();
-    });
-  });
 
   var searchInput = document.getElementById('item-search');
   if (searchInput) {

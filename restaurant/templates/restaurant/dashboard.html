@@ -95,16 +95,21 @@
 <h2 class="font-h2-subhead text-h2-subhead text-on-surface">Revenue Trend</h2>
 <span class="font-label-caps text-label-caps text-on-surface-variant uppercase border border-outline-variant px-sm py-xs rounded-DEFAULT">All Time</span>
 </div>
-<div class="flex-1 relative border-l border-b border-outline-variant/30 mt-sm flex items-end pt-lg">
-<div class="absolute left-0 top-0 h-full w-full bg-gradient-to-t from-primary/10 to-transparent z-0 opacity-50"></div>
-<div class="w-full h-full flex items-end justify-between px-md z-10 relative">
-{% with bar_count=7 %}
-{% for i in "1234567"|make_list %}
-<div class="w-[8%] bg-surface-bright border-t-2 border-primary hover:bg-primary/20 transition-all group relative" style="height: {% widthratio forloop.counter|add:"0" 8 80 %}%;"><div class="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 font-data-mono text-data-mono text-on-surface transition-opacity whitespace-nowrap">${{ forloop.counter|add:"1" }}k</div></div>
-{% endfor %}
-{% endwith %}
-</div>
-</div>
+            <div class="flex-1 relative border-l border-b border-outline-variant/30 mt-sm flex items-end pt-lg">
+                    <div class="absolute left-0 top-0 h-full w-full bg-gradient-to-t from-primary/10 to-transparent z-0 opacity-50"></div>
+                    <div class="w-full h-full flex items-end justify-between px-md z-10 relative">
+                        {% for rev in daily_revenue %}
+                        <div class="w-[8%] bg-surface-bright border-t-2 border-primary hover:bg-primary/20 transition-all group relative flex flex-col items-center justify-end" style="height: {% widthratio rev max_revenue 100 %}%;min-height:4px;">
+                            <div class="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 font-data-mono text-data-mono text-on-surface transition-opacity whitespace-nowrap">${{ rev }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="flex justify-between px-md mt-2">
+                    {% for label in revenue_labels %}
+                    <span class="font-label-caps text-[10px] text-on-surface-variant w-[8%] text-center">{{ label }}</span>
+                    {% endfor %}
+                </div>
 </div>
 <div class="col-span-4 glass-card rounded-xl flex flex-col h-[400px] overflow-hidden">
 <div class="p-lg border-b border-outline-variant/30 flex justify-between items-center bg-surface-container/50">
