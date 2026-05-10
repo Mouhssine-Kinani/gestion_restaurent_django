@@ -1,52 +1,180 @@
-{% extends 'restaurant/base.html' %}
-
-{% block title %}Edit Menu Item{% endblock %}
-
-{% block content %}
-<div class="animate-fade-in">
-    <div class="flex items-center gap-4 mb-10">
-        <a href="{% url 'menu_list' %}" class="p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-            </svg>
-        </a>
-        <div>
-            <h2 class="text-3xl font-bold text-white">Edit Menu Item</h2>
-            <p class="text-gray-400">Update dish details</p>
-        </div>
-    </div>
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RestaurantOS - Edit Menu Item</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#ffd9dc", "surface-tint": "#e9c349", "primary-container": "#d4af37", "tertiary-container": "#ff94a1", "on-error": "#690005", "background": "#111316", "primary-fixed-dim": "#e9c349", "inverse-primary": "#735c00", "outline-variant": "#4d4635", "surface": "#111316", "on-primary-fixed-variant": "#574500", "surface-variant": "#333538", "primary-fixed": "#ffe088", "inverse-surface": "#e2e2e6", "surface-bright": "#37393d", "error-container": "#93000a", "on-secondary": "#003824", "on-primary": "#3c2f00", "surface-container-highest": "#333538", "on-background": "#e2e2e6", "secondary-fixed-dim": "#4edea3", "on-primary-container": "#554300", "on-tertiary-container": "#8e002f", "on-surface-variant": "#d0c5af", "on-error-container": "#ffdad6", "on-secondary-fixed-variant": "#005236", "surface-container": "#1e2023", "surface-container-low": "#1a1c1f", "surface-container-lowest": "#0c0e11", "on-tertiary": "#670020", "secondary-container": "#00a572", "inverse-on-surface": "#2f3034", "on-tertiary-fixed": "#400010", "error": "#ffb4ab", "on-secondary-container": "#00311f", "surface-dim": "#111316", "on-surface": "#e2e2e6", "outline": "#99907c", "tertiary": "#ffbec4", "secondary": "#4edea3", "surface-container-high": "#282a2d", "on-secondary-fixed": "#002113", "tertiary-fixed-dim": "#ffb2ba", "on-tertiary-fixed-variant": "#910130", "secondary-fixed": "#6ffbbe", "primary": "#f2ca50", "on-primary-fixed": "#241a00"
+            },
+            "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+            "spacing": { "base": "4px", "md": "16px", "xl": "40px", "xs": "4px", "margin": "32px", "sm": "8px", "lg": "24px", "grid-columns": "12", "gutter": "16px" },
+            "fontFamily": { "body-sm": ["Outfit"], "body-main": ["Outfit"], "label-caps": ["Outfit"], "data-mono": ["JetBrains Mono"], "h1-header": ["Playfair Display"], "h2-subhead": ["Playfair Display"], "display-hero": ["Playfair Display"] },
+            "fontSize": { "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}], "body-main": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}], "label-caps": ["11px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700"}], "data-mono": ["13px", {"lineHeight": "1.4", "letterSpacing": "-0.02em", "fontWeight": "500"}], "h1-header": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}], "h2-subhead": ["24px", {"lineHeight": "1.4", "fontWeight": "500"}], "display-hero": ["48px", {"lineHeight": "1.2", "fontWeight": "700"}] }
+          }
+        }
+      }
+    </script>
+<style>
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+        body { font-family: 'Outfit', sans-serif; background-color: theme('colors.background'); color: theme('colors.on-background'); }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex bg-background text-on-background">
+<nav class="fixed left-0 top-0 h-full flex flex-col z-50 w-64 bg-surface-container border-r border-outline-variant/30 backdrop-blur-xl">
+<div class="p-lg border-b border-outline-variant/30 flex items-center gap-md">
+<div>
+<h1 class="font-h2-subhead text-h2-subhead text-primary m-0">RestaurantOS</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase mt-1">Kitchen HQ</p>
 </div>
-
-<div class="max-w-xl">
-    <div class="glass-card rounded-2xl p-8 border-glow">
-        <form method="post" class="space-y-6">
-            {% csrf_token %}
-            
-            {% if form.non_field_errors %}
-            <div class="p-4 rounded-xl bg-red-500/20 border border-red-500/30">
-                <p class="text-red-400 text-sm">{{ form.non_field_errors }}</p>
-            </div>
-            {% endif %}
-            
-            {% for field in form %}
-            <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">{{ field.label }}</label>
-                {{ field }}
-                {% if field.errors %}
-                <p class="text-red-400 text-sm mt-1">{{ field.errors }}</p>
-                {% endif %}
-            </div>
-            {% endfor %}
-            
-            <div class="flex gap-4 pt-4">
-                <button type="submit" class="flex-1 py-4 bg-gradient-to-r from-accent-500 to-neon-orange rounded-xl font-bold text-dark-900 hover:shadow-[0_0_30px_rgba(251,191,36,0.4)] transition-all duration-300">
-                    Save Changes
-                </button>
-                <a href="{% url 'menu_list' %}" class="px-6 py-4 rounded-xl font-medium text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-300">
-                    Cancel
-                </a>
-            </div>
-        </form>
-    </div>
 </div>
-{% endblock %}
+<div class="flex-1 overflow-y-auto py-md flex flex-col font-body-main text-body-main">
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-colors" href="{% url 'dashboard' %}"><span class="material-symbols-outlined">dashboard</span>Dashboard</a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-colors" href="{% url 'table_list' %}"><span class="material-symbols-outlined">table_restaurant</span>Tables</a>
+<a class="flex items-center gap-md bg-primary/10 text-primary border-r-2 border-primary py-3 px-lg opacity-90 scale-[0.99] transition-all" href="#"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">restaurant_menu</span>Menu</a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-colors" href="{% url 'order_list' %}"><span class="material-symbols-outlined">receipt_long</span>Orders</a>
+</div>
+<div class="border-t border-outline-variant/30 py-md font-body-main text-body-main">
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-colors" href="{% url 'settings' %}"><span class="material-symbols-outlined">settings</span>Settings</a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright transition-colors" href="{% url 'logout' %}"><span class="material-symbols-outlined">logout</span>Logout</a>
+</div>
+</nav>
+<header class="fixed top-0 right-0 w-[calc(100%-16rem)] flex justify-between items-center px-margin py-md z-40 bg-surface-container border-b border-outline-variant/30 backdrop-blur-xl">
+<div class="flex items-center gap-lg font-h2-subhead text-h2-subhead">
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors" href="{% url 'dashboard' %}">Overview</a>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-bright"><span class="material-symbols-outlined">notifications</span></button>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-bright"><span class="material-symbols-outlined">help</span></button>
+<a href="{% url 'add_table' %}" class="px-4 py-2 border border-outline-variant text-on-surface rounded font-body-sm text-body-sm hover:bg-surface-bright transition-colors">Add Table</a>
+<a href="{% url 'add_order' %}" class="px-4 py-2 bg-primary text-on-primary font-bold rounded font-body-sm text-body-sm hover:bg-primary-fixed transition-colors shadow-[0_0_15px_rgba(242,202,80,0.2)]">Create Order</a>
+</div>
+</header>
+<main class="flex-1 ml-64 mt-[88px] p-margin bg-background">
+<form method="post" enctype="multipart/form-data">
+{% csrf_token %}
+<div class="mb-lg flex justify-between items-end border-b border-outline-variant/30 pb-lg">
+<div>
+<p class="font-label-caps text-label-caps text-primary uppercase mb-2 tracking-widest">Menu Management</p>
+<h2 class="font-h1-header text-h1-header text-on-surface m-0">Edit Menu Item</h2>
+</div>
+<div class="flex gap-md">
+<a href="{% url 'menu_list' %}" class="px-6 py-3 border border-outline-variant text-on-surface rounded font-body-main text-body-main hover:bg-surface-bright transition-colors backdrop-blur-sm">Cancel</a>
+<button type="submit" class="px-6 py-3 text-on-primary font-bold rounded font-body-main text-body-main hover:bg-primary-fixed transition-all shadow-[0_0_20px_rgba(242,202,80,0.3)]" style="background-color: #D4AF37;">Update Item</button>
+</div>
+</div>
+{% if form.errors %}
+<div class="mb-lg p-md bg-error-container/20 border border-error/30 rounded-lg">
+<p class="font-body-sm text-body-sm text-error">Please correct the errors below.</p>
+</div>
+{% endif %}
+<div class="grid grid-cols-12 gap-xl mt-xl">
+<div class="col-span-12 lg:col-span-7 space-y-xl">
+<div class="border border-outline-variant/30 rounded-xl p-xl bg-surface-container">
+<h3 class="font-h2-subhead text-h2-subhead text-on-surface mb-lg pb-sm border-b border-outline-variant/30">Core Details</h3>
+<div class="space-y-8">
+<div>
+<label class="block font-label-caps text-label-caps text-on-surface-variant uppercase mb-3" for="id_image">Item Image</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-md p-4 font-body-main text-body-main text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors file:bg-primary file:text-on-primary file:border-0 file:px-md file:py-sm file:mr-md file:font-data-mono file:text-data-mono file:cursor-pointer" type="file" id="id_image" name="image" accept="image/*"/>
+</div>
+<div>
+<label class="block font-label-caps text-label-caps text-on-surface-variant uppercase mb-3" for="id_name">Item Name</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-md p-4 font-body-main text-body-main text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" type="text" id="id_name" name="name" value="{{ form.name.value|default:'' }}"/>
+</div>
+<div class="grid grid-cols-2 gap-lg">
+<div>
+<label class="block font-label-caps text-label-caps text-on-surface-variant uppercase mb-3" for="id_price">Price (USD)</label>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-data-mono">$</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-md py-4 pl-10 pr-4 font-data-mono text-data-mono text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" type="number" id="id_price" name="price" value="{{ form.price.value|default:'' }}"/>
+</div>
+</div>
+<div>
+<label class="block font-label-caps text-label-caps text-on-surface-variant uppercase mb-3" for="id_available">Status</label>
+<select id="id_available" name="available" class="w-full bg-surface-container-lowest border border-outline-variant rounded-md p-4 font-data-mono text-data-mono text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+<option value="Yes" {% if form.available.value == 'Yes' %}selected{% endif %}>Available</option>
+<option value="No" {% if form.available.value == 'No' %}selected{% endif %}>Unavailable</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="col-span-12 lg:col-span-5">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-lg tracking-widest flex items-center gap-2"><span class="material-symbols-outlined text-sm">visibility</span>Live Menu Preview</h3>
+<div class="border rounded-2xl overflow-hidden shadow-2xl relative group bg-surface-container border-outline-variant/30 flex flex-col">
+<div class="h-64 w-full relative">
+<img id="preview-image" alt="Menu Item Preview" class="w-full h-full object-cover" src="{% if form.instance.image %}{{ form.instance.image.url }}{% else %}https://lh3.googleusercontent.com/aida-public/AB6AXuCWuXpDVkeY7U0Ck37me2dXPQEOglY1grFAVUas4ZP6RJXDke4S8ZQV0qu5MffsgVRMtYHNE3b5wZZCtuSqj4RPJJ8z5e3Xqooio5GGT4jzXWnPbeQbgVwQkob0-3TfvO3fDWTXcTMtv-X6i6108dQFxtqb_F_4lu8VClHMaqXG2fEB3dQYXaduU2MoxBOH3YGg7TWEAXBOWe70NGtvkX5k8rok4HrWXBAUz_h2Q-u0X3GYMSHN9vH36ZyEkD0z08I8jbDqp-Vmvb4{% endif %}"/>
+                <div class="absolute top-4 right-4 bg-surface-container-lowest/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-outline-variant/50 flex items-center gap-2 shadow-lg" id="preview-avail-badge">
+                    <div class="w-2 h-2 rounded-full bg-secondary" id="preview-avail-dot"></div>
+                    <span class="font-label-caps text-label-caps text-secondary uppercase tracking-wider" id="preview-avail-text">{% if form.available.value == 'Yes' %}Available{% else %}Unavailable{% endif %}</span>
+                </div>
+</div>
+<div class="p-xl relative flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-md">
+<h4 class="font-h1-header text-h2-subhead text-on-surface m-0 leading-tight" id="preview-name">{{ form.name.value|default:'Item Name' }}</h4>
+<span class="font-data-mono text-data-mono text-primary bg-primary/10 px-3 py-1.5 rounded border border-primary/20" id="preview-price">${{ form.price.value|default:'0' }}</span>
+</div>
+<p class="font-body-main text-body-main text-on-surface-variant leading-relaxed mb-lg flex-1">Update the item details on the left.</p>
+</div>
+</div>
+</div>
+</div>
+</form>
+<script>
+(function() {
+  const nameInput = document.getElementById('id_name');
+  const priceInput = document.getElementById('id_price');
+  const imageInput = document.getElementById('id_image');
+  const availSelect = document.getElementById('id_available');
+  const previewName = document.getElementById('preview-name');
+  const previewPrice = document.getElementById('preview-price');
+  const previewImage = document.getElementById('preview-image');
+  const previewAvailText = document.getElementById('preview-avail-text');
+  const previewAvailDot = document.getElementById('preview-avail-dot');
+  if (nameInput && previewName) {
+    nameInput.addEventListener('input', function() {
+      previewName.textContent = this.value || 'Item Name';
+    });
+  }
+  if (priceInput && previewPrice) {
+    priceInput.addEventListener('input', function() {
+      previewPrice.textContent = '$' + (this.value || '0');
+    });
+  }
+  if (availSelect && previewAvailText) {
+    availSelect.addEventListener('change', function() {
+      if (this.value === 'No') {
+        previewAvailText.textContent = 'Unavailable';
+        previewAvailText.className = 'font-label-caps text-label-caps text-error uppercase tracking-wider';
+        if (previewAvailDot) previewAvailDot.className = 'w-2 h-2 rounded-full bg-error';
+      } else {
+        previewAvailText.textContent = 'Available';
+        previewAvailText.className = 'font-label-caps text-label-caps text-secondary uppercase tracking-wider';
+        if (previewAvailDot) previewAvailDot.className = 'w-2 h-2 rounded-full bg-secondary';
+      }
+    });
+  }
+  if (imageInput && previewImage) {
+    imageInput.addEventListener('change', function() {
+      if (this.files && this.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          previewImage.src = e.target.result;
+        };
+        reader.readAsDataURL(this.files[0]);
+      }
+    });
+  }
+})();
+</script>
+</main>
+</body></html>

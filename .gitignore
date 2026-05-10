@@ -1,0 +1,108 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+pythonenv*
+
+# Django
+db.sqlite3
+*.log
+*.pot
+*.pyc
+local_settings.py
+migrations/*.pyc
+!migrations/__init__.py
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-*
+.project
+.pydevproject
+.settings/
+
+# Development tools
+.opencode/
+*.opencode/
+
+# Logs
+logs/
+*.log
+logfile-*
+
+# Static and media files
+staticfiles/
+media/
+static_collected/
+
+# Backup files
+*.bak
+*.backup
+*.tmp
+*.temp
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Testing
+.coverage
+htmlcov/
+.tox/
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+coverage.xml
+*.cover
+
+# Packaging
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+*.tar.gz
+*.tgz
+
+# Project specific
+restaurant/__pycache__/
+restaurant/migrations/__pycache__/
+restaurant_manager/__pycache__/
+*.pyc
+
+# API keys/secrets
+*.key
+*.pem
+secrets.json
+config.json
+
+stitch_restaurantos_manager
+opencode.jsonc

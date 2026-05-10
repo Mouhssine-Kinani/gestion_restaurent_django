@@ -1,143 +1,151 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - RESTO</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        dark: {
-                            900: '#0a0a0f',
-                            800: '#12121a',
-                            700: '#1a1a25',
-                            600: '#252532',
-                            500: '#32324a',
-                        },
-                        accent: {
-                            400: '#fbbf24',
-                            500: '#f59e0b',
-                            600: '#d97706',
-                        },
-                        neon: {
-                            cyan: '#00f5ff',
-                            magenta: '#ff00ff',
-                            green: '#00ff88',
-                            orange: '#ff6b35',
-                        }
-                    },
-                    animation: {
-                        'glow': 'glow 2s ease-in-out infinite alternate',
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
-        
-        * {
-            font-family: 'Outfit', sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
-            min-height: 100vh;
-        }
-        
-        .glass {
-            background: rgba(26, 26, 37, 0.7);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        
-        .text-gradient {
-            background: linear-gradient(90deg, #fbbf24, #ff6b35, #fbbf24);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-size: 200% auto;
-            animation: shimmer 3s linear infinite;
-        }
-        
-        @keyframes shimmer {
-            to { background-position: 200% center; }
-        }
-        
-        .mesh-bg {
-            background: 
-                radial-gradient(at 40% 20%, rgba(251, 191, 36, 0.15) 0px, transparent 50%),
-                radial-gradient(at 80% 0%, rgba(0, 245, 255, 0.1) 0px, transparent 50%),
-                radial-gradient(at 0% 50%, rgba(255, 0, 255, 0.08) 0px, transparent 50%),
-                radial-gradient(at 80% 50%, rgba(0, 255, 136, 0.08) 0px, transparent 50%),
-                radial-gradient(at 0% 100%, rgba(255, 107, 53, 0.1) 0px, transparent 50%);
-        }
-        
-        input[type="text"], input[type="password"], input[type="email"] {
-            background: rgba(26, 26, 37, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            transition: all 0.3s ease;
-        }
-        
-        input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus {
-            outline: none;
-            border-color: rgba(251, 191, 36, 0.5);
-            box-shadow: 0 0 20px rgba(251, 191, 36, 0.2);
-        }
-        
-        .glow-accent {
-            box-shadow: 0 0 30px rgba(251, 191, 36, 0.2), 0 0 60px rgba(251, 191, 36, 0.1);
-        }
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RestaurantOS - Registration</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&amp;family=JetBrains+Mono:wght@300;400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@200..400,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "primary": "#f2ca50",
+                "secondary-fixed": "#6ffbbe",
+                "secondary-container": "#00a572",
+                "on-surface": "#e2e2e6",
+                "on-background": "#e2e2e6",
+                "surface-container-high": "#282a2d",
+                "tertiary": "#ffbec4",
+                "on-primary-fixed-variant": "#574500",
+                "background": "#111316",
+                "on-primary": "#3c2f00",
+                "inverse-on-surface": "#2f3034",
+                "surface-container-low": "#1a1c1f",
+                "on-primary-fixed": "#241a00",
+                "on-secondary": "#003824",
+                "surface-bright": "#37393d",
+                "on-secondary-fixed-variant": "#005236",
+                "surface-container": "#1e2023",
+                "on-tertiary-container": "#8e002f",
+                "error-container": "#93000a",
+                "on-primary-container": "#554300",
+                "secondary-fixed-dim": "#4edea3",
+                "primary-container": "#d4af37",
+                "tertiary-fixed-dim": "#ffb2ba",
+                "on-secondary-fixed": "#002113",
+                "on-error": "#690005",
+                "tertiary-container": "#ff94a1",
+                "on-tertiary-fixed-variant": "#910130",
+                "surface": "#111316",
+                "inverse-surface": "#e2e2e6",
+                "surface-variant": "#333538",
+                "surface-container-lowest": "#0c0e11",
+                "outline": "#99907c",
+                "surface-dim": "#111316",
+                "on-tertiary": "#670020",
+                "primary-fixed-dim": "#e9c349",
+                "outline-variant": "#4d4635",
+                "inverse-primary": "#735c00",
+                "tertiary-fixed": "#ffd9dc",
+                "on-secondary-container": "#00311f",
+                "primary-fixed": "#ffe088",
+                "on-tertiary-fixed": "#400010",
+                "secondary": "#4edea3",
+                "on-error-container": "#ffdad6",
+                "surface-container-highest": "#333538",
+                "error": "#ffb4ab",
+                "surface-tint": "#e9c349",
+                "on-surface-variant": "#d0c5af"
+        },
+        "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+        "spacing": { "gutter": "16px", "lg": "24px", "base": "4px", "xl": "40px", "sm": "8px", "md": "16px", "xs": "4px", "margin": "32px", "grid-columns": "12" },
+        "fontFamily": { "label-caps": ["Outfit"], "body-sm": ["Outfit"], "h1-header": ["Playfair Display"], "display-hero": ["Playfair Display"], "h2-subhead": ["Playfair Display"], "data-mono": ["JetBrains Mono"], "body-main": ["Outfit"] },
+        "fontSize": { "label-caps": ["11px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700" }], "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }], "h1-header": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }], "display-hero": ["48px", { "lineHeight": "1.2", "fontWeight": "700" }], "h2-subhead": ["24px", { "lineHeight": "1.4", "fontWeight": "500" }], "data-mono": ["13px", { "lineHeight": "1.4", "letterSpacing": "-0.02em", "fontWeight": "500" }], "body-main": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }] }
+      }
+    }
+  }
+</script>
+<style>
+        .glass-panel { background-color: rgba(17, 19, 22, 0.75); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(212, 175, 55, 0.25); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 30px rgba(212, 175, 55, 0.05); }
+        .gold-gradient-text { background: linear-gradient(135deg, #FFE088 0%, #D4AF37 50%, #735C00 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .input-premium { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .input-premium:focus-within { background: rgba(212, 175, 55, 0.05); border-color: rgba(212, 175, 55, 0.5); box-shadow: 0 0 20px rgba(212, 175, 55, 0.1); }
+        .input-premium input:-webkit-autofill,
+        .input-premium input:-webkit-autofill:hover,
+        .input-premium input:-webkit-autofill:focus,
+        .input-premium input:-webkit-autofill:active { -webkit-box-shadow: 0 0 0 30px #111316 inset !important; -webkit-text-fill-color: #e2e2e6 !important; transition: background-color 5000s ease-in-out 0s; }
+        .btn-gold { background: linear-gradient(135deg, #D4AF37 0%, #B49020 100%); position: relative; overflow: hidden; transition: all 0.3s ease; }
+        .btn-gold::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); transition: all 0.5s ease; }
+        .btn-gold:hover::before { left: 100%; }
+        .btn-gold:hover { box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3); transform: translateY(-1px); }
     </style>
 </head>
-<body class="text-white min-h-screen mesh-bg flex items-center justify-center p-4">
-    <div class="w-full max-w-md">
-        <div class="text-center mb-10 animate-fade-in">
-            <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-accent-400 to-neon-orange mb-6 glow-accent">
-                <svg class="w-10 h-10 text-dark-900" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H12a1 1 0 100-2H6.414a1 1 0 00-1.017.089l-.893.892a1 1 0 01-.894 0l-.894-.892A1 1 0 013 14H2V1z"/>
-                </svg>
-            </div>
-            <h1 class="text-4xl font-bold text-white mb-2">RESTO</h1>
-            <p class="text-gray-400">Create your account to get started.</p>
-        </div>
-        
-        <div class="glass rounded-2xl p-8 animate-slide-up">
-            <form method="post" class="space-y-5">
-                {% csrf_token %}
-                
-                {% if form.non_field_errors %}
-                <div class="p-4 rounded-xl bg-red-500/20 border border-red-500/30">
-                    <p class="text-red-400 text-sm">{{ form.non_field_errors }}</p>
-                </div>
-                {% endif %}
-                
-                {% for field in form %}
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-2">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.errors %}
-                    <p class="text-red-400 text-sm mt-1">{{ field.errors }}</p>
-                    {% endif %}
-                </div>
-                {% endfor %}
-                
-                <button type="submit" class="w-full py-4 bg-gradient-to-r from-accent-500 to-neon-orange rounded-xl font-bold text-dark-900 hover:shadow-[0_0_30px_rgba(251,191,36,0.4)] transition-all duration-300 transform hover:scale-[1.02]">
-                    Create Account
-                </button>
-            </form>
-            
-            <div class="mt-8 text-center">
-                <p class="text-gray-400">Already have an account? 
-                    <a href="{% url 'login' %}" class="text-accent-400 hover:text-accent-300 font-medium transition-colors">Sign in</a>
-                </p>
-            </div>
-        </div>
-        
-        <p class="text-center text-sm text-gray-500 mt-8">&copy; 2024 RESTO. Crafted with fire.</p>
-    </div>
-</body>
-</html>
+<body class="bg-background text-on-background min-h-screen flex overflow-hidden">
+<div class="flex w-full min-h-screen relative">
+<div class="absolute inset-0 z-0 bg-surface-container-lowest">
+<img alt="Elegant restaurant interior" class="absolute inset-0 w-full h-full object-cover opacity-60" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABwLCmm_RHGO5xWSy-ITm5PhXB6NBZihaDCb3MFd-aQUR3TP5bHp86ILxv1xzg-H_L-vqmDSlS8rd_fi1m3gq-G5lKtas4NqBI4CFyJiL6WtwGrctYqis3Q0lUfGCDXUh-SEQ6ttBPcF4FFZxxmHsuC1a_s8X8cUTQBhR840BLiNQIdYh5f9wedLWRyao_rqMEF-vSB-ZS7yVXWseusiredZt37a5e8MZX9HKssgOoa04I8RFKH7hApF_r51edfETOVbJnpPwsPxQ"/>
+<div class="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-background/60"></div>
+<div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-background/0 to-background/0"></div>
+</div>
+<div class="flex w-full min-h-screen relative z-10">
+<div class="hidden lg:flex lg:w-5/12 relative flex-col justify-end p-xl pl-24 pb-32">
+<div class="mb-xl">
+<div class="w-12 h-[2px] bg-primary mb-md"></div>
+<h2 class="font-display-hero text-[56px] text-on-background mb-lg font-light leading-tight tracking-tight">Elevate Your<br/><i class="text-primary font-serif font-medium">Dining</i> Experience</h2>
+<p class="font-body-main text-[18px] text-on-surface-variant max-w-md font-light leading-relaxed">Join the world's most exclusive establishments using RestaurantOS to orchestrate unforgettable culinary journeys.</p>
+</div>
+</div>
+<div class="w-full lg:w-7/12 flex items-center justify-center p-md lg:p-xl">
+<div class="w-full max-w-[520px] glass-panel rounded-2xl p-lg sm:p-xl lg:p-[56px] relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/10 to-transparent pointer-events-none"></div>
+<div class="mb-12 text-center">
+<h1 class="font-h1-header text-[42px] gold-gradient-text mb-2 tracking-wide font-medium">RestaurantOS</h1>
+<p class="font-body-main text-[15px] text-on-surface-variant font-light">Create your management account</p>
+</div>
+{% if form.errors %}
+<div class="mb-lg p-md bg-error-container/20 border border-error/30 rounded-lg">
+<p class="font-body-sm text-body-sm text-error flex items-center gap-sm"><span class="material-symbols-outlined text-[18px]">error</span> Please correct the errors below.</p>
+</div>
+{% endif %}
+<form class="space-y-8 flex flex-col" method="post">
+{% csrf_token %}
+<div class="space-y-2">
+<label class="font-label-caps text-[11px] text-on-surface-variant uppercase tracking-[0.1em] ml-1 font-medium" for="username">Username / ID</label>
+<div class="relative group input-premium rounded-xl flex items-center h-[60px] px-md">
+<span class="material-symbols-outlined text-outline/50 group-focus-within:text-primary transition-colors text-[22px] font-light">person</span>
+<input class="w-full bg-transparent border-0 text-on-surface font-data-mono text-[14px] py-2 pl-4 pr-4 focus:outline-none focus:ring-0 placeholder-on-surface-variant/30" id="username" name="username" placeholder="e.g. m_scott_01" required="" type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-[11px] text-on-surface-variant uppercase tracking-[0.1em] ml-1 font-medium" for="password">Password</label>
+<div class="relative group input-premium rounded-xl flex items-center h-[60px] px-md">
+<span class="material-symbols-outlined text-outline/50 group-focus-within:text-primary transition-colors text-[22px] font-light">lock</span>
+<input class="w-full bg-transparent border-0 text-on-surface font-data-mono text-[14px] py-2 pl-4 pr-12 focus:outline-none focus:ring-0 placeholder-on-surface-variant/30 tracking-widest" id="password" name="password1" placeholder="••••••••" required="" type="password"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-[11px] text-on-surface-variant uppercase tracking-[0.1em] ml-1 font-medium" for="password-confirm">Confirm Password</label>
+<div class="relative group input-premium rounded-xl flex items-center h-[60px] px-md">
+<span class="material-symbols-outlined text-outline/50 group-focus-within:text-primary transition-colors text-[22px] font-light">lock_reset</span>
+<input class="w-full bg-transparent border-0 text-on-surface font-data-mono text-[14px] py-2 pl-4 pr-12 focus:outline-none focus:ring-0 placeholder-on-surface-variant/30 tracking-widest" id="password-confirm" name="password2" placeholder="••••••••" required="" type="password"/>
+</div>
+</div>
+<div class="pt-6">
+<button class="w-full btn-gold text-on-primary font-body-main font-medium py-[20px] px-lg rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background flex items-center justify-center gap-2 uppercase tracking-[0.1em] text-[13px]" type="submit">
+<span>Register Account</span>
+<span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+</div>
+</form>
+<div class="mt-10 text-center font-body-sm text-[14px] text-on-surface-variant/70">
+<span class="font-light">Already have an account?</span>
+<a class="text-primary hover:text-primary-fixed transition-colors ml-2 font-medium tracking-wide uppercase text-[12px]" href="{% url 'login' %}">Return to Login</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>

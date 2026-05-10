@@ -1,79 +1,236 @@
-{% extends 'restaurant/base.html' %}
-
-{% block title %}Tables{% endblock %}
-
-{% block content %}
-<div class="animate-fade-in">
-    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-10">
-        <div>
-            <h2 class="text-4xl font-bold text-white mb-2">Tables</h2>
-            <p class="text-gray-400">Manage your restaurant seating</p>
-        </div>
-        <div class="flex flex-wrap items-center gap-4">
-            <form method="get" class="relative flex-1 min-w-[250px]">
-                <input type="text" name="q" placeholder="Search tables..." value="{{ request.GET.q|default:'' }}"
-                    class="w-full px-4 py-3 pl-12 rounded-xl bg-dark-700 border border-white/10 text-white placeholder-gray-500 focus:border-accent-500/50 focus:shadow-[0_0_20px_rgba(251,191,36,0.2)] transition-all duration-300">
-                <svg class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                </svg>
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RestaurantOS - Tables</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&amp;family=Outfit:wght@400;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#ffd9dc",
+                        "surface-tint": "#e9c349",
+                        "primary-container": "#d4af37",
+                        "tertiary-container": "#ff94a1",
+                        "on-error": "#690005",
+                        "background": "#111316",
+                        "primary-fixed-dim": "#e9c349",
+                        "inverse-primary": "#735c00",
+                        "outline-variant": "#4d4635",
+                        "surface": "#111316",
+                        "on-primary-fixed-variant": "#574500",
+                        "surface-variant": "#333538",
+                        "primary-fixed": "#ffe088",
+                        "inverse-surface": "#e2e2e6",
+                        "surface-bright": "#37393d",
+                        "error-container": "#93000a",
+                        "on-secondary": "#003824",
+                        "on-primary": "#3c2f00",
+                        "surface-container-highest": "#333538",
+                        "on-background": "#e2e2e6",
+                        "secondary-fixed-dim": "#4edea3",
+                        "on-primary-container": "#554300",
+                        "on-tertiary-container": "#8e002f",
+                        "on-surface-variant": "#d0c5af",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#005236",
+                        "surface-container": "#1e2023",
+                        "surface-container-low": "#1a1c1f",
+                        "surface-container-lowest": "#0c0e11",
+                        "on-tertiary": "#670020",
+                        "secondary-container": "#00a572",
+                        "inverse-on-surface": "#2f3034",
+                        "on-tertiary-fixed": "#400010",
+                        "error": "#ffb4ab",
+                        "on-secondary-container": "#00311f",
+                        "surface-dim": "#111316",
+                        "on-surface": "#e2e2e6",
+                        "outline": "#99907c",
+                        "tertiary": "#ffbec4",
+                        "secondary": "#4edea3",
+                        "surface-container-high": "#282a2d",
+                        "on-secondary-fixed": "#002113",
+                        "tertiary-fixed-dim": "#ffb2ba",
+                        "on-tertiary-fixed-variant": "#910130",
+                        "secondary-fixed": "#6ffbbe",
+                        "primary": "#f2ca50",
+                        "on-primary-fixed": "#241a00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "md": "16px",
+                        "xl": "40px",
+                        "xs": "4px",
+                        "margin": "32px",
+                        "sm": "8px",
+                        "lg": "24px",
+                        "grid-columns": "12",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Outfit"],
+                        "body-main": ["Outfit"],
+                        "label-caps": ["Outfit"],
+                        "data-mono": ["JetBrains Mono"],
+                        "h1-header": ["Playfair Display"],
+                        "h2-subhead": ["Playfair Display"],
+                        "display-hero": ["Playfair Display"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "body-main": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-caps": ["11px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "data-mono": ["13px", { "lineHeight": "1.4", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+                        "h1-header": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "h2-subhead": ["24px", { "lineHeight": "1.4", "fontWeight": "500" }],
+                        "display-hero": ["48px", { "lineHeight": "1.2", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #111316;
+            color: #e2e2e6;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .floor-table-card:hover .floor-actions {
+            opacity: 1 !important;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        .animate-pulse-custom {
+            animation: pulse 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-main antialiased selection:bg-primary selection:text-on-primary">
+<nav class="fixed left-0 top-0 h-full flex flex-col z-50 bg-surface-container dark:bg-surface-container docked full-height left-0 w-64 border-r border-outline-variant/30 backdrop-blur-xl flat no shadows">
+<div class="p-lg border-b border-outline-variant/30">
+<h1 class="font-h2-subhead text-h2-subhead text-primary dark:text-primary">RestaurantOS</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Kitchen HQ</p>
+</div>
+<div class="flex-1 overflow-y-auto py-md flex flex-col gap-sm">
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors font-body-main text-body-main" href="{% url 'dashboard' %}">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-md bg-primary/10 text-primary border-r-2 border-primary py-3 px-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors font-body-main text-body-main Active: opacity-90 scale-[0.99] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="table_restaurant" style="font-variation-settings: 'FILL' 1;">table_restaurant</span>
+<span>Tables</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors font-body-main text-body-main" href="{% url 'menu_list' %}">
+<span class="material-symbols-outlined" data-icon="restaurant_menu">restaurant_menu</span>
+<span>Menu</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors font-body-main text-body-main" href="{% url 'order_list' %}">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span>Orders</span>
+</a>
+</div>
+<div class="p-md border-t border-outline-variant/30 flex flex-col gap-sm">
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors font-body-main text-body-main" href="{% url 'settings' %}">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-on-surface py-3 px-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors font-body-main text-body-main" href="{% url 'logout' %}">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span>Logout</span>
+</a>
+</div>
+</nav>
+<header class="fixed top-0 right-0 w-[calc(100%-16rem)] flex justify-between items-center px-margin py-md z-40 bg-surface/70 dark:bg-surface/70 border-b border-outline-variant/30 backdrop-blur-xl flat no shadows docked full-width top-0">
+<div class="flex items-center gap-xl">
+<span class="font-h1-header text-h1-header text-primary dark:text-primary">RestaurantOS</span>
+<nav class="hidden md:flex items-center gap-lg font-h2-subhead text-h2-subhead">
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors Click: glow-sm transition-all" href="{% url 'dashboard' %}">Overview</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex items-center gap-sm text-on-surface-variant">
+<button class="p-xs hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-xs hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+</div>
+<div class="flex items-center gap-sm border-l border-outline-variant/30 pl-md">
+<a href="{% url 'add_table' %}" class="px-md py-sm bg-transparent border border-outline-variant text-on-surface hover:text-primary hover:border-primary transition-colors font-body-sm text-body-sm rounded">Add Table</a>
+<a href="{% url 'add_order' %}" class="px-md py-sm bg-primary text-on-primary font-body-sm text-body-sm font-bold rounded hover:bg-primary-fixed transition-colors">Create Order</a>
+</div>
+</div>
+</header>
+<main class="ml-64 pt-[100px] p-margin min-h-screen">
+<div class="flex flex-wrap items-center justify-between gap-md mb-xl glass-panel p-md rounded-xl">
+<div class="flex items-center gap-md flex-1">
+            <form method="get" class="relative w-64" id="table-search-form">
+                <span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-sm pointer-events-none" data-icon="search">search</span>
+                <input name="q" value="{{ request.GET.q|default:'' }}" class="w-full bg-surface-container border border-outline-variant rounded py-sm pl-xl pr-sm text-on-surface font-data-mono text-data-mono focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder:text-on-surface-variant/50" placeholder="Search tables by number or seats..." type="text" oninput="this.form.submit()"/>
             </form>
-            <a href="{% url 'add_table' %}" class="group px-6 py-3 bg-gradient-to-r from-accent-500 to-neon-orange rounded-xl font-semibold text-dark-900 hover:shadow-[0_0_30px_rgba(251,191,36,0.4)] transition-all duration-300">
-                <span class="flex items-center gap-2">
-                    <svg class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                    </svg>
-                    Add Table
-                </span>
-            </a>
-        </div>
-    </div>
+<div class="flex items-center gap-sm">
+<span class="px-sm py-xs border border-outline-variant rounded font-label-caps text-label-caps text-on-surface-variant flex items-center gap-xs"><span class="w-2 h-2 rounded-full bg-secondary"></span> Available</span>
+<span class="px-sm py-xs border border-outline-variant rounded font-label-caps text-label-caps text-on-surface-variant flex items-center gap-xs"><span class="w-2 h-2 rounded-full bg-primary"></span> Occupied</span>
 </div>
-
-<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-    {% for table in tables %}
-    <div class="group relative glass-card rounded-2xl p-5 hover-lift border-glow">
-        <div class="absolute top-0 left-0 right-0 h-1 rounded-t-2xl {% if table.status == 'available' %}bg-gradient-to-r from-green-400 to-neon-green{% elif table.status == 'occupied' %}bg-gradient-to-r from-red-400 to-orange-500{% else %}bg-gradient-to-r from-gray-400 to-gray-500{% endif %}"></div>
-        <div class="flex items-center justify-between mb-4">
-            <span class="text-3xl font-bold text-white">#{{ table.number }}</span>
-            <span class="w-3 h-3 rounded-full {% if table.status == 'available' %}bg-green-400 shadow-[0_0_15px_rgba(0,255,136,0.6)]{% elif table.status == 'occupied' %}bg-red-400 shadow-[0_0_15px_rgba(255,68,68,0.6)]{% else %}bg-gray-400{% endif %} animate-pulse"></span>
-        </div>
-        <div class="flex items-center gap-2 mb-4">
-            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-            </svg>
-            <span class="text-gray-400">{{ table.seats }} seats</span>
-        </div>
-        <div class="flex items-center justify-between pt-3 border-t border-white/5">
-            <span class="text-xs font-medium px-2 py-1 rounded-lg capitalize {% if table.status == 'available' %}bg-green-500/20 text-green-400{% elif table.status == 'occupied' %}bg-red-500/20 text-red-400{% else %}bg-gray-500/20 text-gray-400{% endif %}">
-                {{ table.status }}
-            </span>
-            <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <a href="{% url 'update_table' table.id %}" class="p-2 rounded-lg bg-white/10 hover:bg-accent-500/30 transition-colors" title="Edit">
-                    <svg class="w-4 h-4 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                    </svg>
-                </a>
-                <a href="{% url 'delete_table' table.id %}" class="p-2 rounded-lg bg-white/10 hover:bg-red-500/30 transition-colors" title="Delete">
-                    <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                    </svg>
-                </a>
-            </div>
-        </div>
-    </div>
-    {% empty %}
-    <div class="col-span-full flex flex-col items-center justify-center py-20">
-        <div class="w-20 h-20 rounded-2xl bg-dark-600 flex items-center justify-center mb-6">
-            <svg class="w-10 h-10 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
-            </svg>
-        </div>
-        <h3 class="text-xl font-semibold text-white mb-2">No tables yet</h3>
-        <p class="text-gray-400 mb-6">Add tables to manage your seating</p>
-        <a href="{% url 'add_table' %}" class="px-6 py-3 bg-accent-500 rounded-xl font-semibold text-dark-900 hover:bg-accent-400 transition-colors">
-            Add First Table
-        </a>
-    </div>
-    {% endfor %}
 </div>
-{% endblock %}
+</div>
+<div class="bg-surface-container-low rounded-2xl p-lg border border-outline-variant/30 relative min-h-[700px] overflow-hidden shadow-inner">
+<div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px); background-size: 40px 40px;"></div>
+<div class="absolute top-0 left-1/4 w-1/2 h-4 bg-outline-variant/20 rounded-b-lg"></div>
+<div class="absolute top-lg left-1/4 w-1/2 text-center font-label-caps text-label-caps text-on-surface-variant/50 tracking-[0.2em]">KITCHEN PASS</div>
+<div class="absolute bottom-0 right-1/4 w-32 h-4 bg-outline-variant/20 rounded-t-lg"></div>
+<div class="absolute bottom-lg right-1/4 w-32 text-center font-label-caps text-label-caps text-on-surface-variant/50 tracking-[0.2em]">ENTRANCE</div>
+<div class="absolute left-0 top-1/2 w-4 h-1/3 -translate-y-1/2 bg-outline-variant/20 rounded-r-lg"></div>
+<div class="absolute left-lg top-1/2 -translate-y-1/2 -rotate-90 font-label-caps text-label-caps text-on-surface-variant/50 tracking-[0.2em] whitespace-nowrap">BAR AREA</div>
+<div class="relative z-10 w-full h-full p-8 min-h-[600px]">
+{% if tables %}
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+{% for table in tables %}
+{% with st=table.status %}
+<div class="floor-table-card bg-surface border-2 {% if st == 'free' %}border-secondary/40{% elif st == 'occupied' %}border-primary/50{% else %}border-outline-variant border-dashed{% endif %} rounded-xl flex flex-col items-center justify-center hover:bg-surface-container-high transition-all group cursor-pointer relative overflow-hidden min-h-[160px]">
+{% if st == 'occupied' %}<div class="absolute inset-0 bg-primary/5"></div>{% endif %}
+<span class="absolute top-3 right-3 w-3 h-3 rounded-full {% if st == 'free' %}bg-secondary shadow-[0_0_8px_rgba(78,222,163,0.8)]{% elif st == 'occupied' %}bg-primary shadow-[0_0_10px_rgba(242,202,80,1)] animate-pulse-custom{% else %}bg-outline{% endif %}"></span>
+<span class="font-data-mono {% if st == 'occupied' %}text-display-hero text-primary{% else %}text-h1-header text-on-surface{% endif %} group-hover:{% if st == 'free' %}text-secondary{% elif st == 'occupied' %}text-primary{% else %}text-on-surface{% endif %} transition-colors mb-xs">T{{ table.number }}</span>
+<div class="flex flex-col items-center {% if st == 'occupied' %}relative z-10{% endif %}">
+<span class="font-body-sm text-body-sm text-on-surface-variant">{{ table.seats }} Seats</span>
+{% if st == 'occupied' %}
+<span class="font-data-mono text-label-caps text-primary/80 mt-1">{{ st|capfirst }}</span>
+{% endif %}
+</div>
+<div class="floor-actions absolute inset-0 rounded-xl bg-surface/90 backdrop-blur-sm opacity-0 transition-opacity duration-200 flex items-center justify-center gap-3">
+<a href="{% url 'update_table' table.id %}" class="w-10 h-10 rounded-full bg-surface-bright border border-outline-variant/50 flex items-center justify-center text-on-surface hover:text-primary hover:border-primary transition-all"><span class="material-symbols-outlined text-sm">edit</span></a>
+<a href="{% url 'delete_table' table.id %}" class="w-10 h-10 rounded-full bg-error-container/20 border border-error/40 flex items-center justify-center text-error hover:bg-error-container/40 transition-all"><span class="material-symbols-outlined text-sm">delete</span></a>
+</div>
+</div>
+{% endwith %}
+{% endfor %}
+</div>
+{% else %}
+<div class="flex flex-col items-center justify-center min-h-[400px] gap-md">
+<span class="material-symbols-outlined text-6xl text-on-surface-variant/30">table_restaurant</span>
+<p class="font-body-main text-body-main text-on-surface-variant">No tables yet. Add your first table to get started.</p>
+<a href="{% url 'add_table' %}" class="px-md py-sm bg-primary text-on-primary font-body-sm text-body-sm font-bold rounded hover:bg-primary-fixed transition-colors">Add Table</a>
+</div>
+{% endif %}
+</div>
+</div>
+</main>
+</body></html>

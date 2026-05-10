@@ -1,147 +1,149 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - RESTO</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RestaurantOS - Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&amp;family=Playfair+Display:ital,wght@0,400..700;1,400..700&amp;family=Outfit:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #4d4635; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #99907c; }
+    </style>
+<script id="tailwind-config">
         tailwind.config = {
+            darkMode: "class",
             theme: {
                 extend: {
-                    colors: {
-                        dark: {
-                            900: '#0a0a0f',
-                            800: '#12121a',
-                            700: '#1a1a25',
-                            600: '#252532',
-                            500: '#32324a',
-                        },
-                        accent: {
-                            400: '#fbbf24',
-                            500: '#f59e0b',
-                            600: '#d97706',
-                        },
-                        neon: {
-                            cyan: '#00f5ff',
-                            magenta: '#ff00ff',
-                            green: '#00ff88',
-                            orange: '#ff6b35',
-                        }
+                    "colors": {
+                        "primary": "#f2ca50",
+                        "secondary-fixed": "#6ffbbe",
+                        "secondary-container": "#00a572",
+                        "on-surface": "#e2e2e6",
+                        "on-background": "#e2e2e6",
+                        "surface-container-high": "#282a2d",
+                        "tertiary": "#ffbec4",
+                        "on-primary-fixed-variant": "#574500",
+                        "background": "#111316",
+                        "on-primary": "#3c2f00",
+                        "inverse-on-surface": "#2f3034",
+                        "surface-container-low": "#1a1c1f",
+                        "on-primary-fixed": "#241a00",
+                        "on-secondary": "#003824",
+                        "surface-bright": "#37393d",
+                        "on-secondary-fixed-variant": "#005236",
+                        "surface-container": "#1e2023",
+                        "on-tertiary-container": "#8e002f",
+                        "error-container": "#93000a",
+                        "on-primary-container": "#554300",
+                        "secondary-fixed-dim": "#4edea3",
+                        "primary-container": "#d4af37",
+                        "tertiary-fixed-dim": "#ffb2ba",
+                        "on-secondary-fixed": "#002113",
+                        "on-error": "#690005",
+                        "tertiary-container": "#ff94a1",
+                        "on-tertiary-fixed-variant": "#910130",
+                        "surface": "#111316",
+                        "inverse-surface": "#e2e2e6",
+                        "surface-variant": "#333538",
+                        "surface-container-lowest": "#0c0e11",
+                        "outline": "#99907c",
+                        "surface-dim": "#111316",
+                        "on-tertiary": "#670020",
+                        "primary-fixed-dim": "#e9c349",
+                        "outline-variant": "#4d4635",
+                        "inverse-primary": "#735c00",
+                        "tertiary-fixed": "#ffd9dc",
+                        "on-secondary-container": "#00311f",
+                        "primary-fixed": "#ffe088",
+                        "on-tertiary-fixed": "#400010",
+                        "secondary": "#4edea3",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-highest": "#333538",
+                        "error": "#ffb4ab",
+                        "surface-tint": "#e9c349",
+                        "on-surface-variant": "#d0c5af"
                     },
-                    animation: {
-                        'glow': 'glow 2s ease-in-out infinite alternate',
-                        'float': 'float 3s ease-in-out infinite',
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                    }
+                    "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                    "spacing": { "gutter": "16px", "lg": "24px", "base": "4px", "xl": "40px", "sm": "8px", "md": "16px", "xs": "4px", "margin": "32px", "grid-columns": "12" },
+                    "fontFamily": { "label-caps": ["Outfit", "sans-serif"], "body-sm": ["Outfit", "sans-serif"], "h1-header": ["Playfair Display", "serif"], "display-hero": ["Playfair Display", "serif"], "h2-subhead": ["Playfair Display", "serif"], "data-mono": ["JetBrains Mono", "monospace"], "body-main": ["Outfit", "sans-serif"] },
+                    "fontSize": { "label-caps": ["11px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700" }], "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }], "h1-header": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }], "display-hero": ["48px", { "lineHeight": "1.2", "fontWeight": "700" }], "h2-subhead": ["24px", { "lineHeight": "1.4", "fontWeight": "500" }], "data-mono": ["13px", { "lineHeight": "1.4", "letterSpacing": "-0.02em", "fontWeight": "500" }], "body-main": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }] }
                 }
             }
         }
     </script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
-        
-        * {
-            font-family: 'Outfit', sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
-            min-height: 100vh;
-        }
-        
-        .glass {
-            background: rgba(26, 26, 37, 0.7);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        
-        .text-gradient {
-            background: linear-gradient(90deg, #fbbf24, #ff6b35, #fbbf24);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-size: 200% auto;
-            animation: shimmer 3s linear infinite;
-        }
-        
-        @keyframes shimmer {
-            to { background-position: 200% center; }
-        }
-        
-        .mesh-bg {
-            background: 
-                radial-gradient(at 40% 20%, rgba(251, 191, 36, 0.15) 0px, transparent 50%),
-                radial-gradient(at 80% 0%, rgba(0, 245, 255, 0.1) 0px, transparent 50%),
-                radial-gradient(at 0% 50%, rgba(255, 0, 255, 0.08) 0px, transparent 50%),
-                radial-gradient(at 80% 50%, rgba(0, 255, 136, 0.08) 0px, transparent 50%),
-                radial-gradient(at 0% 100%, rgba(255, 107, 53, 0.1) 0px, transparent 50%);
-        }
-        
-        input[type="text"], input[type="password"] {
-            background: rgba(26, 26, 37, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            transition: all 0.3s ease;
-        }
-        
-        input[type="text"]:focus, input[type="password"]:focus {
-            outline: none;
-            border-color: rgba(251, 191, 36, 0.5);
-            box-shadow: 0 0 20px rgba(251, 191, 36, 0.2);
-        }
-        
-        .glow-accent {
-            box-shadow: 0 0 30px rgba(251, 191, 36, 0.2), 0 0 60px rgba(251, 191, 36, 0.1);
-        }
-    </style>
 </head>
-<body class="text-white min-h-screen mesh-bg flex items-center justify-center p-4">
-    <div class="w-full max-w-md">
-        <div class="text-center mb-10 animate-fade-in">
-            <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-accent-400 to-neon-orange mb-6 glow-accent">
-                <svg class="w-10 h-10 text-dark-900" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H12a1 1 0 100-2H6.414a1 1 0 00-1.017.089l-.893.892a1 1 0 01-.894 0l-.894-.892A1 1 0 013 14H2V1z"/>
-                </svg>
-            </div>
-            <h1 class="text-4xl font-bold text-white mb-2">RESTO</h1>
-            <p class="text-gray-400">Welcome back! Sign in to continue.</p>
-        </div>
-        
-        <div class="glass rounded-2xl p-8 animate-slide-up">
-            <form method="post" class="space-y-6">
-                {% csrf_token %}
-                
-                {% if form.non_field_errors %}
-                <div class="p-4 rounded-xl bg-red-500/20 border border-red-500/30">
-                    <p class="text-red-400 text-sm">{{ form.non_field_errors }}</p>
-                </div>
-                {% endif %}
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-2">Username</label>
-                    <input type="text" name="username" required placeholder="Enter your username"
-                        class="w-full px-4 py-3 rounded-xl placeholder-gray-500">
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
-                    <input type="password" name="password" required placeholder="Enter your password"
-                        class="w-full px-4 py-3 rounded-xl placeholder-gray-500">
-                </div>
-                
-                <button type="submit" class="w-full py-4 bg-gradient-to-r from-accent-500 to-neon-orange rounded-xl font-bold text-dark-900 hover:shadow-[0_0_30px_rgba(251,191,36,0.4)] transition-all duration-300 transform hover:scale-[1.02]">
-                    Sign In
-                </button>
-            </form>
-            
-            <div class="mt-8 text-center">
-                <p class="text-gray-400">Don't have an account? 
-                    <a href="{% url 'register' %}" class="text-accent-400 hover:text-accent-300 font-medium transition-colors">Register here</a>
-                </p>
-            </div>
-        </div>
-        
-        <p class="text-center text-sm text-gray-500 mt-8">&copy; 2024 RESTO. Crafted with fire.</p>
-    </div>
-</body>
-</html>
+<body class="bg-background text-on-background font-body-main min-h-screen flex items-center justify-center relative overflow-hidden">
+<div class="absolute inset-0 z-0 bg-background">
+<div class="absolute inset-0 bg-[#0c0e11]/75 z-10 mix-blend-multiply"></div>
+<img alt="High-end restaurant interior" class="w-full h-full object-cover opacity-80 object-center" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAE2U4_DD87aq5sO2iRc_GnwKymruvnm4ONbP8kGjQAWNFa5YvMbqhFhCB7gSm09rDg3JQtONfXN-NJYe1S9oOanNRU5IO8B7NIhihRm3HHEM4TSYKp0umNcwShp5zHMg2_63EGUkR5zbgJjMjw-B0WAp2rMGKCcHPCBhMEQi5sCm3W3JCH_oiSJFEv8IYjpFoVtUY5Mz3uEVExGUxI9YgMucAhnJp-_drSKsR4gQ1tiCmvjGiNJVbzlmj3DFaR7Xrj8opgwpO8Qe8"/>
+</div>
+<div class="relative z-10 w-full max-w-md px-md">
+<div class="bg-surface-container-low/60 backdrop-blur-xl border border-primary-container/50 rounded-xl p-margin shadow-[0_16px_48px_rgba(0,0,0,0.8)]">
+<div class="flex flex-col items-center mb-xl">
+<div class="w-16 h-16 rounded-full bg-surface-container-high border border-primary-container/60 flex items-center justify-center mb-md shadow-[0_0_20px_rgba(212,175,55,0.2)]">
+<span class="material-symbols-outlined text-[32px] text-primary-container" style="font-variation-settings: 'FILL' 1;">restaurant_menu</span>
+</div>
+<h1 class="font-h1-header text-h1-header text-primary-container tracking-tight">RestaurantOS</h1>
+<p class="font-label-caps text-label-caps text-primary-container/80 mt-sm tracking-[0.2em] uppercase">Secure Access Terminal</p>
+</div>
+{% if form.errors %}
+<div class="mb-lg p-md bg-error-container/20 border border-error/30 rounded-lg">
+<p class="font-body-sm text-body-sm text-error flex items-center gap-sm"><span class="material-symbols-outlined text-[18px]">error</span> Invalid username or password. Please try again.</p>
+</div>
+{% endif %}
+<form class="flex flex-col gap-lg" method="post">
+{% csrf_token %}
+<div class="flex flex-col gap-sm">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase" for="username">Operator ID / Email</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline/80 text-[20px]">person</span>
+<input class="w-full bg-surface-container-lowest/70 border border-outline-variant/60 rounded-lg pl-12 pr-md py-3.5 font-data-mono text-data-mono text-on-surface focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container placeholder-outline/40 transition-all duration-300" id="username" name="username" placeholder="e.g. chef.smith@os" type="text"/>
+</div>
+</div>
+<div class="flex flex-col gap-sm">
+<div class="flex justify-between items-center">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase" for="password">Authorization Key</label>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline/80 text-[20px]">lock</span>
+<input class="w-full bg-surface-container-lowest/70 border border-outline-variant/60 rounded-lg pl-12 pr-12 py-3.5 font-data-mono text-data-mono text-on-surface focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container placeholder-outline/40 transition-all duration-300" id="password" name="password" placeholder="••••••••••••" type="password"/>
+</div>
+</div>
+<div class="flex items-center gap-sm mt-xs">
+<div class="relative flex items-center justify-center">
+<input class="peer appearance-none w-4 h-4 border border-outline-variant rounded bg-surface-container-lowest/50 checked:bg-gradient-to-br checked:from-primary-container checked:to-primary checked:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-container/30 transition-all cursor-pointer" id="remember" name="remember" type="checkbox"/>
+<span class="material-symbols-outlined absolute text-[14px] text-on-primary opacity-0 peer-checked:opacity-100 pointer-events-none" style="font-variation-settings: 'wght' 700;">check</span>
+</div>
+<label class="font-body-sm text-body-sm text-on-surface-variant cursor-pointer select-none" for="remember">Maintain secure session</label>
+</div>
+<button class="mt-sm w-full bg-gradient-to-r from-primary-container to-primary text-on-primary font-body-main font-semibold py-3.5 rounded-lg border border-transparent hover:shadow-[0_0_24px_rgba(212,175,55,0.4)] hover:brightness-110 transition-all duration-300 flex items-center justify-center gap-sm" type="submit">
+                    Authenticate
+                    <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+</form>
+<div class="flex items-center gap-md my-lg opacity-40">
+<div class="h-px flex-1 bg-outline-variant"></div>
+<span class="font-label-caps text-label-caps text-on-surface-variant">OR</span>
+<div class="h-px flex-1 bg-outline-variant"></div>
+</div>
+<div class="text-center">
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                    Unregistered terminal?
+                    <a class="text-primary-container hover:text-primary font-medium border-b border-primary-container/30 hover:border-primary transition-colors pb-xs" href="{% url 'register' %}">Request system access</a>
+</p>
+</div>
+</div>
+<div class="mt-lg flex justify-center items-center gap-sm opacity-80 backdrop-blur-sm py-2 px-4 rounded-full bg-surface-container-lowest/40 w-max mx-auto border border-outline-variant/20">
+<div class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_rgba(78,222,163,0.8)]"></div>
+<span class="font-data-mono text-[11px] text-on-surface-variant uppercase tracking-wider">System Operational - Core V.2.4</span>
+</div>
+</div>
+</body></html>
